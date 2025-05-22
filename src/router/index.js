@@ -1,11 +1,40 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import LoginView from '@/views/LoginView.vue'
-import MenuView from '@/views/MenuView.vue'
 
 const routes = [
-    { path: '/', redirect: '/login' },
-    { path: '/login', name: 'Login', component: LoginView },
-    { path: '/menu', name: 'Menu', component: MenuView }
+    {
+        path: '/login',
+        name: 'Login',
+        component: () => import('@/views/LoginView.vue'),
+        meta: { menu: false }
+    },
+    {
+        path: '/dashboard',
+        name: 'Dashboard',
+        component: () => import('@/views/DashboardView.vue'),
+        meta: { menu: true }
+    },
+    {
+        path: '/agenda',
+        name: 'Agenda',
+        component: () => import('@/views/AgendaView.vue'),
+        meta: { menu: true }
+    },
+    {
+        path: '/fluxo-de-caixa',
+        name: 'FluxoDeCaixa',
+        component: () => import('@/views/FluxoDeCaixa.vue'),
+        meta: { menu: true }
+    },
+    {
+        path: '/',
+        redirect: '/dashboard'
+    },
+    {
+        path: '/:catchAll(.*)',
+        name: 'NotFound',
+        component: () => import('@/views/NotFound.vue'),
+        meta: { menu: false }
+    }
 ]
 
 const router = createRouter({
@@ -14,14 +43,12 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-    const isAuthenticated = !!localStorage.getItem('token') // ou outra verificação
-
+    const isAuthenticated = !!localStorage.getItem('token')
     if (to.path !== '/login' && !isAuthenticated) {
         next('/login')
     } else {
         next()
     }
 })
-
 
 export default router

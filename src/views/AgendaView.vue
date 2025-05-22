@@ -25,9 +25,9 @@
         <span>Mês</span>
       </div>
       <div class="date-range">
-        <button><</button>
-        <strong>18/05 - 24/05</strong>
-        <button>></button>
+        <button></button>
+        <strong> 18/05 - 24/05</strong>
+        <button></button>
       </div>
     </section>
 

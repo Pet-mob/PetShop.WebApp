@@ -12,7 +12,6 @@
           v-model="cnpj"
           type="text"
           placeholder="00.000.000/0000-00"
-          required
         />
 
         <label for="senha">Senha</label>
@@ -21,7 +20,6 @@
           v-model="senha"
           type="password"
           placeholder="••••••••••"
-          required
         />
 
         <div class="remember">
@@ -59,10 +57,26 @@ const loading = ref(false)
 const handleLogin = async () => {
   loading.value = true
 
-  // Simulação
+  // Simulação de autenticação (futuro: substituir por chamada à API)
   setTimeout(() => {
+    if (cnpj.value === '00.000.000/0001-00' && senha.value === '123456') {
+      // Simula token
+      localStorage.setItem('token', 'fake-jwt-token')
+
+      // Se lembrar o login, salva o CNPJ
+      if (remember.value) {
+        localStorage.setItem('cnpj', cnpj.value)
+      } else {
+        localStorage.removeItem('cnpj')
+      }
+
+      // Redireciona após login
+      router.push('/dashboard') // ou '/menu'
+    } else {
+      alert('CNPJ ou senha inválidos')
+    }
+
     loading.value = false
-    router.push('/menu') // Redireciona para o menu após login
   }, 1000)
 }
 </script>

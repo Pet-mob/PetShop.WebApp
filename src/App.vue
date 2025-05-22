@@ -1,43 +1,18 @@
 <template>
-  <router-view /> <!-- Aqui o conteúdo das rotas será exibido -->
+  <div id="app">
+    <MenuView v-if="$route.meta.menu" />
+    <router-view />
+  </div>
 </template>
 
 <script setup>
-// Não é necessário código JS por enquanto
+import MenuView from '@/components/MenuView.vue'
 </script>
 
-<style>
-/* Estilos globais opcionais */
-body {
+body, html {
   margin: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f5f5f5;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: #f8f9fa;
+  color: #333;
 }
-</style>
-
-<!-- <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
-</template>
-
-<script>
-import HelloWorld from './components/HelloWorld.vue'
-
-export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
-</script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style> -->
