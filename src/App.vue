@@ -8,11 +8,13 @@
 <script setup>
 import MenuView from '@/components/MenuView.vue'
 </script>
-
-body, html {
+<style>
+html,
+body {
   margin: 0;
   padding: 0;
-  font-family: 'Inter', sans-serif;
-  background-color: #f8f9fa;
-  color: #333;
+  height: 100%;
+  width: 100%;
+
 }
+</style>

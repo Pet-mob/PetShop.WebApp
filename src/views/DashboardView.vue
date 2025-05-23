@@ -1,62 +1,71 @@
 <template>
-  <div class="p-6 space-y-6">
-    <h1 class="text-2xl font-bold text-gray-800">Dashboard</h1>
+  <div class="dashboard-container">
+    <h1>Bem-vindo ao <span class="highlight">Pet.ON</span></h1>
+    <p>Escolha uma opção no menu acima.</p>
 
-    <!-- Cards principais -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="bg-white p-4 rounded-2xl shadow-md">
-        <p class="text-gray-500">Pets agendados hoje</p>
-        <p class="text-2xl font-semibold text-indigo-600">12</p>
+    <div class="cards">
+      <div class="card">
+        <h2>Pets agendados hoje</h2>
+        <p>{{ petsHoje }}</p>
       </div>
-      <div class="bg-white p-4 rounded-2xl shadow-md">
-        <p class="text-gray-500">Serviços concluídos</p>
-        <p class="text-2xl font-semibold text-green-600">9</p>
+      <div class="card">
+        <h2>Serviços concluídos</h2>
+        <p>{{ servicosConcluidos }}</p>
       </div>
-      <div class="bg-white p-4 rounded-2xl shadow-md">
-        <p class="text-gray-500">Agendamentos para amanhã</p>
-        <p class="text-2xl font-semibold text-blue-600">15</p>
+      <div class="card">
+        <h2>Agendamentos para amanhã</h2>
+        <p>{{ agendamentosAmanha }}</p>
       </div>
-      <div class="bg-white p-4 rounded-2xl shadow-md">
-        <p class="text-gray-500">Próximo horário</p>
-        <p class="text-2xl font-semibold text-rose-600">14:30 - Banho (Thor)</p>
+      <div class="card">
+        <h2>Próximo horário</h2>
+        <p>{{ proximoHorario }}</p>
       </div>
     </div>
 
-    <!-- Gráfico de barras -->
-    <div class="bg-white p-4 rounded-2xl shadow-md">
-      <h2 class="text-lg font-semibold text-gray-800 mb-4">Serviços na última semana</h2>
-      <apexchart type="bar" height="300" :options="chartOptions" :series="series" />
+    <div class="grafico">
+      <h3>Serviços na última semana</h3>
+      <!-- Componente de gráfico aqui -->
     </div>
   </div>
 </template>
 
 <script setup>
-// import ApexCharts from 'apexcharts'
-// import VueApexCharts from 'vue3-apexcharts'
-
-const chartOptions = {
-  chart: {
-    id: 'servicos-bar'
-  },
-  xaxis: {
-    categories: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']
-  },
-  colors: ['#6366f1'],
-  plotOptions: {
-    bar: {
-      borderRadius: 6,
-      columnWidth: '40%'
-    }
-  }
-}
-
-const series = [
-  {
-    name: 'Serviços',
-    data: [10, 14, 8, 12, 15, 7, 4]
-  }
-]
+const petsHoje = 12
+const servicosConcluidos = 9
+const agendamentosAmanha = 15
+const proximoHorario = '14:30 - Banho (Thor)'
 </script>
 
 <style scoped>
+.dashboard-container {
+  padding: 2rem;
+}
+.highlight {
+  color: #6a1b9a;
+}
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+.card {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  text-align: center;
+}
+.card h2 {
+  font-size: 1rem;
+  color: #555;
+}
+.card p {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #333;
+}
+.grafico {
+  margin-top: 3rem;
+}
 </style>
