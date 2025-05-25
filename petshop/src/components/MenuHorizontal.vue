@@ -1,16 +1,30 @@
 <template>
     <nav class="top-menu">
         <div class="menu-left">
-            <router-link to="/inicio" class="nav-button" active-class="active-button">Início</router-link>
-            <router-link to="/agenda" class="nav-button" active-class="active-button">Agenda</router-link>
+            <router-link to="/inicio" class="nav-button" active-class="active-button">
+                <Home class="icon" />
+                <span>Início</span>
+            </router-link>
+
+            <router-link to="/agenda" class="nav-button" active-class="active-button">
+                <Calendar class="icon" />
+                <span>Agenda</span>
+            </router-link>
         </div>
+
         <div class="menu-right">
-            <router-link to="/configuracoes" class="nav-button" active-class="active-button">Configurações</router-link>
+            <router-link to="/configuracoes" class="nav-button" active-class="active-button">
+                <Settings class="icon" />
+                <span>Configurações</span>
+            </router-link>
+
             <img src="@/assets/perfil.png" class="profile-icon" alt="Perfil" />
         </div>
     </nav>
 </template>
-
+<script setup>
+import { Home, Calendar, Settings } from 'lucide-vue-next'
+</script>
 <style scoped>
 .top-menu {
     display: flex;
@@ -72,5 +86,12 @@
 
 .profile-icon:hover {
     transform: scale(1.05);
+}
+
+.icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 0.5rem;
+    vertical-align: middle;
 }
 </style>
