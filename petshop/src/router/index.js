@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import ConfiguracoesLayoutBase from '@/ui/layout/ConfiguracoesLayoutBase.vue'
 import configuracoesRoutes from '@/router/indexConfiguracoes'
 
+import { Settings } from 'lucide-vue-next'
+
 const routes = [
   {
     path: '/login',
@@ -25,7 +27,7 @@ const routes = [
     path: '/configuracoes',
     component: ConfiguracoesLayoutBase,
     children: configuracoesRoutes,
-    meta: { menu: true }
+    meta: { menu: true, icon: Settings },
   }
   // {
   //   path: '/fluxo-de-caixa',

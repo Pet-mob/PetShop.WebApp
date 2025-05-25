@@ -3,9 +3,9 @@
         <div class="menu-left">
             <router-link to="/inicio" class="nav-button" active-class="active-button">Início</router-link>
             <router-link to="/agenda" class="nav-button" active-class="active-button">Agenda</router-link>
-            <router-link to="/configuracoes" class="nav-button" active-class="active-button">Configurações</router-link>
         </div>
         <div class="menu-right">
+            <router-link to="/configuracoes" class="nav-button" active-class="active-button">Configurações</router-link>
             <img src="@/assets/perfil.png" class="profile-icon" alt="Perfil" />
         </div>
     </nav>
@@ -22,6 +22,12 @@
 }
 
 .menu-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.menu-right {
     display: flex;
     align-items: center;
     gap: 1.5rem;
