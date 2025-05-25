@@ -1,0 +1,176 @@
+/* ========== RESET ========== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ========== VARIÁVEIS DE TEMA ========== */
+:root {
+    --color-primary: #4CAF93;
+    --color-secondary: #7E57C2;
+    --color-accent: #FFA726;
+    --color-error: #E57373;
+    --color-bg: #F7F9FA;
+    --color-text: #333333;
+    --color-white: #ffffff;
+}
+
+/* ========== BASE ========== */
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Segoe UI', 'Roboto', sans-serif;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.6;
+}
+
+/* ========== CONTAINER ========== */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+/* ========== TIPOGRAFIA ========== */
+h1,
+h2,
+h3,
+h4 {
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: 0.5rem;
+}
+
+h1 {
+    font-size: 2rem;
+}
+
+h2 {
+    font-size: 1.75rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+}
+
+p {
+    margin-bottom: 1rem;
+    color: #555;
+}
+
+/* ========== LINKS ========== */
+a {
+    color: var(--color-secondary);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* ========== BOTÕES ========== */
+button {
+    padding: 0.6rem 1.2rem;
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+button:hover {
+    background-color: #3f947a;
+}
+
+/* ========== FORMULÁRIOS ========== */
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(76, 175, 147, 0.2);
+    outline: none;
+}
+
+/* ========== CARDS E BOXES ========== */
+.card {
+    background-color: var(--color-white);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1rem;
+}
+
+/* ========== UTILITÁRIOS ========== */
+.text-center {
+    text-align: center;
+}
+
+.mt-2 {
+    margin-top: 1rem;
+}
+
+.mb-2 {
+    margin-bottom: 1rem;
+}
+
+/* ========== NAV E FOOTER ========== */
+header,
+footer {
+    background-color: var(--color-white);
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+nav a {
+    margin-right: 1rem;
+    font-weight: 500;
+}
+
+/* ========== ALERTAS ========== */
+.alert {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.alert-success {
+    background-color: var(--color-primary);
+}
+
+.alert-error {
+    background-color: var(--color-error);
+}
+
+/* ========== RESPONSIVO ========== */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    h2 {
+        font-size: 1.25rem;
+    }
+
+    .container {
+        padding: 0.5rem;
+    }
+}
