@@ -1,18 +1,5 @@
 <template>
   <div class="agenda-semanal-container">
-    <!-- Filtro e Navegação -->
-    <div class="filtro-navegacao mb-6">
-      <div class="filtro">
-        <input v-model="dataFiltro" type="date" />
-        <button @click="aplicarFiltro">Aplicar</button>
-      </div>
-      <div class="navegacao-semana">
-        <button @click="voltarSemana">&lt;</button>
-        <span>{{ intervaloSemana }}</span>
-        <button @click="avancarSemana">&gt;</button>
-      </div>
-    </div>
-
     <!-- Cards Semanais -->
     <div class="cards-grid">
       <div v-for="(dia, i) in semana" :key="i" class="card">
@@ -38,7 +25,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import dayjs from 'dayjs'
 import 'dayjs/locale/pt-br'
 dayjs.locale('pt-br')
@@ -70,27 +57,6 @@ function gerarSemana(dataBase) {
 
 gerarSemana(dataFiltro.value)
 
-function aplicarFiltro() {
-  gerarSemana(dataFiltro.value)
-}
-
-function voltarSemana() {
-  const novaData = dayjs(dataFiltro.value).subtract(7, 'day')
-  dataFiltro.value = novaData.format('YYYY-MM-DD')
-  gerarSemana(dataFiltro.value)
-}
-
-function avancarSemana() {
-  const novaData = dayjs(dataFiltro.value).add(7, 'day')
-  dataFiltro.value = novaData.format('YYYY-MM-DD')
-  gerarSemana(dataFiltro.value)
-}
-
-const intervaloSemana = computed(() => {
-  const inicio = dayjs(dataFiltro.value).startOf('week').format('DD/MM')
-  const fim = dayjs(dataFiltro.value).endOf('week').format('DD/MM')
-  return `${inicio} - ${fim}`
-})
 </script>
 
 <style scoped>
@@ -98,69 +64,6 @@ const intervaloSemana = computed(() => {
   background-color: #f9fafb;
   min-height: 100vh;
   padding: 1.5rem;
-}
-
-/* Filtro e Navegação */
-.filtro-navegacao {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.filtro input[type='date'] {
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  border: 1px solid #d1d5db;
-  outline: none;
-  transition: border-color 0.3s ease;
-}
-
-.filtro input[type='date']:focus {
-  border-color: #7c3aed;
-  box-shadow: 0 0 5px rgba(124, 58, 237, 0.5);
-}
-
-.filtro button {
-  background-color: #7c3aed;
-  color: white;
-  border: none;
-  padding: 0.5rem 1.25rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin-left: 0.5rem;
-}
-
-.filtro button:hover {
-  background-color: #6d28d9;
-}
-
-/* Navegação da semana */
-.navegacao-semana {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  color: #7c3aed;
-  font-weight: 600;
-  font-size: 1.125rem;
-  user-select: none;
-}
-
-.navegacao-semana button {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0.4rem 0.8rem;
-  border-radius: 0.375rem;
-  transition: background-color 0.3s ease;
-}
-
-.navegacao-semana button:hover {
-  background-color: #ede9fe;
 }
 
 /* Grid dos cards */
