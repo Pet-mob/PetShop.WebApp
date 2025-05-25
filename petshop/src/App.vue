@@ -1,7 +1,12 @@
 <template>
-  <router-view />
+  <div id="app">
+    <MenuHorizontal v-if="$route.meta.menu" />
+    <router-view />
+  </div>
 </template>
-
+<script setup>
+import MenuHorizontal from '@/components/MenuHorizontal.vue'
+</script>
 <style>
 html,
 body {
