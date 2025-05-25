@@ -61,7 +61,6 @@ gerarSemana(dataFiltro.value)
 
 <style scoped>
 .agenda-semanal-container {
-  background-color: #f9fafb;
   min-height: 100vh;
   padding: 1.5rem;
 }
