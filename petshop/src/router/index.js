@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import ConfiguracoesLayoutBase from '@/ui/layout/ConfiguracoesLayoutBase.vue'
+import configuracoesRoutes from '@/router/indexConfiguracoes'
 
 const routes = [
   {
@@ -19,6 +21,12 @@ const routes = [
     component: () => import('@/pages/AgendaPage.vue'),
     meta: { menu: true }
   },
+  {
+    path: '/configuracoes',
+    component: ConfiguracoesLayoutBase,
+    children: configuracoesRoutes,
+    meta: { menu: true }
+  }
   // {
   //   path: '/fluxo-de-caixa',
   //   name: 'FluxoDeCaixa',

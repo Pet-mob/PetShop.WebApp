@@ -3,8 +3,6 @@
         <div class="menu-left">
             <router-link to="/inicio" class="nav-button" active-class="active-button">Início</router-link>
             <router-link to="/agenda" class="nav-button" active-class="active-button">Agenda</router-link>
-            <router-link to="/servicos" class="nav-button" active-class="active-button">Serviços</router-link>
-            <router-link to="/pets" class="nav-button" active-class="active-button">Pets</router-link>
             <router-link to="/configuracoes" class="nav-button" active-class="active-button">Configurações</router-link>
         </div>
         <div class="menu-right">
