@@ -30,7 +30,7 @@ import { Home, Calendar, Settings } from 'lucide-vue-next'
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #1e1e2f;
+    background-color: #dadada;
     padding: 1rem 2.5rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
@@ -49,7 +49,7 @@ import { Home, Calendar, Settings } from 'lucide-vue-next'
 
 .nav-button {
     background-color: transparent;
-    color: #ffffffcc;
+    color: #000000cc;
     border: 2px solid transparent;
     padding: 0.6rem 1.4rem;
     font-size: 1rem;
@@ -61,24 +61,24 @@ import { Home, Calendar, Settings } from 'lucide-vue-next'
 }
 
 .nav-button:hover {
-    background-color: #00d1b2;
+    background-color: #73aff0;
     color: #ffffff;
-    box-shadow: 0 0 10px #00d1b290;
+    box-shadow: 0 0 10px #73aff090;
     transform: translateY(-2px);
 }
 
 .active-button {
-    background-color: #00d1b2;
+    background-color: #73aff0;
     color: #ffffff;
-    border: 2px solid #00d1b2;
-    box-shadow: 0 0 12px #00d1b290;
+    border: 2px solid #73aff0;
+    box-shadow: 0 0 12px #73aff090;
 }
 
 .profile-icon {
     height: 40px;
     width: 40px;
     border-radius: 50%;
-    border: 2px solid #00d1b2;
+    border: 2px solid #73aff0;
     object-fit: cover;
     cursor: pointer;
     transition: transform 0.3s ease;
