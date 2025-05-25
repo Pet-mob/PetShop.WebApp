@@ -25,10 +25,6 @@
         <router-link to="/recuperar-senha" class="link">
           Esqueceu a senha?
         </router-link>
-
-        <a href="https://docs.peton.app" target="_blank" class="link">
-          Ver documentação do sistema
-        </a>
       </form>
     </div>
   </div>
@@ -73,7 +69,8 @@ const realizarLogin = async () => {
 
 <style scoped>
 .container-login {
-  background-color: #334d3c;
+  /* background-color: #1e1e2f; */
+  background-image: linear-gradient(90deg, #10b981, #1e1e2f);
   min-height: 100vh;
   display: flex;
   align-items: center;
