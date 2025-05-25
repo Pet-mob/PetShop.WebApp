@@ -8,8 +8,8 @@ const routes = [
     meta: { menu: false }
   },
   {
-    path: '/dashboard',
-    name: 'Dashboard',
+    path: '/inicio',
+    name: 'Inicio',
     component: () => import('@/pages/DashboardPage.vue'),
     meta: { menu: true }
   },

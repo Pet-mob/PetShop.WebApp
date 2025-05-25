@@ -7,22 +7,10 @@
 
       <form @submit.prevent="realizarLogin">
         <label for="cnpj">CNPJ</label>
-        <input
-          id="cnpj"
-          v-model="cnpj"
-          type="text"
-          placeholder="00.000.000/0000-00"
-          required
-        />
+        <input id="cnpj" v-model="cnpj" type="text" placeholder="00.000.000/0000-00" required />
 
         <label for="senha">Senha</label>
-        <input
-          id="senha"
-          v-model="senha"
-          type="password"
-          placeholder="Digite sua senha"
-          required
-        />
+        <input id="senha" v-model="senha" type="password" placeholder="Digite sua senha" required />
 
         <div class="lembrar-dados">
           <input type="checkbox" id="lembrar" v-model="lembrar" />
@@ -73,7 +61,7 @@ const realizarLogin = async () => {
         localStorage.removeItem('cnpj')
       }
 
-      router.push('/dashboard')
+      router.push('/inicio')
     } else {
       alert('CNPJ ou senha incorretos. Tente novamente.')
     }
@@ -90,7 +78,8 @@ const realizarLogin = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem; /* Adicionado padding para telas menores */
+  padding: 1rem;
+  /* Adicionado padding para telas menores */
   box-sizing: border-box;
 }
 
