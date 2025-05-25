@@ -13,12 +13,12 @@ const routes = [
     component: () => import('@/pages/DashboardPage.vue'),
     meta: { menu: true }
   },
-  // {
-  //   path: '/agenda',
-  //   name: 'Agenda',
-  //   component: () => import('@/views/AgendaView.vue'),
-  //   meta: { menu: true }
-  // },
+  {
+    path: '/agenda',
+    name: 'Agenda',
+    component: () => import('@/pages/AgendaPage.vue'),
+    meta: { menu: true }
+  },
   // {
   //   path: '/fluxo-de-caixa',
   //   name: 'FluxoDeCaixa',
