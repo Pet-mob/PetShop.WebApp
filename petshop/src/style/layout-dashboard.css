@@ -1,0 +1,26 @@
+/* Layout geral do painel */
+painel-dashboard {
+    padding: 2rem;
+    background-color: var(--cor-clara);
+    min-height: 100vh;
+}
+
+grade-dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+}
+
+cartao-dashboard {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+grafico-dashboard {
+    background-color: white;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}

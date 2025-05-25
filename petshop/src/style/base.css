@@ -1,0 +1,19 @@
+/* Variáveis globais de cor e estilo base */
+:root {
+    --cor-primaria: #10b981;
+    --cor-secundaria: #0ea5e9;
+    --cor-escura: #1e1e2f;
+    --cor-clara: #f3f4f6;
+    --cor-texto: #1f2937;
+    --cor-sucesso: #22c55e;
+    --cor-erro: #ef4444;
+}
+
+/* Estilo global do corpo */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--cor-clara);
+    color: var(--cor-texto);
+    margin: 0;
+    padding: 0;
+}

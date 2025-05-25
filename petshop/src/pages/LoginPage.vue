@@ -12,10 +12,10 @@
         <label for="senha">Senha</label>
         <input id="senha" v-model="senha" type="password" placeholder="Digite sua senha" required />
 
-        <div class="lembrar-dados">
+        <!-- <div class="lembrar-dados">
           <input type="checkbox" id="lembrar" v-model="lembrar" />
           <label for="lembrar">Lembrar meus dados</label>
-        </div>
+        </div> -->
 
         <button type="submit" :disabled="carregando">
           <span v-if="carregando">Entrando...</span>

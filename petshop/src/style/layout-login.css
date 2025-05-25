@@ -1,0 +1,17 @@
+/* Layout da tela de login */
+tela-login {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, var(--cor-primaria), var(--cor-secundaria));
+}
+
+cartao-login {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 420px;
+}

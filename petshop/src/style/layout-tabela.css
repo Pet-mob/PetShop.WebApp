@@ -1,0 +1,26 @@
+/* Layout para telas de listagem e consulta */
+container-tabela {
+    padding: 2rem;
+    background-color: #f9fafb;
+}
+
+tabela-padrao {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+tabela-padrao th,
+tabela-padrao td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+tabela-padrao th {
+    background-color: var(--cor-primaria);
+    color: white;
+}
