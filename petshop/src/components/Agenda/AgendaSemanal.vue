@@ -11,7 +11,7 @@
           <p class="section-title">Horários</p>
           <ul>
             <li v-for="(item, idx) in dia.horarios" :key="idx">
-              {{ item.hora }} - {{ item.pet }} - {{ item.usuario }}
+              {{ item.hora }} - {{ item.usuario }}
             </li>
           </ul>
         </section>
@@ -76,7 +76,7 @@ gerarSemana(dataFiltro.value)
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 /* Card */
