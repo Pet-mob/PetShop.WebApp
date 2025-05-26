@@ -66,15 +66,16 @@ gerarSemana(dataFiltro.value)
 </script>
 
 <style scoped>
+/* Container principal */
 .agenda-semanal-container {
   min-height: 10vh;
   padding: 1rem;
 }
 
-/* Grid dos cards */
+/* Grid responsivo */
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 1.5rem;
 }
 
@@ -95,13 +96,12 @@ gerarSemana(dataFiltro.value)
   box-shadow: 0 8px 20px #6b7280;
 }
 
-/* Header do card */
+/* Header */
 .card header {
   text-align: center;
   margin-bottom: 0.75rem;
 }
 
-/*NomeDaSemana*/
 .card header h3 {
   color: #374151; 
   font-weight: 550;
@@ -109,7 +109,6 @@ gerarSemana(dataFiltro.value)
   margin: 0;
 }
 
-/*dia*/
 .card header span {
   color: #6b7280;
   font-size: 0.875rem;
@@ -121,7 +120,6 @@ gerarSemana(dataFiltro.value)
   font-size: 0.875rem;
 }
 
-/*titulo Horarios*/
 .section-title {
   font-weight: 600;
   border-bottom: 1px solid #e5e7eb;
@@ -145,4 +143,5 @@ gerarSemana(dataFiltro.value)
   font-family: monospace;
   color: #6b7280;
 }
+
 </style>
