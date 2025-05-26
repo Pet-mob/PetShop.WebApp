@@ -7,7 +7,7 @@
       </header>
       <section>
         <p class="section-title">Total de Agendamentos: {{ dia.totalAgendamentos }}</p>
-        <p>Total Recebido: R$ {{ dia.valorTotal.toFixed(2) }}</p>
+        <p class="section-title">Total Recebido: R$ {{ dia.valorTotal.toFixed(2) }}</p>
       </section>
     </div>
   </div>
@@ -52,7 +52,7 @@ onMounted(() => {
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
 }
 .card:hover {
-  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.3);
+  box-shadow: 0 8px 20px #6b7280;
 }
 .card header {
   text-align: center;
