@@ -8,14 +8,10 @@
           <span>{{ dia.dataFormatada }}</span>
         </header>
         <section>
-          <p class="section-title">Serviços Agendados</p>
-          <p>Banho: {{ dia.banho }}</p>
-          <p>Tosa: {{ dia.tosa }}</p>
-
-          <p class="section-title" style="margin-top:1rem;">Horários</p>
+          <p class="section-title">Horários</p>
           <ul>
             <li v-for="(item, idx) in dia.horarios" :key="idx">
-              {{ item.hora }} - {{ item.pet }}
+              {{ item.hora }} - {{ item.pet }} - {{ item.usuario }}
             </li>
           </ul>
         </section>
@@ -46,9 +42,19 @@ function gerarSemana(dataBase) {
       banho: 2,
       tosa: 1,
       horarios: [
-        { hora: '09:00', pet: 'Rex' },
-        { hora: '11:00', pet: 'Bob' },
-        { hora: '15:00', pet: 'Luna' }
+        { hora: '08:00', pet: 'Rex', usuario: 'Rennan' },
+        { hora: '09:00', pet: 'Rex', usuario: 'Rennan' },
+        { hora: '10:00', pet: 'Rex', usuario: 'Rennan' },
+        { hora: '11:00', pet: 'Rex', usuario: 'Rennan' },
+        { hora: '12:00', pet: 'Rex', usuario: 'Rennan' },
+        { hora: '13:00', pet: 'Rex', usuario: 'Rennan' },
+        { hora: '14:00', pet: 'Bob', usuario: 'Sergio' },
+        { hora: '15:00', pet: 'Luna', usuario: 'Nathan' },
+        { hora: '16:00', pet: 'Luna', usuario: 'Nathan' },
+        { hora: '17:00', pet: 'Luna', usuario: 'Nathan' },
+        { hora: '18:00', pet: 'Luna', usuario: 'Nathan' },
+        { hora: '19:00', pet: 'Luna', usuario: 'Nathan' },
+        { hora: '20:00', pet: 'Luna', usuario: 'Nathan' }
       ]
     })
   }
@@ -61,15 +67,15 @@ gerarSemana(dataFiltro.value)
 
 <style scoped>
 .agenda-semanal-container {
-  min-height: 100vh;
-  padding: 1.5rem;
+  min-height: 10vh;
+  padding: 1rem;
 }
 
 /* Grid dos cards */
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
 }
 
 /* Card */
@@ -82,11 +88,11 @@ gerarSemana(dataFiltro.value)
   flex-direction: column;
   justify-content: space-between;
   transition: box-shadow 0.3s ease;
-  min-height: 180px;
+  min-height: 120px;
 }
 
 .card:hover {
-  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.3);
+  box-shadow: 0 8px 20px #6b7280;
 }
 
 /* Header do card */
@@ -95,13 +101,15 @@ gerarSemana(dataFiltro.value)
   margin-bottom: 0.75rem;
 }
 
+/*NomeDaSemana*/
 .card header h3 {
-  color: #7c3aed;
-  font-weight: 700;
+  color: #374151; 
+  font-weight: 550;
   font-size: 1.1rem;
   margin: 0;
 }
 
+/*dia*/
 .card header span {
   color: #6b7280;
   font-size: 0.875rem;
@@ -113,6 +121,7 @@ gerarSemana(dataFiltro.value)
   font-size: 0.875rem;
 }
 
+/*titulo Horarios*/
 .section-title {
   font-weight: 600;
   border-bottom: 1px solid #e5e7eb;
@@ -124,7 +133,7 @@ gerarSemana(dataFiltro.value)
   list-style: disc;
   padding-left: 1.2rem;
   margin: 0;
-  max-height: 100px;
+  max-height: 600px;
   overflow-y: auto;
 }
 
@@ -134,6 +143,6 @@ gerarSemana(dataFiltro.value)
   text-overflow: ellipsis;
   margin-bottom: 0.25rem;
   font-family: monospace;
-  color: #7c3aed;
+  color: #6b7280;
 }
 </style>
