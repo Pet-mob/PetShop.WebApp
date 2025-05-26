@@ -4,7 +4,7 @@ export default [
     {
         path: 'horarios-funcionamento',
         name: 'ConfigHorarios',
-        component: () => import('@/pages/Configuracoes/PetShopFuncionamento.vue'),
+        component: () => import('@/pages/Configuracoes/HorarioFuncionamento.vue'),
         meta: {
             label: 'Horários de Funcionamento',
             icon: Clock
