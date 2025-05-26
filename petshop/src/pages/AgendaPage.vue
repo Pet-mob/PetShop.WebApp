@@ -5,9 +5,9 @@
             <button :class="['tab-btn', { active: visualizacao === 'semanal' }]" @click="visualizacao = 'semanal'">
                 Semanal
             </button>
-            <button :class="['tab-btn', { active: visualizacao === 'mensal' }]" @click="visualizacao = 'mensal'">
+            <!-- <button :class="['tab-btn', { active: visualizacao === 'mensal' }]" @click="visualizacao = 'mensal'">
                 Mensal
-            </button>
+            </button> -->
         </div>
 
         <div class="filtro-navegacao mb-6">
@@ -41,7 +41,7 @@
         <!-- Exibe o componente conforme visualização -->
         <div>
             <AgendaSemanal v-if="visualizacao === 'semanal'" :data-base="dataFiltro" />
-            <AgendaMensal v-else :data-base="dataFiltro" />
+            <!-- <AgendaMensal v-else :data-base="dataFiltro" /> -->
         </div>
     </div>
 </template>
@@ -53,7 +53,7 @@ import 'dayjs/locale/pt-br'
 dayjs.locale('pt-br')
 
 import AgendaSemanal from '@/components/Agenda/AgendaSemanal.vue'
-import AgendaMensal from '@/components/Agenda/AgendaMensal.vue'
+// import AgendaMensal from '@/components/Agenda/AgendaMensal.vue'
 
 const visualizacao = ref('semanal')
 const dataFiltro = ref(dayjs().format('YYYY-MM-DD'))
