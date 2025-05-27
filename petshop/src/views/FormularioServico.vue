@@ -1,40 +1,41 @@
 <template>
   <form class="formulario-container" @submit.prevent="enviarFormulario">
     <div class="grupo-formulario">
-      <label for="nome" class="rotulo-formulario">Nome do Serviço</label>
-      <input
-        id="nome"
-        v-model="dados.nome"
-        type="text"
-        class="campo-texto"
-        placeholder="Ex: Banho e Tosa"
-        required
-      />
-    </div>
-
-    <div class="grupo-formulario">
-      <label for="descricao" class="rotulo-formulario">Descrição</label>
-      <textarea
-        id="descricao"
-        v-model="dados.descricao"
-        class="caixa-texto"
-        placeholder="Descrição detalhada do serviço"
-        rows="3"
-      ></textarea>
-    </div>
-
-    <div class="grupo-formulario">
-      <label for="preco" class="rotulo-formulario">Preço (R$)</label>
-      <input
-        id="preco"
-        v-model.number="dados.preco"
-        type="number"
-        class="campo-texto"
-        placeholder="Ex: 120.00"
-        min="0"
-        step="0.01"
-        required
-      />
+      <div class="linha-formulario">
+        <div class="campo-formulario">
+          <label for="nome" class="label-formulario">Nome do Serviço</label>
+          <input
+            id="nome"
+            v-model="dados.nome"
+            type="text"
+            class="campo-texto"
+            placeholder="Ex: Banho e Tosa"
+            required
+          />
+        </div>
+        <div class="campo-formulario">
+          <label for="preco" class="label-formulario">Preço (R$)</label>
+          <input
+            id="preco"
+            v-model.number="dados.preco"
+            type="number"
+            class="campo-texto"
+            placeholder="Ex: 120.00"
+            min="0"
+            step="0.01"
+            required
+          />
+        </div>
+        <div class="campo-formulario">
+          <label for="duracao" class="label-formulario">Duração (min)</label>
+          <input
+            id="duracao"
+            class="campo-texto"
+            v-model="dados.duracao"
+            type="number"
+          />
+        </div>
+      </div>
     </div>
 
     <div class="grupo-formulario">
@@ -56,35 +57,38 @@
 </template>
 
 <script setup>
-import { ref, watch, defineProps, defineEmits } from 'vue'
+import { ref, watch, defineProps, defineEmits } from "vue";
 
 const props = defineProps({
   dadosIniciais: {
     type: Object,
     default: () => ({
-      nome: '',
-      descricao: '',
+      nome: "",
+      duracao: 0,
       preco: 0,
-      ativo: true
-    })
+      ativo: true,
+    }),
   },
   botaoTexto: {
     type: String,
-    default: 'Salvar'
-  }
-})
+    default: "Salvar",
+  },
+});
 
-const emit = defineEmits(['salvar'])
+const emit = defineEmits(["salvar"]);
 
-const dados = ref({ ...props.dadosIniciais })
+const dados = ref({ ...props.dadosIniciais });
 
 // Atualiza local se dadosIniciais mudar
-watch(() => props.dadosIniciais, (novo) => {
-  dados.value = { ...novo }
-})
+watch(
+  () => props.dadosIniciais,
+  (novo) => {
+    dados.value = { ...novo };
+  }
+);
 
 function enviarFormulario() {
-  emit('salvar', { ...dados.value })
+  emit("salvar", { ...dados.value });
 }
 </script>
 
@@ -100,9 +104,12 @@ function enviarFormulario() {
   flex-direction: column;
 }
 
-.rotulo-formulario {
+.label-formulario {
   font-weight: 600;
   margin-bottom: 0.3rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .campo-texto,
@@ -149,5 +156,35 @@ function enviarFormulario() {
 
 .botao-principal:hover {
   background-color: #218838;
+}
+
+/* Formulário */
+.linha-formulario {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.campo-formulario {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.campo-formulario label {
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.campo-formulario input,
+.campo-formulario textarea {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.observacao {
+  flex: 1 1 100%;
 }
 </style>

@@ -3,7 +3,13 @@
     <div class="container-modal">
       <header class="cabecalho-modal">
         <h2 class="titulo-modal">{{ props.titulo }}</h2>
-        <button class="botao-fechar-modal" @click="fecharModal" aria-label="Fechar modal">×</button>
+        <button
+          class="botao-fechar-modal"
+          @click="fecharModal"
+          aria-label="Fechar modal"
+        >
+          ×
+        </button>
       </header>
       <section class="corpo-modal">
         <slot></slot>
@@ -16,27 +22,30 @@
 </template>
 
 <script setup>
-import { defineEmits, defineProps } from 'vue'
+import { defineEmits, defineProps } from "vue";
 
 const props = defineProps({
   titulo: {
     type: String,
-    default: 'Título do Modal'
-  }
-})
+    default: "Título do Modal",
+  },
+});
 
-const emit = defineEmits(['fechar'])
+const emit = defineEmits(["fechar"]);
 
 function fecharModal() {
-  emit('fechar')
+  emit("fechar");
 }
 </script>
 
 <style scoped>
 .sobreposicao-modal {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: rgba(0,0,0,0.5);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -46,13 +55,13 @@ function fecharModal() {
 .container-modal {
   background: white; /* Corrigido aqui */
   border-radius: 8px;
-  max-width: 500px;
-  width: 90%;
+  /* max-width: 500px; */
+  /* width: 90%; aumentar cada vez que estiver montando a modal */
   max-height: 90vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 .cabecalho-modal {
