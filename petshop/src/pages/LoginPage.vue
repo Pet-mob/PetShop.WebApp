@@ -88,7 +88,7 @@ onMounted(() => {
 });
 
 const realizarLogin = async () => {
-  // carregando.value = true;
+  carregando.value = true;
 
   try {
     const resultado = await loginService.validarLogin(cnpj.value, senha.value);
