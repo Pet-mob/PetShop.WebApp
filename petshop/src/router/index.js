@@ -24,9 +24,9 @@ const routes = [
     meta: { menu: true },
   },
   {
-    path: "/recupera-senha",
-    name: "RecuperaSenha",
-    component: () => import("@/pages/RecuperaSenhaPage.vue"),
+    path: "/recuperar-senha",
+    name: "RecuperarSenha",
+    component: () => import("@/pages/RecuperarSenhaPage.vue"),
     meta: { menu: false },
   },
   {
