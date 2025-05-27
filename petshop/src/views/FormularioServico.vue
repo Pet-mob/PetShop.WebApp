@@ -98,6 +98,7 @@ function enviarFormulario() {
 
 .linha-formulario {
   display: flex;
+  text-align: left;
   gap: 1rem;
   flex-wrap: wrap;
 }
