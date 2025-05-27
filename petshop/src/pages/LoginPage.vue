@@ -48,7 +48,9 @@ import { useRouter } from "vue-router";
 import loginService from "@/services/loginService";
 import Toast from "@/components/ToastCustomizado.vue";
 import LoadingPetON from "@/components/LoadingPetON.vue";
+import useCnpjFormatado from "@/composables/useCnpjFormatado";
 
+const { cnpj, cnpjSemFormatacao, formatarCnpj } = useCnpjFormatado();
 const toastMessage = ref("");
 const toastType = ref("info");
 
@@ -58,26 +60,9 @@ function showToast(msg, type = "info") {
 }
 
 const router = useRouter();
-
-const cnpj = ref("");
 const senha = ref("");
 const lembrar = ref(false);
 const carregando = ref(false);
-
-function formatarCnpj(event) {
-  let valor = event.target.value;
-
-  // Remove tudo que não for número
-  valor = valor.replace(/\D/g, "").slice(0, 14);
-
-  // Aplica a máscara
-  valor = valor.replace(/^(\d{2})(\d)/, "$1.$2");
-  valor = valor.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
-  valor = valor.replace(/\.(\d{3})(\d)/, ".$1/$2");
-  valor = valor.replace(/(\d{4})(\d)/, "$1-$2");
-
-  cnpj.value = valor;
-}
 
 onMounted(() => {
   const cnpjSalvo = localStorage.getItem("cnpj");
@@ -91,7 +76,10 @@ const realizarLogin = async () => {
   carregando.value = true;
 
   try {
-    const resultado = await loginService.validarLogin(cnpj.value, senha.value);
+    const resultado = await loginService.validarLogin(
+      cnpjSemFormatacao.value,
+      senha.value
+    );
 
     // Supondo que a API retorna { token: '...' }
     localStorage.setItem("token", resultado.token);
