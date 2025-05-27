@@ -1,40 +1,38 @@
 <template>
   <form class="formulario-container" @submit.prevent="enviarFormulario">
-    <div class="grupo-formulario">
-      <div class="linha-formulario">
-        <div class="campo-formulario">
-          <label for="nome" class="label-formulario">Nome do Serviço</label>
-          <input
-            id="nome"
-            v-model="dados.nome"
-            type="text"
-            class="campo-texto"
-            placeholder="Ex: Banho e Tosa"
-            required
-          />
-        </div>
-        <div class="campo-formulario">
-          <label for="preco" class="label-formulario">Preço (R$)</label>
-          <input
-            id="preco"
-            v-model.number="dados.preco"
-            type="number"
-            class="campo-texto"
-            placeholder="Ex: 120.00"
-            min="0"
-            step="0.01"
-            required
-          />
-        </div>
-        <div class="campo-formulario">
-          <label for="duracao" class="label-formulario">Duração (min)</label>
-          <input
-            id="duracao"
-            class="campo-texto"
-            v-model="dados.duracao"
-            type="number"
-          />
-        </div>
+    <div class="linha-formulario">
+      <div class="campo-formulario flex2">
+        <label for="nome" class="label-formulario">Nome do Serviço</label>
+        <input
+          id="nome"
+          v-model="dados.nome"
+          type="text"
+          class="campo-texto"
+          placeholder="Ex: Banho e Tosa"
+          required
+        />
+      </div>
+      <div class="campo-formulario flex1">
+        <label for="preco" class="label-formulario">Preço (R$)</label>
+        <input
+          id="preco"
+          v-model.number="dados.preco"
+          type="number"
+          class="campo-texto"
+          placeholder="Ex: 120.00"
+          min="0"
+          step="0.01"
+          required
+        />
+      </div>
+      <div class="campo-formulario flex1">
+        <label for="duracao" class="label-formulario">Duração (min)</label>
+        <input
+          id="duracao"
+          v-model="dados.duracao"
+          type="number"
+          class="campo-texto"
+        />
       </div>
     </div>
 
@@ -79,7 +77,6 @@ const emit = defineEmits(["salvar"]);
 
 const dados = ref({ ...props.dadosIniciais });
 
-// Atualiza local se dadosIniciais mudar
 watch(
   () => props.dadosIniciais,
   (novo) => {
@@ -99,21 +96,33 @@ function enviarFormulario() {
   gap: 1rem;
 }
 
-.grupo-formulario {
-  display: flex;
-  flex-direction: column;
-}
-
-.label-formulario {
-  font-weight: 600;
-  margin-bottom: 0.3rem;
+.linha-formulario {
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
 }
 
-.campo-texto,
-.caixa-texto {
+.campo-formulario {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex2 {
+  flex: 2;
+  min-width: 200px;
+}
+
+.flex1 {
+  flex: 1;
+  min-width: 120px;
+}
+
+.label-formulario {
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+.campo-texto {
   border: 1px solid #ccc;
   border-radius: 6px;
   padding: 0.5rem 0.75rem;
@@ -121,70 +130,37 @@ function enviarFormulario() {
   font-size: 1rem;
 }
 
-.campo-texto:focus,
-.caixa-texto:focus {
+.campo-texto:focus {
   outline: none;
   border-color: #28a745;
   box-shadow: 0 0 3px #28a745;
-  background-color: branco;
-}
-
-.caixa-texto {
-  resize: vertical;
+  background-color: white;
 }
 
 .grupo-checkbox {
-  flex-direction: row;
+  display: flex;
   align-items: center;
+  gap: 0.5rem;
   cursor: pointer;
 }
 
 .caixa-checkbox {
-  margin-right: 0.5rem;
+  margin: 0;
 }
 
 .botao-principal {
   background-color: #28a745;
-  color: branco;
+  color: white;
   padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 6px;
   font-weight: 700;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  align-self: flex-start;
 }
 
 .botao-principal:hover {
   background-color: #218838;
-}
-
-/* Formulário */
-.linha-formulario {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  flex-wrap: wrap;
-}
-
-.campo-formulario {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.campo-formulario label {
-  margin-bottom: 0.25rem;
-  font-weight: 500;
-}
-
-.campo-formulario input,
-.campo-formulario textarea {
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.observacao {
-  flex: 1 1 100%;
 }
 </style>
