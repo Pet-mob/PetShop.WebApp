@@ -102,8 +102,8 @@ const realizarLogin = async () => {
       localStorage.removeItem("cnpj");
     }
 
-    router.push("/inicio");
     showToast("Login realizado com sucesso!", "success");
+    router.push("/inicio");
   } catch (err) {
     console.log(err);
     showToast(
