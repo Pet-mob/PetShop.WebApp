@@ -1,157 +1,203 @@
 <template>
-  <div class="dados-petshop">
-    <!-- Cabeçalho -->
-    <div class="header">
-      <button class="back-button" @click="voltar">
-        <i class="icon">←</i>
-      </button>
-      <h1 class="title">Dados da Conta</h1>
+  <div class="empresa-container">
+    <h2 class="titulo">Dados da Empresa</h2>
+
+    <div class="empresa-fotos">
+      <div class="foto-bloco">
+        <label class="foto-perfil">
+          <img :src="perfilUrl" alt="Logo da empresa" />
+          <input type="file" @change="onFotoPerfilChange" hidden />
+        </label>
+        <div class="foto-legenda">Logo da empresa</div>
+      </div>
+
+      <div class="foto-bloco">
+        <label class="foto-capa">
+          <img :src="capaUrl" alt="Foto de capa" />
+          <input type="file" @change="onFotoCapaChange" hidden />
+        </label>
+        <div class="foto-legenda">Foto de capa</div>
+        <div class="foto-descricao">
+          Essa imagem será exibida para o usuário ao visualizar sua empresa na
+          agenda de serviços.
+        </div>
+      </div>
     </div>
 
-    <div class="body-container">
-      <!-- Foto do usuário -->
-      <div class="foto-container" @click="selecionarFoto">
-        <img
-          :src="foto || '/logoPetON.png'"
-          class="foto"
-          alt="Foto do Petshop"
-        />
-        <p class="texto-foto">Alterar Foto</p>
+    <form class="formulario" @submit.prevent="salvar">
+      <div class="linha">
+        <div class="campo">
+          <label for="nome">Nome da Empresa</label>
+          <input type="text" id="nome" v-model="empresa.nome" required />
+        </div>
+        <div class="campo">
+          <label for="cnpj">CNPJ</label>
+          <input type="text" id="cnpj" v-model="empresa.cnpj" required />
+        </div>
       </div>
 
-      <div class="input-container">
-        <label>Razão/Fantasia:</label>
-        <input v-model="nome" placeholder="Digite Razão social/Fantasia" />
+      <div class="linha">
+        <div class="campo">
+          <label for="email">Email</label>
+          <input type="email" id="email" v-model="empresa.email" required />
+        </div>
+        <div class="campo">
+          <label for="telefone">Telefone</label>
+          <input type="tel" id="telefone" v-model="empresa.telefone" required />
+        </div>
       </div>
 
-      <div class="input-container">
-        <label>CNPJ:</label>
-        <input v-model="cnpj" placeholder="Digite seu CNPJ" />
+      <div class="botoes">
+        <button type="submit" class="btn">Salvar</button>
       </div>
-
-      <div class="input-container">
-        <label>Email:</label>
-        <input v-model="email" placeholder="Digite seu email" type="email" />
-      </div>
-
-      <div class="input-container">
-        <label>Telefone:</label>
-        <input v-model="telefone" placeholder="Digite seu telefone" />
-      </div>
-
-      <button class="botao-salvar">Salvar</button>
-    </div>
+    </form>
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
-import { useRouter } from "vue-router";
 
-const router = useRouter();
+const empresa = ref({
+  nome: "",
+  cnpj: "",
+  email: "",
+  telefone: "",
+});
 
-const nome = ref("Rennan Pet Shop");
-const cnpj = ref("123.456.789/0001-22");
-const email = ref("rennanpetshop@email.com");
-const telefone = ref("(11) 98765-4321");
-const foto = ref(null);
+const perfilUrl = ref("https://via.placeholder.com/100"); // logo
+const capaUrl = ref(""); // capa
 
-const voltar = () => {
-  router.back();
+const onFotoPerfilChange = (e) => {
+  const file = e.target.files[0];
+  if (file) perfilUrl.value = URL.createObjectURL(file);
 };
 
-const selecionarFoto = () => {
-  const input = document.createElement("input");
-  input.type = "file";
-  input.accept = "image/*";
-  input.onchange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      foto.value = URL.createObjectURL(file);
-    }
-  };
-  input.click();
+const onFotoCapaChange = (e) => {
+  const file = e.target.files[0];
+  if (file) capaUrl.value = URL.createObjectURL(file);
 };
+
+function salvar() {
+  console.log("Empresa:", empresa.value);
+}
 </script>
 
 <style scoped>
-.dados-petshop {
+.empresa-container {
+  width: 100%;
+
+  padding: 32px;
   background: #fff;
-  min-height: 100vh;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
 
-.header {
+.titulo {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 32px;
+  color: #333;
+  text-align: left;
+}
+
+.empresa-fotos {
   display: flex;
+  gap: 48px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.foto-bloco {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  border-bottom: 1px solid #ccc;
-  position: relative;
 }
 
-.back-button {
-  position: absolute;
-  left: 1rem;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-}
-
-.title {
-  font-size: 1.25rem;
-  font-weight: bold;
-}
-
-.body-container {
-  padding: 1rem;
-}
-
-.foto-container {
-  text-align: center;
-  margin-bottom: 1.5rem;
+.foto-perfil img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
   cursor: pointer;
 }
 
-.foto {
-  width: 150px;
-  height: 150px;
-  border-radius: 75px;
-  background-color: #e0e0e0;
+.foto-capa img {
+  width: 400px;
+  height: 100px;
+  border-radius: 8px;
   object-fit: cover;
+  border: 2px solid #ccc;
+  cursor: pointer;
 }
 
-.texto-foto {
-  color: #007bff;
-  margin-top: 0.5rem;
+.foto-legenda {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
 }
 
-.input-container {
-  margin-bottom: 1rem;
+.foto-descricao {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+  max-width: 400px;
 }
 
-.input-container label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
-.input-container input {
-  width: 100%;
-  padding: 0.75rem;
+.linha {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.campo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.campo label {
+  margin-bottom: 6px;
+  font-weight: 500;
+  font-size: 14px;
+  color: #333;
+  text-align: left;
+}
+
+.campo input {
+  padding: 10px;
   border: 1px solid #ccc;
   border-radius: 8px;
-  background: #f9f9f9;
+  font-size: 14px;
+  background-color: #fefefe;
 }
 
-.botao-salvar {
-  background-color: #28a745;
+.botoes {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.btn {
+  padding: 10px 24px;
+  background-color: #4caf50;
   color: white;
-  padding: 0.75rem;
   border: none;
   border-radius: 8px;
-  width: 100%;
-  font-weight: bold;
+  font-size: 15px;
   cursor: pointer;
-  margin-top: 1.5rem;
+  transition: 0.2s;
+}
+
+.btn:hover {
+  background-color: #43a047;
 }
 </style>
