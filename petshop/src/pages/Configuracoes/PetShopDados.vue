@@ -56,6 +56,8 @@
 
 <script setup>
 import { ref } from "vue";
+import perfilPadrao from "@/assets/perfil.png";
+import fotoCapaPadrao from "@/assets/LogoEscrita.png";
 
 const empresa = ref({
   nome: "",
@@ -64,8 +66,8 @@ const empresa = ref({
   telefone: "",
 });
 
-const perfilUrl = ref("https://via.placeholder.com/100");
-const capaUrl = ref("https://via.placeholder.com/400x100");
+const perfilUrl = ref(perfilPadrao);
+const capaUrl = ref(fotoCapaPadrao);
 
 const onFotoPerfilChange = (e) => {
   const file = e.target.files[0];
