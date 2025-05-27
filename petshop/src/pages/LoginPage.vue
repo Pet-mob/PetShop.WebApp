@@ -1,26 +1,38 @@
 <template>
   <div class="container-login">
-    <div class="card-login">
+    <!-- Exibe o loading se estiver carregando -->
+    <LoadingPetON v-if="carregando" />
+
+    <!-- Oculta o card de login durante o loading -->
+    <div class="card-login" v-else>
       <img src="@/assets/LogoPetON.png" alt="Logo Pet.ON" class="logo" />
       <h2>Bem-vindo</h2>
       <p>Faça login com seu CNPJ e senha cadastrados.</p>
 
       <form @submit.prevent="realizarLogin">
         <label for="cnpj">CNPJ</label>
-        <input id="cnpj" v-model="cnpj" type="text" placeholder="00.000.000/0000-00" required />
+        <input
+          id="cnpj"
+          v-model="cnpj"
+          @input="formatarCnpj"
+          type="text"
+          placeholder="00.000.000/0000-00"
+          required
+          maxlength="18"
+        />
 
         <label for="senha">Senha</label>
-        <input id="senha" v-model="senha" type="password" placeholder="Digite sua senha" required />
+        <input
+          id="senha"
+          v-model="senha"
+          type="password"
+          placeholder="Digite sua senha"
+          required
+        />
 
-        <!-- <div class="lembrar-dados">
-          <input type="checkbox" id="lembrar" v-model="lembrar" />
-          <label for="lembrar">Lembrar meus dados</label>
-        </div> -->
+        <button type="submit">Entrar</button>
 
-        <button type="submit" :disabled="carregando">
-          <span v-if="carregando">Entrando...</span>
-          <span v-else>Entrar</span>
-        </button>
+        <Toast :message="toastMessage" :type="toastType" />
 
         <router-link to="/recuperar-senha" class="link">
           Esqueceu a senha?
@@ -31,40 +43,77 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import loginService from "@/services/loginService";
+import Toast from "@/components/ToastCustomizado.vue";
+import LoadingPetON from "@/components/LoadingPetON.vue";
 
-const router = useRouter()
+const toastMessage = ref("");
+const toastType = ref("info");
 
-const cnpj = ref('')
-const senha = ref('')
-const lembrar = ref(false)
-const carregando = ref(false)
+function showToast(msg, type = "info") {
+  toastMessage.value = msg;
+  toastType.value = type;
+}
+
+const router = useRouter();
+
+const cnpj = ref("");
+const senha = ref("");
+const lembrar = ref(false);
+const carregando = ref(false);
+
+function formatarCnpj(event) {
+  let valor = event.target.value;
+
+  // Remove tudo que não for número
+  valor = valor.replace(/\D/g, "").slice(0, 14);
+
+  // Aplica a máscara
+  valor = valor.replace(/^(\d{2})(\d)/, "$1.$2");
+  valor = valor.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
+  valor = valor.replace(/\.(\d{3})(\d)/, ".$1/$2");
+  valor = valor.replace(/(\d{4})(\d)/, "$1-$2");
+
+  cnpj.value = valor;
+}
+
+onMounted(() => {
+  const cnpjSalvo = localStorage.getItem("cnpj");
+  if (cnpjSalvo) {
+    cnpj.value = cnpjSalvo;
+    lembrar.value = true;
+  }
+});
 
 const realizarLogin = async () => {
-  carregando.value = true
+  // carregando.value = true;
 
-  setTimeout(() => {
-    const cnpjValido = '00.000.000/0001-00'
-    const senhaValida = '123456'
+  try {
+    const resultado = await loginService.validarLogin(cnpj.value, senha.value);
 
-    if (cnpj.value === cnpjValido && senha.value === senhaValida) {
-      localStorage.setItem('token', 'fake-jwt-token')
+    // Supondo que a API retorna { token: '...' }
+    localStorage.setItem("token", resultado.token);
 
-      if (lembrar.value) {
-        localStorage.setItem('cnpj', cnpj.value)
-      } else {
-        localStorage.removeItem('cnpj')
-      }
-
-      router.push('/inicio')
+    if (lembrar.value) {
+      localStorage.setItem("cnpj", cnpj.value);
     } else {
-      alert('CNPJ ou senha incorretos. Tente novamente.')
+      localStorage.removeItem("cnpj");
     }
 
-    carregando.value = false
-  }, 1000)
-}
+    router.push("/inicio");
+    showToast("Login realizado com sucesso!", "success");
+  } catch (err) {
+    console.log(err);
+    showToast(
+      err.response?.data?.message || "CNPJ ou senha incorretos.",
+      "error"
+    );
+  } finally {
+    carregando.value = false;
+  }
+};
 </script>
 
 <style scoped>
