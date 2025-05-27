@@ -2,8 +2,8 @@
   <div class="empresa-container">
     <h2 class="titulo">Dados da Empresa</h2>
 
-    <div class="empresa-fotos">
-      <div class="foto-bloco">
+    <div class="empresa-fotos-linha">
+      <div class="foto-perfil-bloco">
         <label class="foto-perfil">
           <img :src="perfilUrl" alt="Logo da empresa" />
           <input type="file" @change="onFotoPerfilChange" hidden />
@@ -11,15 +11,15 @@
         <div class="foto-legenda">Logo da empresa</div>
       </div>
 
-      <div class="foto-bloco">
+      <div class="foto-capa-bloco">
         <label class="foto-capa">
           <img :src="capaUrl" alt="Foto de capa" />
           <input type="file" @change="onFotoCapaChange" hidden />
         </label>
         <div class="foto-legenda">Foto de capa</div>
         <div class="foto-descricao">
-          Essa imagem será exibida para o usuário ao visualizar sua empresa na
-          agenda de serviços.
+          Essa imagem será exibida no aplicativo quando o usuário for agendar um
+          horário com sua empresa.
         </div>
       </div>
     </div>
@@ -64,8 +64,8 @@ const empresa = ref({
   telefone: "",
 });
 
-const perfilUrl = ref("https://via.placeholder.com/100"); // logo
-const capaUrl = ref(""); // capa
+const perfilUrl = ref("https://via.placeholder.com/100");
+const capaUrl = ref("https://via.placeholder.com/400x100");
 
 const onFotoPerfilChange = (e) => {
   const file = e.target.files[0];
@@ -84,8 +84,7 @@ function salvar() {
 
 <style scoped>
 .empresa-container {
-  width: 100%;
-
+  max-width: 100%;
   padding: 32px;
   background: #fff;
   border-radius: 12px;
@@ -100,22 +99,27 @@ function salvar() {
   text-align: left;
 }
 
-.empresa-fotos {
+.empresa-fotos-linha {
   display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   gap: 48px;
+  width: 100%;
   margin-bottom: 40px;
   flex-wrap: wrap;
 }
 
-.foto-bloco {
+.foto-perfil-bloco,
+.foto-capa-bloco {
   display: flex;
   flex-direction: column;
   align-items: center;
+  flex: 1;
 }
 
 .foto-perfil img {
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #ccc;
@@ -123,8 +127,9 @@ function salvar() {
 }
 
 .foto-capa img {
-  width: 400px;
-  height: 100px;
+  width: 100%;
+  max-width: 480px;
+  height: 120px;
   border-radius: 8px;
   object-fit: cover;
   border: 2px solid #ccc;
@@ -143,7 +148,7 @@ function salvar() {
   font-size: 12px;
   color: #666;
   text-align: center;
-  max-width: 400px;
+  max-width: 480px;
 }
 
 .formulario {
