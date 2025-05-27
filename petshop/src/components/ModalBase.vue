@@ -2,7 +2,7 @@
   <div class="sobreposicao-modal" @click.self="fecharModal">
     <div class="container-modal">
       <header class="cabecalho-modal">
-        <h2 class="titulo-modal">{{ titulo }}</h2>
+        <h2 class="titulo-modal">{{ props.titulo }}</h2>
         <button class="botao-fechar-modal" @click="fecharModal" aria-label="Fechar modal">×</button>
       </header>
       <section class="corpo-modal">
@@ -16,14 +16,14 @@
 </template>
 
 <script setup>
-import { defineEmits, /*defineProps*/ } from 'vue'
+import { defineEmits, defineProps } from 'vue'
 
-// const props = defineProps({
-//   titulo: {
-//     type: String,
-//     default: 'Título do Modal'
-//   }
-// })
+const props = defineProps({
+  titulo: {
+    type: String,
+    default: 'Título do Modal'
+  }
+})
 
 const emit = defineEmits(['fechar'])
 
@@ -44,7 +44,7 @@ function fecharModal() {
 }
 
 .container-modal {
-  background: branco;
+  background: white; /* Corrigido aqui */
   border-radius: 8px;
   max-width: 500px;
   width: 90%;
@@ -52,6 +52,7 @@ function fecharModal() {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
 .cabecalho-modal {
