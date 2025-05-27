@@ -36,16 +36,41 @@
       </div>
     </div>
 
-    <div class="grupo-formulario">
-      <label for="ativo" class="grupo-checkbox">
+    <!-- Linha: Observação -->
+    <div class="linha-formulario">
+      <div class="campo-formulario flex2">
+        <label for="observacao" class="label-formulario">Observação</label>
+        <textarea
+          id="observacao"
+          v-model="dados.observacao"
+          rows="2"
+          class="campo-texto"
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Linha: Possui Oferta | Valor da Oferta -->
+    <div class="linha-formulario">
+      <div class="campo-formulario">
+        <label class="checkbox-container">
+          <input type="checkbox" v-model="dados.possuiOferta" />
+          <span class="checkmark"></span>
+          Possui Oferta
+        </label>
+      </div>
+
+      <div class="campo-formulario" v-if="dados.possuiOferta">
+        <label for="valorOferta" class="label-formulario"
+          >Valor da Oferta</label
+        >
         <input
-          id="ativo"
-          v-model="dados.ativo"
-          type="checkbox"
-          class="caixa-checkbox"
+          id="valorOferta"
+          v-model="dados.valorOferta"
+          type="number"
+          step="0.01"
+          class="campo-texto"
         />
-        Serviço Ativo
-      </label>
+      </div>
     </div>
 
     <button type="submit" class="botao-principal">
@@ -64,7 +89,9 @@ const props = defineProps({
       nome: "",
       duracao: 0,
       preco: 0,
-      ativo: true,
+      observacao: "",
+      possuiOferta: false,
+      valorOferta: 0,
     }),
   },
   botaoTexto: {
@@ -163,5 +190,64 @@ function enviarFormulario() {
 
 .botao-principal:hover {
   background-color: #218838;
+}
+
+/*checkbox*/
+.checkbox-container {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  padding-left: 2rem;
+  cursor: pointer;
+  font-size: 1rem;
+  user-select: none;
+}
+
+/* Oculta o checkbox original */
+.checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Caixa customizada */
+.checkmark {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 20px;
+  width: 20px;
+  background-color: #eee;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  transition: 0.2s ease;
+}
+
+/* Quando selecionado */
+.checkbox-container input:checked ~ .checkmark {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+/* Check branco */
+.checkmark::after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 6px;
+  top: 2px;
+  width: 6px;
+  height: 12px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Exibe quando marcado */
+.checkbox-container input:checked ~ .checkmark::after {
+  display: block;
 }
 </style>
