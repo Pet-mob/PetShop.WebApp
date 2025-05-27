@@ -34,9 +34,9 @@
 
         <Toast :message="toastMessage" :type="toastType" />
 
-        <router-link to="/recuperar-senha" class="link">
+        <!-- <router-link to="/recuperar-senha" class="link">
           Esqueceu a senha?
-        </router-link>
+        </router-link> -->
       </form>
     </div>
   </div>
