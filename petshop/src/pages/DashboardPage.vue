@@ -27,18 +27,60 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import GraficoServicos from '../components/GraficoServicos.vue'
+import { ref, onMounted } from "vue";
+import GraficoServicos from "../components/GraficoServicos.vue";
+import { useGlobalStore } from "@/store/useGlobalStore";
+import empresaService from "@/services/empresaService";
+import dashboardService from "@/services/dashboardService";
 
-const petsAgendadosHoje = ref(12)
-const servicosConcluidos = ref(9)
-const agendamentosAmanha = ref(15)
-const proximoHorario = ref('14:30 - Banho (Thor)')
+const store = useGlobalStore();
 
-// Dados reais do gráfico (exemplo dinâmico)
-const dadosSemana = ref([5, 8, 6, 10, 7, 9, 12])
+// Refs reativos
+const carregando = ref(false);
+const petsAgendadosHoje = ref(0);
+const servicosConcluidos = ref(0);
+const agendamentosAmanha = ref(0);
+const proximoHorario = ref("Nenhum horário");
+const dadosSemana = ref([]);
+
+onMounted(async () => {
+  await buscarEmpresaLogadaPorCnpj();
+});
+
+const buscarEmpresaLogadaPorCnpj = async () => {
+  try {
+    carregando.value = true;
+
+    const empresa = await empresaService.buscarEmpresa(store.cnpjLogado);
+    if (empresa) {
+      store.definirObjetoEmpresaLogada(empresa[0]);
+      const dashboard = await buscarDashboard(empresa[0].idEmpresa);
+
+      if (dashboard) {
+        petsAgendadosHoje.value = dashboard.petsAgendadosHoje || 0;
+        servicosConcluidos.value = dashboard.servicosConcluidos || 0;
+        agendamentosAmanha.value = dashboard.agendamentosAmanha || 0;
+        proximoHorario.value = dashboard.proximoHorario || "Nenhum horário";
+        dadosSemana.value = dashboard.graficoSemanal || [0, 0, 0, 0, 0, 0, 0];
+      }
+    }
+  } catch (error) {
+    console.error("Erro ao carregar dashboard:", error);
+  } finally {
+    carregando.value = false;
+  }
+};
+
+const buscarDashboard = async (idEmpresaParam) => {
+  try {
+    const dataAtual = new Date(); // ou new Date().toISOString()
+    return await dashboardService.buscarDashboard(dataAtual, idEmpresaParam);
+  } catch (error) {
+    console.error("Erro ao buscar dashboard:", error);
+    return null;
+  }
+};
 </script>
-
 
 <style scoped>
 .container-dashboard {

@@ -3,7 +3,7 @@ import { ref } from "vue";
 
 export const useGlobalStore = defineStore("global", () => {
   // Dados auxiliares e constantes globais
-  const empresa = ref({});
+  const empresaLogada = ref({});
   const cnpjLogado = ref("");
 
   // Funções utilitárias
@@ -11,9 +11,14 @@ export const useGlobalStore = defineStore("global", () => {
     cnpjLogado.value = param;
   }
 
+  function definirObjetoEmpresaLogada(param) {
+    empresaLogada.value = param;
+  }
+
   return {
-    empresa,
+    empresaLogada,
     cnpjLogado,
     definirCnpjLogado,
+    definirObjetoEmpresaLogada,
   };
 });
