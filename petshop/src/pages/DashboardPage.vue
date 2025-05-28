@@ -1,27 +1,33 @@
 <template>
   <div class="container-dashboard">
-    <div class="cartoes">
-      <section class="cartao">
-        <h2>Pets agendados hoje</h2>
-        <p>{{ petsAgendadosHoje }}</p>
-      </section>
-      <section class="cartao">
-        <h2>Serviços concluídos</h2>
-        <p>{{ servicosConcluidos }}</p>
-      </section>
-      <section class="cartao">
-        <h2>Agendamentos para amanhã</h2>
-        <p>{{ agendamentosAmanha }}</p>
-      </section>
-      <section class="cartao">
-        <h2>Próximo horário</h2>
-        <p>{{ proximoHorario }}</p>
-      </section>
-    </div>
+    <!-- Exibe o loading se estiver carregando -->
+    <LoadingPetON v-if="carregando" />
+    <!-- Oculta o card de login durante o loading -->
+    <div v-else>
+      <div class="cartoes">
+        <section class="cartao">
+          <h2>Pets agendados hoje</h2>
+          <p>{{ petsAgendadosHoje }}</p>
+        </section>
+        <section class="cartao">
+          <h2>Serviços concluídos</h2>
+          <p>{{ servicosConcluidos }}</p>
+        </section>
+        <section class="cartao">
+          <h2>Agendamentos para amanhã</h2>
+          <p>{{ agendamentosAmanha }}</p>
+        </section>
+        <section class="cartao">
+          <h2>Próximo horário</h2>
+          <p>{{ proximoHorario }}</p>
+        </section>
+      </div>
 
-    <div class="grafico">
-      <h3>Serviços na última semana</h3>
-      <GraficoServicos :dadosSemana="dadosSemana" />
+      <div class="grafico">
+        <h3>Serviços na última semana</h3>
+        <GraficoServicos :dadosSemana="dadosSemana" />
+      </div>
+      <Toast :message="toastMessage" :type="toastType" />
     </div>
   </div>
 </template>
@@ -32,6 +38,8 @@ import GraficoServicos from "../components/GraficoServicos.vue";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import empresaService from "@/services/empresaService";
 import dashboardService from "@/services/dashboardService";
+import Toast from "@/components/ToastCustomizado.vue";
+import LoadingPetON from "@/components/LoadingPetON.vue";
 
 const store = useGlobalStore();
 
@@ -42,10 +50,17 @@ const servicosConcluidos = ref(0);
 const agendamentosAmanha = ref(0);
 const proximoHorario = ref("Nenhum horário");
 const dadosSemana = ref([]);
+const toastMessage = ref("");
+const toastType = ref("info");
 
 onMounted(async () => {
   await buscarEmpresaLogadaPorCnpj();
 });
+
+function showToast(msg, type = "info") {
+  toastMessage.value = msg;
+  toastType.value = type;
+}
 
 const buscarEmpresaLogadaPorCnpj = async () => {
   try {
@@ -65,7 +80,10 @@ const buscarEmpresaLogadaPorCnpj = async () => {
       }
     }
   } catch (error) {
-    console.error("Erro ao carregar dashboard:", error);
+    showToast(
+      error.response?.data?.message || "Erro ao carregar dashboard",
+      "error"
+    );
   } finally {
     carregando.value = false;
   }

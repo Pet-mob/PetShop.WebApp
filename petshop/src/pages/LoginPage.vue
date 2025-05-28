@@ -96,7 +96,6 @@ const realizarLogin = async () => {
     showToast("Login realizado com sucesso!", "success");
     router.push("/inicio");
   } catch (err) {
-    console.log(err);
     showToast(
       err.response?.data?.message || "CNPJ ou senha incorretos.",
       "error"
