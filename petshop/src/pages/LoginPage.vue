@@ -49,7 +49,9 @@ import loginService from "@/services/loginService";
 import Toast from "@/components/ToastCustomizado.vue";
 import LoadingPetON from "@/components/LoadingPetON.vue";
 import useCnpjFormatado from "@/composables/useCnpjFormatado";
+import { useGlobalStore } from "@/store/useGlobalStore";
 
+const store = useGlobalStore();
 const { cnpj, cnpjSemFormatacao, formatarCnpj } = useCnpjFormatado();
 const toastMessage = ref("");
 const toastType = ref("info");
@@ -90,6 +92,7 @@ const realizarLogin = async () => {
       localStorage.removeItem("cnpj");
     }
 
+    store.definirCnpjLogado(cnpjSemFormatacao.value);
     showToast("Login realizado com sucesso!", "success");
     router.push("/inicio");
   } catch (err) {
