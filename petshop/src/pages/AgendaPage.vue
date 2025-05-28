@@ -1,118 +1,124 @@
 <template>
-    <div class="agenda-container p-6 bg-gray-50 min-h-screen">
-        <!-- Abas de Visualização -->
-        <div class="tabs mb-6">
-            <button :class="['tab-btn', { active: visualizacao === 'semanal' }]" @click="visualizacao = 'semanal'">
-                Semanal
-            </button>
-            <!-- <button :class="['tab-btn', { active: visualizacao === 'mensal' }]" @click="visualizacao = 'mensal'">
+  <div class="agenda-container p-6 bg-gray-50 min-h-screen">
+    <!-- Abas de Visualização -->
+    <div class="tabs mb-6">
+      <button
+        :class="['tab-btn', { active: visualizacao === 'semanal' }]"
+        @click="visualizacao = 'semanal'"
+      >
+        Semanal
+      </button>
+      <!-- <button :class="['tab-btn', { active: visualizacao === 'mensal' }]" @click="visualizacao = 'mensal'">
                 Mensal
             </button> -->
-        </div>
-
-        <div class="filtro-navegacao mb-6">
-            <!-- Esconde input date, só abre no clique no label -->
-            <input
-                ref="inputData"
-                v-model="dataFiltro"
-                type="date"
-                class="input-date-hidden"
-                @change="aplicarFiltro"
-            />
-            <div class="navegacao-central">
-                <button @click="voltarSemana" v-if="visualizacao === 'semanal'">&lt;</button>
-                <button @click="voltarMes" v-else>&lt;</button>
-
-                <label
-                    class="label-data"
-                    @click="abrirCalendario"
-                    tabindex="0"
-                    @keydown.enter.prevent="abrirCalendario"
-                    @keydown.space.prevent="abrirCalendario"
-                >
-                    {{ visualizacao === 'semanal' ? intervaloSemana : intervaloMes }}
-                </label>
-
-                <button @click="avancarSemana" v-if="visualizacao === 'semanal'">&gt;</button>
-                <button @click="avancarMes" v-else>&gt;</button>
-            </div>
-        </div>
-
-        <!-- Exibe o componente conforme visualização -->
-        <div>
-            <AgendaSemanal v-if="visualizacao === 'semanal'" :data-base="dataFiltro" />
-            <!-- <AgendaMensal v-else :data-base="dataFiltro" /> -->
-        </div>
     </div>
+
+    <div class="filtro-navegacao mb-6">
+      <!-- Esconde input date, só abre no clique no label -->
+      <input
+        ref="inputData"
+        v-model="dataFiltro"
+        type="date"
+        class="input-date-hidden"
+        @change="aplicarFiltro"
+      />
+      <div class="navegacao-central">
+        <button @click="voltarSemana" v-if="visualizacao === 'semanal'">
+          &lt;
+        </button>
+        <button @click="voltarMes" v-else>&lt;</button>
+
+        <label
+          class="label-data"
+          @click="abrirCalendario"
+          tabindex="0"
+          @keydown.enter.prevent="abrirCalendario"
+          @keydown.space.prevent="abrirCalendario"
+        >
+          {{ visualizacao === "semanal" ? intervaloSemana : intervaloMes }}
+        </label>
+
+        <button @click="avancarSemana" v-if="visualizacao === 'semanal'">
+          &gt;
+        </button>
+        <button @click="avancarMes" v-else>&gt;</button>
+      </div>
+    </div>
+
+    <!-- Exibe o componente conforme visualização -->
+    <div>
+      <AgendaSemanal
+        v-if="visualizacao === 'semanal'"
+        :data-base="dataFiltro"
+      />
+      <!-- <AgendaMensal v-else :data-base="dataFiltro" /> -->
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import dayjs from 'dayjs'
-import 'dayjs/locale/pt-br'
-dayjs.locale('pt-br')
+import { ref, computed } from "vue";
+import dayjs from "dayjs";
+import "dayjs/locale/pt-br";
+dayjs.locale("pt-br");
 
-import AgendaSemanal from '@/components/Agenda/AgendaSemanal.vue'
+import AgendaSemanal from "@/components/Agenda/AgendaSemanal.vue";
 // import AgendaMensal from '@/components/Agenda/AgendaMensal.vue'
 
-const visualizacao = ref('semanal')
-const dataFiltro = ref(dayjs().format('YYYY-MM-DD'))
+const visualizacao = ref("semanal");
+const dataFiltro = ref(dayjs().format("YYYY-MM-DD"));
 
 // const dataFiltro = ref(dayjs().format('YYYY-MM-DD'))
-const inputData = ref(null)
+const inputData = ref(null);
 
 function abrirCalendario() {
   if (inputData.value) {
-    inputData.value.showPicker?.() // showPicker é suporte novo e mais direto em alguns browsers
-    inputData.value.focus()
+    inputData.value.showPicker?.(); // showPicker é suporte novo e mais direto em alguns browsers
+    inputData.value.focus();
   }
-}
-
-function aplicarFiltro() {
-  // já atualiza dataFiltro pelo v-model, aqui você pode fazer lógica extra se quiser
 }
 
 // Semana (para navegação e exibição do intervalo)
 const intervaloSemana = computed(() => {
-    const inicio = dayjs(dataFiltro.value).startOf('week').format('DD/MM')
-    const fim = dayjs(dataFiltro.value).endOf('week').format('DD/MM')
-    return `${inicio} - ${fim}`
-})
+  const inicio = dayjs(dataFiltro.value).startOf("week").format("DD/MM");
+  const fim = dayjs(dataFiltro.value).endOf("week").format("DD/MM");
+  return `${inicio} - ${fim}`;
+});
 
 // Mês (para navegação mensal)
 const intervaloMes = computed(() => {
-    return dayjs(dataFiltro.value).format('MMMM [de] YYYY')
-})
+  return dayjs(dataFiltro.value).format("MMMM [de] YYYY");
+});
 
-// function aplicarFiltro() {
-//     // Já atualizou dataFiltro pelo v-model, só dispara recarregamento no filho
-//     // Como dataFiltro é reactivo e passado via props, filhos atualizam automaticamente
-// }
+function aplicarFiltro() {
+  // Já atualizou dataFiltro pelo v-model, só dispara recarregamento no filho
+  // Como dataFiltro é reactivo e passado via props, filhos atualizam automaticamente
+}
 
 function voltarSemana() {
-    const novaData = dayjs(dataFiltro.value).subtract(7, 'day')
-    dataFiltro.value = novaData.format('YYYY-MM-DD')
+  const novaData = dayjs(dataFiltro.value).subtract(7, "day");
+  dataFiltro.value = novaData.format("YYYY-MM-DD");
 }
 
 function avancarSemana() {
-    const novaData = dayjs(dataFiltro.value).add(7, 'day')
-    dataFiltro.value = novaData.format('YYYY-MM-DD')
+  const novaData = dayjs(dataFiltro.value).add(7, "day");
+  dataFiltro.value = novaData.format("YYYY-MM-DD");
 }
 
 function voltarMes() {
-    const novaData = dayjs(dataFiltro.value).subtract(1, 'month')
-    dataFiltro.value = novaData.format('YYYY-MM-DD')
+  const novaData = dayjs(dataFiltro.value).subtract(1, "month");
+  dataFiltro.value = novaData.format("YYYY-MM-DD");
 }
 
 function avancarMes() {
-    const novaData = dayjs(dataFiltro.value).add(1, 'month')
-    dataFiltro.value = novaData.format('YYYY-MM-DD')
+  const novaData = dayjs(dataFiltro.value).add(1, "month");
+  dataFiltro.value = novaData.format("YYYY-MM-DD");
 }
 </script>
 
 <style scoped>
-.agenda-container {    
-    min-height: 10vh;
+.agenda-container {
+  min-height: 10vh;
 }
 
 .filtro-navegacao {
@@ -132,30 +138,30 @@ function avancarMes() {
 
 /* Tabs */
 .tabs {
-    display: flex;
-    justify-content: left;
-    padding: 1.5rem;
+  display: flex;
+  justify-content: left;
+  padding: 1.5rem;
 }
 
 .tab-btn {
-    background: transparent;
-    border: none;
-    border-bottom: 4px solid transparent;
-    padding: 0.5rem 1.5rem;
-    margin: 0 0.75rem;
-    font-weight: 600;
-    color: #6b7280;
-    cursor: pointer;
-    transition: all 0.3s ease;
+  background: transparent;
+  border: none;
+  border-bottom: 4px solid transparent;
+  padding: 0.5rem 1.5rem;
+  margin: 0 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .tab-btn:hover {
-    color: #000000;
+  color: #000000;
 }
 
 .tab-btn.active {
-    border-bottom-color: #000000;
-    color: #000000;
+  border-bottom-color: #000000;
+  color: #000000;
 }
 
 /*input oculto*/
@@ -173,7 +179,7 @@ function avancarMes() {
 /* Data (Label Central) */
 .label-data {
   cursor: pointer;
-  padding: 0.5rem 1rem;  
+  padding: 0.5rem 1rem;
   border-radius: 8px;
   font-weight: 600;
   font-size: 1.25rem;
@@ -230,5 +236,4 @@ function avancarMes() {
 .navegacao-central button:active {
   transform: scale(0.95);
 }
-
 </style>
