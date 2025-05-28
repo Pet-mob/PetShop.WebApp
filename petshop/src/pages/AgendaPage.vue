@@ -47,9 +47,13 @@
 
     <!-- Exibe o componente conforme visualização -->
     <div>
-      <AgendaSemanal
+      <!-- <AgendaSemanal
         v-if="visualizacao === 'semanal'"
         :data-base="dataFiltro"
+      /> -->
+      <AgendaSemanal
+        :data-filtro="dataFiltro"
+        :id-empresa="store.empresaLogada.idEmpresa"
       />
       <!-- <AgendaMensal v-else :data-base="dataFiltro" /> -->
     </div>
@@ -63,57 +67,106 @@ import "dayjs/locale/pt-br";
 dayjs.locale("pt-br");
 
 import AgendaSemanal from "@/components/Agenda/AgendaSemanal.vue";
-// import AgendaMensal from '@/components/Agenda/AgendaMensal.vue'
+import { useGlobalStore } from "@/store/useGlobalStore";
 
+const store = useGlobalStore();
 const visualizacao = ref("semanal");
 const dataFiltro = ref(dayjs().format("YYYY-MM-DD"));
-
-// const dataFiltro = ref(dayjs().format('YYYY-MM-DD'))
 const inputData = ref(null);
 
 function abrirCalendario() {
-  if (inputData.value) {
-    inputData.value.showPicker?.(); // showPicker é suporte novo e mais direto em alguns browsers
-    inputData.value.focus();
-  }
+  inputData.value?.showPicker?.();
+  inputData.value?.focus();
 }
 
-// Semana (para navegação e exibição do intervalo)
 const intervaloSemana = computed(() => {
   const inicio = dayjs(dataFiltro.value).startOf("week").format("DD/MM");
   const fim = dayjs(dataFiltro.value).endOf("week").format("DD/MM");
   return `${inicio} - ${fim}`;
 });
 
-// Mês (para navegação mensal)
 const intervaloMes = computed(() => {
   return dayjs(dataFiltro.value).format("MMMM [de] YYYY");
 });
 
-function aplicarFiltro() {
-  // Já atualizou dataFiltro pelo v-model, só dispara recarregamento no filho
-  // Como dataFiltro é reactivo e passado via props, filhos atualizam automaticamente
-}
-
 function voltarSemana() {
-  const novaData = dayjs(dataFiltro.value).subtract(7, "day");
-  dataFiltro.value = novaData.format("YYYY-MM-DD");
+  dataFiltro.value = dayjs(dataFiltro.value)
+    .subtract(7, "day")
+    .format("YYYY-MM-DD");
 }
 
 function avancarSemana() {
-  const novaData = dayjs(dataFiltro.value).add(7, "day");
-  dataFiltro.value = novaData.format("YYYY-MM-DD");
+  dataFiltro.value = dayjs(dataFiltro.value).add(7, "day").format("YYYY-MM-DD");
 }
 
 function voltarMes() {
-  const novaData = dayjs(dataFiltro.value).subtract(1, "month");
-  dataFiltro.value = novaData.format("YYYY-MM-DD");
+  dataFiltro.value = dayjs(dataFiltro.value)
+    .subtract(1, "month")
+    .format("YYYY-MM-DD");
 }
 
 function avancarMes() {
-  const novaData = dayjs(dataFiltro.value).add(1, "month");
-  dataFiltro.value = novaData.format("YYYY-MM-DD");
+  dataFiltro.value = dayjs(dataFiltro.value)
+    .add(1, "month")
+    .format("YYYY-MM-DD");
 }
+// import { ref, computed } from "vue";
+// import dayjs from "dayjs";
+// import "dayjs/locale/pt-br";
+// dayjs.locale("pt-br");
+
+// import AgendaSemanal from "@/components/Agenda/AgendaSemanal.vue";
+// // import AgendaMensal from '@/components/Agenda/AgendaMensal.vue'
+
+// const visualizacao = ref("semanal");
+// const dataFiltro = ref(dayjs().format("YYYY-MM-DD"));
+
+// // const dataFiltro = ref(dayjs().format('YYYY-MM-DD'))
+// const inputData = ref(null);
+
+// function abrirCalendario() {
+//   if (inputData.value) {
+//     inputData.value.showPicker?.(); // showPicker é suporte novo e mais direto em alguns browsers
+//     inputData.value.focus();
+//   }
+// }
+
+// // Semana (para navegação e exibição do intervalo)
+// const intervaloSemana = computed(() => {
+//   const inicio = dayjs(dataFiltro.value).startOf("week").format("DD/MM");
+//   const fim = dayjs(dataFiltro.value).endOf("week").format("DD/MM");
+//   return `${inicio} - ${fim}`;
+// });
+
+// // Mês (para navegação mensal)
+// const intervaloMes = computed(() => {
+//   return dayjs(dataFiltro.value).format("MMMM [de] YYYY");
+// });
+
+// function aplicarFiltro() {
+//   // Já atualizou dataFiltro pelo v-model, só dispara recarregamento no filho
+//   // Como dataFiltro é reactivo e passado via props, filhos atualizam automaticamente
+// }
+
+// function voltarSemana() {
+//   const novaData = dayjs(dataFiltro.value).subtract(7, "day");
+//   dataFiltro.value = novaData.format("YYYY-MM-DD");
+// }
+
+// function avancarSemana() {
+//   const novaData = dayjs(dataFiltro.value).add(7, "day");
+//   dataFiltro.value = novaData.format("YYYY-MM-DD");
+// }
+
+// function voltarMes() {
+//   const novaData = dayjs(dataFiltro.value).subtract(1, "month");
+//   dataFiltro.value = novaData.format("YYYY-MM-DD");
+// }
+
+// function avancarMes() {
+//   const novaData = dayjs(dataFiltro.value).add(1, "month");
+//   dataFiltro.value = novaData.format("YYYY-MM-DD");
+// }
 </script>
 
 <style scoped>

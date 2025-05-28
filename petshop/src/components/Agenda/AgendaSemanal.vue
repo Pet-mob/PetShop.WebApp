@@ -21,6 +21,36 @@
 </template>
 
 <script setup>
+import { watch, ref } from "vue";
+import AgendaService from "@/services/agendaService";
+import dayjs from "dayjs";
+import "dayjs/locale/pt-br";
+dayjs.locale("pt-br");
+
+const props = defineProps({
+  dataFiltro: String,
+  idEmpresa: Number,
+});
+
+const semana = ref([]);
+
+async function carregarAgenda() {
+  try {
+    const resposta = await AgendaService.buscarAgenda(
+      props.dataFiltro,
+      props.idEmpresa
+    );
+    semana.value = resposta; // já no formato esperado
+  } catch (error) {
+    console.error("Erro ao buscar agenda:", error);
+    semana.value = [];
+  }
+}
+
+watch(() => props.dataFiltro, carregarAgenda, { immediate: true });
+</script>
+
+<!-- <script setup>
 import { ref } from 'vue'
 import dayjs from 'dayjs'
 import 'dayjs/locale/pt-br'
@@ -63,7 +93,7 @@ function gerarSemana(dataBase) {
 
 gerarSemana(dataFiltro.value)
 
-</script>
+</script> -->
 
 <style scoped>
 /* Container principal */
@@ -103,7 +133,7 @@ gerarSemana(dataFiltro.value)
 }
 
 .card header h3 {
-  color: #374151; 
+  color: #374151;
   font-weight: 550;
   font-size: 1.1rem;
   margin: 0;
@@ -143,5 +173,4 @@ gerarSemana(dataFiltro.value)
   font-family: monospace;
   color: #6b7280;
 }
-
 </style>
