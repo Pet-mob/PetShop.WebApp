@@ -21,12 +21,18 @@
 </template>
 
 <script setup>
-import { watch, ref } from "vue";
+import { ref, defineEmits, watch } from "vue";
 import AgendaService from "@/services/agendaService";
 import dayjs from "dayjs";
 import "dayjs/locale/pt-br";
 dayjs.locale("pt-br");
 
+const emit = defineEmits([
+  "carregando",
+  "carregado",
+  "dados-vazios",
+  "dados-encontrados",
+]);
 const props = defineProps({
   dataFiltro: String,
   idEmpresa: Number,
@@ -34,66 +40,54 @@ const props = defineProps({
 
 const semana = ref([]);
 
-async function carregarAgenda() {
+// onMounted(async () => {
+//   emit("carregando");
+//   console.log("emit:carregando");
+//   const dados = await carregarAgenda(); // sua função real
+
+//   if (!dados || dados.length === 0) {
+//     emit("dados-vazios");
+//     console.log("emit:dados-vazios");
+//   } else {
+//     emit("dados-encontrados");
+//     console.log("emit:dados-encontrados");
+//   }
+
+//   console.log("emit:carregado");
+//   emit("carregado");
+// });
+
+const carregarAgenda = async () => {
   try {
     const resposta = await AgendaService.buscarAgenda(
       props.dataFiltro,
       props.idEmpresa
     );
-    semana.value = resposta; // já no formato esperado
+    semana.value = resposta;
+    return resposta;
   } catch (error) {
     console.error("Erro ao buscar agenda:", error);
     semana.value = [];
+    return [];
   }
-}
+};
 
-watch(() => props.dataFiltro, carregarAgenda, { immediate: true });
+// Reage a mudanças no dataFiltro
+watch(
+  () => props.dataFiltro,
+  async () => {
+    emit("carregando");
+    const dados = await carregarAgenda();
+    if (!dados || dados.length === 0) {
+      emit("dados-vazios");
+    } else {
+      emit("dados-encontrados");
+    }
+    emit("carregado");
+  },
+  { immediate: true }
+);
 </script>
-
-<!-- <script setup>
-import { ref } from 'vue'
-import dayjs from 'dayjs'
-import 'dayjs/locale/pt-br'
-dayjs.locale('pt-br')
-
-const dataFiltro = ref(dayjs().format('YYYY-MM-DD'))
-const semana = ref([])
-
-const diasDaSemana = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']
-
-function gerarSemana(dataBase) {
-  const inicio = dayjs(dataBase).startOf('week')
-  const novaSemana = []
-  for (let i = 0; i < 7; i++) {
-    const dataAtual = inicio.add(i, 'day')
-    novaSemana.push({
-      diaSemana: diasDaSemana[dataAtual.day()],
-      dataFormatada: dataAtual.format('DD/MM'),
-      banho: 2,
-      tosa: 1,
-      horarios: [
-        { hora: '08:00', pet: 'Rex', usuario: 'Rennan' },
-        { hora: '09:00', pet: 'Rex', usuario: 'Rennan' },
-        { hora: '10:00', pet: 'Rex', usuario: 'Rennan' },
-        { hora: '11:00', pet: 'Rex', usuario: 'Rennan' },
-        { hora: '12:00', pet: 'Rex', usuario: 'Rennan' },
-        { hora: '13:00', pet: 'Rex', usuario: 'Rennan' },
-        { hora: '14:00', pet: 'Bob', usuario: 'Sergio' },
-        { hora: '15:00', pet: 'Luna', usuario: 'Nathan' },
-        { hora: '16:00', pet: 'Luna', usuario: 'Nathan' },
-        { hora: '17:00', pet: 'Luna', usuario: 'Nathan' },
-        { hora: '18:00', pet: 'Luna', usuario: 'Nathan' },
-        { hora: '19:00', pet: 'Luna', usuario: 'Nathan' },
-        { hora: '20:00', pet: 'Luna', usuario: 'Nathan' }
-      ]
-    })
-  }
-  semana.value = novaSemana
-}
-
-gerarSemana(dataFiltro.value)
-
-</script> -->
 
 <style scoped>
 /* Container principal */

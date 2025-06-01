@@ -1,6 +1,6 @@
 <template>
   <div class="agenda-container p-6 bg-gray-50 min-h-screen">
-    <!-- Abas de Visualização -->
+    <!-- Tabs -->
     <div class="tabs mb-6">
       <button
         :class="['tab-btn', { active: visualizacao === 'semanal' }]"
@@ -8,13 +8,16 @@
       >
         Semanal
       </button>
-      <!-- <button :class="['tab-btn', { active: visualizacao === 'mensal' }]" @click="visualizacao = 'mensal'">
-                Mensal
-            </button> -->
+      <button
+        :class="['tab-btn', { active: visualizacao === 'mensal' }]"
+        disabled
+      >
+        Mensal
+      </button>
     </div>
 
+    <!-- Navegação -->
     <div class="filtro-navegacao mb-6">
-      <!-- Esconde input date, só abre no clique no label -->
       <input
         ref="inputData"
         v-model="dataFiltro"
@@ -23,179 +26,143 @@
         @change="aplicarFiltro"
       />
       <div class="navegacao-central">
-        <button @click="voltarSemana" v-if="visualizacao === 'semanal'">
-          &lt;
-        </button>
-        <button @click="voltarMes" v-else>&lt;</button>
-
+        <button @click="voltarPeriodo">&lt;</button>
         <label
           class="label-data"
           @click="abrirCalendario"
+          role="button"
           tabindex="0"
           @keydown.enter.prevent="abrirCalendario"
           @keydown.space.prevent="abrirCalendario"
         >
-          {{ visualizacao === "semanal" ? intervaloSemana : intervaloMes }}
+          {{ intervaloSemana }}
         </label>
-
-        <button @click="avancarSemana" v-if="visualizacao === 'semanal'">
-          &gt;
-        </button>
-        <button @click="avancarMes" v-else>&gt;</button>
+        <button @click="avancarPeriodo">&gt;</button>
       </div>
     </div>
 
-    <!-- Exibe o componente conforme visualização -->
-    <div>
-      <!-- <AgendaSemanal
-        v-if="visualizacao === 'semanal'"
-        :data-base="dataFiltro"
-      /> -->
-      <AgendaSemanal
-        :data-filtro="dataFiltro"
-        :id-empresa="store.empresaLogada.idEmpresa"
-      />
-      <!-- <AgendaMensal v-else :data-base="dataFiltro" /> -->
+    <!-- Estado de carregamento -->
+    <div v-if="carregando" class="text-center text-gray-400 py-8">
+      <span class="animate-pulse">Carregando agendamentos...</span>
+    </div>
+
+    <!-- Agenda semanal -->
+    <div v-else>
+      <div
+        v-if="agendamentos.length === 0"
+        class="text-center text-gray-500 py-4"
+      >
+        Nenhum agendamento para esse período.
+      </div>
+      <div v-else class="grid gap-4">
+        <div
+          v-for="(item, index) in agendamentos"
+          :key="index"
+          class="bg-white p-4 rounded shadow"
+        >
+          <h3 class="font-semibold text-lg">{{ item.nomePet }}</h3>
+          <p><strong>Serviço:</strong> {{ item.servico }}</p>
+          <p><strong>Data:</strong> {{ formatarData(item.data) }}</p>
+          <p><strong>Hora:</strong> {{ item.hora }}</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import dayjs from "dayjs";
 import "dayjs/locale/pt-br";
-dayjs.locale("pt-br");
-
-import AgendaSemanal from "@/components/Agenda/AgendaSemanal.vue";
+import AgendaService from "@/services/agendaService";
 import { useGlobalStore } from "@/store/useGlobalStore";
+
+dayjs.locale("pt-br");
 
 const store = useGlobalStore();
 const visualizacao = ref("semanal");
 const dataFiltro = ref(dayjs().format("YYYY-MM-DD"));
 const inputData = ref(null);
+const carregando = ref(false);
+const agendamentos = ref([]);
+const idEmpresaLogada = store.empresaLogada.idEmpresa;
+
+const intervaloSemana = computed(() => {
+  const inicio = dayjs(dataFiltro.value)
+    .startOf("week")
+    .add(1, "day")
+    .format("DD/MM");
+  const fim = dayjs(dataFiltro.value)
+    .endOf("week")
+    .add(1, "day")
+    .format("DD/MM");
+  return `${inicio} - ${fim}`;
+});
 
 function abrirCalendario() {
   inputData.value?.showPicker?.();
   inputData.value?.focus();
 }
 
-const intervaloSemana = computed(() => {
-  const inicio = dayjs(dataFiltro.value).startOf("week").format("DD/MM");
-  const fim = dayjs(dataFiltro.value).endOf("week").format("DD/MM");
-  return `${inicio} - ${fim}`;
-});
-
-const intervaloMes = computed(() => {
-  return dayjs(dataFiltro.value).format("MMMM [de] YYYY");
-});
-
-function voltarSemana() {
+function voltarPeriodo() {
   dataFiltro.value = dayjs(dataFiltro.value)
     .subtract(7, "day")
     .format("YYYY-MM-DD");
 }
 
-function avancarSemana() {
+function avancarPeriodo() {
   dataFiltro.value = dayjs(dataFiltro.value).add(7, "day").format("YYYY-MM-DD");
 }
 
-function voltarMes() {
-  dataFiltro.value = dayjs(dataFiltro.value)
-    .subtract(1, "month")
-    .format("YYYY-MM-DD");
+function aplicarFiltro() {
+  dataFiltro.value = inputData.value.value;
 }
 
-function avancarMes() {
-  dataFiltro.value = dayjs(dataFiltro.value)
-    .add(1, "month")
-    .format("YYYY-MM-DD");
+function formatarData(data) {
+  return dayjs(data).format("DD/MM/YYYY");
 }
-// import { ref, computed } from "vue";
-// import dayjs from "dayjs";
-// import "dayjs/locale/pt-br";
-// dayjs.locale("pt-br");
 
-// import AgendaSemanal from "@/components/Agenda/AgendaSemanal.vue";
-// // import AgendaMensal from '@/components/Agenda/AgendaMensal.vue'
+async function buscarAgendamentos() {
+  carregando.value = true;
+  try {
+    const data = await AgendaService.buscarAgenda(
+      dataFiltro.value,
+      idEmpresaLogada
+    );
+    agendamentos.value = data;
+  } catch (error) {
+    console.error("Erro ao buscar agendamentos:", error);
+    agendamentos.value = [];
+  } finally {
+    carregando.value = false;
+  }
+}
 
-// const visualizacao = ref("semanal");
-// const dataFiltro = ref(dayjs().format("YYYY-MM-DD"));
-
-// // const dataFiltro = ref(dayjs().format('YYYY-MM-DD'))
-// const inputData = ref(null);
-
-// function abrirCalendario() {
-//   if (inputData.value) {
-//     inputData.value.showPicker?.(); // showPicker é suporte novo e mais direto em alguns browsers
-//     inputData.value.focus();
-//   }
-// }
-
-// // Semana (para navegação e exibição do intervalo)
-// const intervaloSemana = computed(() => {
-//   const inicio = dayjs(dataFiltro.value).startOf("week").format("DD/MM");
-//   const fim = dayjs(dataFiltro.value).endOf("week").format("DD/MM");
-//   return `${inicio} - ${fim}`;
-// });
-
-// // Mês (para navegação mensal)
-// const intervaloMes = computed(() => {
-//   return dayjs(dataFiltro.value).format("MMMM [de] YYYY");
-// });
-
-// function aplicarFiltro() {
-//   // Já atualizou dataFiltro pelo v-model, só dispara recarregamento no filho
-//   // Como dataFiltro é reactivo e passado via props, filhos atualizam automaticamente
-// }
-
-// function voltarSemana() {
-//   const novaData = dayjs(dataFiltro.value).subtract(7, "day");
-//   dataFiltro.value = novaData.format("YYYY-MM-DD");
-// }
-
-// function avancarSemana() {
-//   const novaData = dayjs(dataFiltro.value).add(7, "day");
-//   dataFiltro.value = novaData.format("YYYY-MM-DD");
-// }
-
-// function voltarMes() {
-//   const novaData = dayjs(dataFiltro.value).subtract(1, "month");
-//   dataFiltro.value = novaData.format("YYYY-MM-DD");
-// }
-
-// function avancarMes() {
-//   const novaData = dayjs(dataFiltro.value).add(1, "month");
-//   dataFiltro.value = novaData.format("YYYY-MM-DD");
-// }
+watch(
+  dataFiltro,
+  () => {
+    buscarAgendamentos();
+  },
+  { immediate: true }
+);
 </script>
 
 <style scoped>
 .agenda-container {
   min-height: 10vh;
 }
-
 .filtro-navegacao {
   display: flex;
   align-items: center;
-  justify-content: center; /* centraliza o conjunto inteiro */
-  gap: 2rem; /* espaço entre filtro e navegação */
+  justify-content: center;
+  gap: 2rem;
   margin-bottom: 1.5rem;
 }
-
-.filtro {
-  flex-grow: 0; /* tira o crescimento para não empurrar */
-  min-width: 180px; /* ou o que achar ideal */
-  display: flex;
-  justify-content: center; /* centraliza o label */
-}
-
-/* Tabs */
 .tabs {
   display: flex;
   justify-content: left;
   padding: 1.5rem;
 }
-
 .tab-btn {
   background: transparent;
   border: none;
@@ -207,17 +174,13 @@ function avancarMes() {
   cursor: pointer;
   transition: all 0.3s ease;
 }
-
 .tab-btn:hover {
   color: #000000;
 }
-
 .tab-btn.active {
   border-bottom-color: #000000;
   color: #000000;
 }
-
-/*input oculto*/
 .input-date-hidden {
   position: absolute;
   opacity: 0;
@@ -228,8 +191,6 @@ function avancarMes() {
   user-select: none;
   z-index: -1;
 }
-
-/* Data (Label Central) */
 .label-data {
   cursor: pointer;
   padding: 0.5rem 1rem;
@@ -244,18 +205,15 @@ function avancarMes() {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 48px; /* garante altura compatível com os botões */
+  height: 48px;
   line-height: 1.25;
 }
-
 .label-data:hover,
 .label-data:focus {
   background-color: #757575;
   color: #fff;
   outline: none;
 }
-
-/* Navegação */
 .navegacao-central {
   display: flex;
   align-items: center;
@@ -263,8 +221,6 @@ function avancarMes() {
   gap: 1rem;
   padding: 0.75rem 1.25rem;
 }
-
-/* Botões da navegação */
 .navegacao-central button {
   background-color: white;
   border: 2px solid #757575;
@@ -280,12 +236,10 @@ function avancarMes() {
   align-items: center;
   justify-content: center;
 }
-
 .navegacao-central button:hover {
   background-color: #757575;
   color: white;
 }
-
 .navegacao-central button:active {
   transform: scale(0.95);
 }

@@ -3,6 +3,7 @@ import ConfiguracoesLayoutBase from "@/ui/layout/ConfiguracoesLayoutBase.vue";
 import configuracoesRoutes from "@/router/indexConfiguracoes";
 
 import { Settings } from "lucide-vue-next";
+import carregarDadosDoMenu from "@/middlewares/carregarDadosDoMenu";
 
 const routes = [
   {
@@ -16,6 +17,7 @@ const routes = [
     name: "Inicio",
     component: () => import("@/pages/DashboardPage.vue"),
     meta: { menu: true },
+    beforeEnter: carregarDadosDoMenu,
   },
   {
     path: "/agenda",
