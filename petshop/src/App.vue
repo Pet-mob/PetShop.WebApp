@@ -5,16 +5,19 @@
   </div>
 </template>
 <script setup>
-import MenuHorizontal from '@/components/MenuHorizontal.vue'
+import MenuHorizontal from "@/components/MenuHorizontal.vue";
 </script>
 <style>
 html,
 body {
-  margin: 0;
+  /* margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
-
+ */
+  margin: 0;
+  padding: 0;
+  height: 100%;
 }
 
 #app {
@@ -23,7 +26,17 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  min-height: 100vh; /* ocupa pelo menos toda a altura da viewport */
+  background-color: #f5f5f5; /* ou outra cor que desejar */
 }
+
+/* #app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+} */
 
 nav {
   padding: 30px;
