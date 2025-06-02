@@ -26,19 +26,19 @@
 </template>
 
 <script setup>
-import rotasConfiguracoes from '@/router/indexConfiguracoes'
-const rotas = rotasConfiguracoes
+import rotasConfiguracoes from "@/router/indexConfiguracoes";
+const rotas = rotasConfiguracoes;
 </script>
 
 <style scoped>
 /* Layout geral */
 .layout-configuracoes {
   display: flex;
-  height: 100vh;
+  flex-direction: row; /* caso tenha cabeçalho fixo acima do conteúdo */
+  /* height: 100vh; */
   overflow: hidden;
   font-family: sans-serif;
 }
-
 /* Menu lateral fixo com rolagem própria */
 .menu-lateral {
   width: 260px;
@@ -90,10 +90,11 @@ const rotas = rotasConfiguracoes
 
 /* Conteúdo com scroll separado */
 .conteudo-principal {
-  flex: 1;
+  flex: 1 1 auto;
   overflow-y: auto;
   background-color: #f5f5f5;
   padding: 32px;
+  min-height: 0; /* ✅ evita overflow indesejado em flex containers */
 }
 
 /* Responsividade */
