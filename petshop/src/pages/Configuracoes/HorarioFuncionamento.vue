@@ -131,7 +131,7 @@ async function buscarHorariosDeFuncionamentoDaEmpresa() {
       };
     }
 
-    showToast("Horários carregados com sucesso!", "success");
+    // showToast("Horários carregados com sucesso!", "success");
   } catch (error) {
     showToast("Erro ao carregar horários de funcionamento", "error");
   } finally {
@@ -152,19 +152,32 @@ function mapearNomeDiaParaChave(nomeDia) {
   return mapa[nomeDia];
 }
 
-function salvarHorarios() {
-  const configuracoes = {};
+async function salvarHorarios() {
+  carregando.value = true;
+
+  const configuracoes = [];
+
   for (const dia of diasDaSemana) {
     const valor = horarios[dia.value];
-    if (valor?.ativo) {
-      configuracoes[dia.value] = {
-        abertura: valor.abertura,
-        fechamento: valor.fechamento,
-      };
-    }
+    configuracoes.push({
+      idEmpresa: idEmpresaLogada,
+      nomeDiaSemana: dia.label,
+      funcionaNesseDia: valor.ativo,
+      horarioAbertura: valor.abertura + ":00",
+      horarioFechamento: valor.fechamento + ":00",
+      intervaloEntreServicos: 0,
+    });
   }
-  showToast("Horários salvos com sucesso!", "success");
-  console.log("Configurações:", configuracoes); // Remover depois, se for desnecessário
+
+  try {
+    await empresaService.atualizarHorariosFuncionamentoEmpresa(configuracoes);
+    showToast("Horários salvos com sucesso!", "success");
+  } catch (error) {
+    showToast("Erro ao salvar horários. Tente novamente.", "error");
+    console.error(error);
+  } finally {
+    carregando.value = false;
+  }
 }
 </script>
 

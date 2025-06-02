@@ -1,5 +1,14 @@
 import apiClient from "@/services/apiClient"; // Certifique-se de que o caminho está correto
 
+const atualizarHorariosFuncionamentoEmpresa = (dto) => {
+  return new Promise((resolve, reject) => {
+    apiClient
+      .put("Empresa/HorariosFuncionamento", dto)
+      .then((response) => resolve(response.data))
+      .catch((error) => reject(error));
+  });
+};
+
 const buscarEmpresa = (cnpjParam) => {
   return new Promise((resolve, reject) => {
     apiClient
@@ -25,4 +34,5 @@ const buscarHorarioFuncionamentoEmpresa = (idEmpresaParam) => {
 export default {
   buscarEmpresa,
   buscarHorarioFuncionamentoEmpresa,
+  atualizarHorariosFuncionamentoEmpresa,
 };
