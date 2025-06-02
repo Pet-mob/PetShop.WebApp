@@ -11,6 +11,18 @@ const buscarEmpresa = (cnpjParam) => {
   });
 };
 
+const buscarHorarioFuncionamentoEmpresa = (idEmpresaParam) => {
+  return new Promise((resolve, reject) => {
+    apiClient
+      .get("Empresa/HorariosFuncionamento", {
+        params: { IdEmpresa: idEmpresaParam },
+      })
+      .then((response) => resolve(response.data))
+      .catch((error) => reject(error));
+  });
+};
+
 export default {
   buscarEmpresa,
+  buscarHorarioFuncionamentoEmpresa,
 };
