@@ -98,40 +98,40 @@ async function buscarServicosDaEmpresa() {
 }
 
 function abrirModalNovo() {
-  // servicoSelecionado.value = { nome: "", descricao: "", preco: 0, ativo: true };
   modalTitulo.value = "Adicionar Serviço";
   botaoTextoModal.value = "Adicionar";
   modalAberto.value = true;
 }
 
-async function buscarServicosDaEmpresaComIdEmpresaEIdServico(idServicoParam) {
-  carregando.value = true;
-  try {
-    const data = await ServicosEmpresaService.buscarServicosEmpresa(
-      idEmpresaLogada,
-      idServicoParam
-    );
+// async function buscarServicosDaEmpresaComIdEmpresaEIdServico(idServicoParam) {
+//   carregando.value = true;
+//   try {
+//     const data =
+//       await ServicosEmpresaService.buscarServicosEmpresaPorIdEmpresaEIdServico(
+//         idEmpresaLogada,
+//         idServicoParam
+//       );
 
-    if (data) servicos.value = data;
-    // showToast("Horários carregados com sucesso!", "success");
-  } catch (error) {
-    showToast("Erro ao carregar serviços", "error");
-  } finally {
-    carregando.value = false;
-  }
-}
+//     if (data) servicos.value = data;
+//   } catch (error) {
+//     showToast("Erro ao carregar serviços", "error");
+//   } finally {
+//     carregando.value = false;
+//   }
+// }
 
 async function abrirModalEditar(servico) {
   servicoSelecionado.value = { ...servico };
-  const idServicoSelecionado = servico.idServico;
-  await buscarServicosDaEmpresaComIdEmpresaEIdServico(idServicoSelecionado);
+  // const idServicoSelecionado = servico.idServico;
+  // await buscarServicosDaEmpresaComIdEmpresaEIdServico(idServicoSelecionado);
   modalTitulo.value = "Editar Serviço";
   botaoTextoModal.value = "Salvar";
   modalAberto.value = true;
 }
 
-function fecharModal() {
+async function fecharModal() {
   modalAberto.value = false;
+  await buscarServicosDaEmpresa();
 }
 
 async function adicionarServico(dto) {
@@ -159,15 +159,6 @@ async function atualizarServico(dto) {
 }
 
 async function salvarServico(dados) {
-  // public int IdServico { get; set; }
-  // public int IdEmpresa { get; set; }
-  // public string Descricao { get; set; }
-  // public decimal? Valor { get; set; }
-  // public decimal? QtdeHora { get; set; }
-  // public string Observacao { get; set; }
-  // public bool PossuiMensal { get; set; }
-  // public decimal? PrecoMensal { get; set; }
-
   carregando.value = true;
   try {
     if (servicoSelecionado.value && servicoSelecionado.value.idServico) {
