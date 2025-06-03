@@ -5,7 +5,7 @@
         <label for="nome" class="label-formulario">Nome do Serviço</label>
         <input
           id="nome"
-          v-model="dados.nome"
+          v-model="dados.descricao"
           type="text"
           class="campo-texto"
           placeholder="Ex: Banho e Tosa"
@@ -16,7 +16,7 @@
         <label for="preco" class="label-formulario">Preço (R$)</label>
         <input
           id="preco"
-          v-model.number="dados.preco"
+          v-model.number="dados.valor"
           type="number"
           class="campo-texto"
           placeholder="Ex: 120.00"
@@ -53,19 +53,19 @@
     <div class="linha-formulario">
       <div class="campo-formulario">
         <label class="checkbox-container">
-          <input type="checkbox" v-model="dados.possuiOferta" />
+          <input type="checkbox" v-model="dados.possuiMensal" />
           <span class="checkmark"></span>
-          Possui Oferta
+          Possui mensal
         </label>
       </div>
 
-      <div class="campo-formulario" v-if="dados.possuiOferta">
+      <div class="campo-formulario" v-if="dados.possuiMensal">
         <label for="valorOferta" class="label-formulario"
-          >Valor da Oferta</label
+          >Valor do mensal</label
         >
         <input
           id="valorOferta"
-          v-model="dados.valorOferta"
+          v-model="dados.precoMensal"
           type="number"
           step="0.01"
           class="campo-texto"
@@ -86,12 +86,12 @@ const props = defineProps({
   dadosIniciais: {
     type: Object,
     default: () => ({
-      nome: "",
+      descricao: "",
       duracao: 0,
-      preco: 0,
+      valor: 0,
       observacao: "",
-      possuiOferta: false,
-      valorOferta: 0,
+      possuiMensal: false,
+      precoMensal: 0,
     }),
   },
   botaoTexto: {

@@ -1,86 +1,198 @@
 <template>
   <section class="secao-servicos">
-    <header class="cabecalho-secao">
-      <h1 class="titulo">Serviços</h1>
-      <button class="botao-adicionar" @click="abrirModalNovo">Adicionar Serviço</button>
-    </header>
+    <!-- Exibe o loading se estiver carregando -->
+    <LoadingPetON v-if="carregando" />
 
-    <div class="lista-grid">
-      <article v-for="servico in servicos" :key="servico.id" class="item-grid">
-        <div class="info-servico">
-          <h2 class="nome-servico">{{ servico.nome }}</h2>
-          <p class="detalhe-servico">{{ servico.descricao }}</p>
-          <p class="detalhe-servico"><strong>Preço:</strong> R$ {{ servico.preco.toFixed(2) }}</p>
-          <p class="detalhe-servico">
-            <strong>Status:</strong> {{ servico.ativo ? 'Ativo' : 'Inativo' }}
-          </p>
-        </div>
-        <button class="botao-editar" @click="abrirModalEditar(servico)">Editar</button>
-      </article>
+    <!-- Conteúdo principal -->
+    <div v-else>
+      <header class="cabecalho-secao">
+        <h1 class="titulo">Serviços</h1>
+        <button class="botao-adicionar" @click="abrirModalNovo">
+          Adicionar Serviço
+        </button>
+      </header>
+
+      <div class="lista-grid">
+        <article
+          v-for="servico in servicos"
+          :key="servico.idServico"
+          class="item-grid"
+        >
+          <div class="info-servico">
+            <h2 class="nome-servico">{{ servico.descricao }}</h2>
+            <p class="detalhe-servico">{{ servico.observacao }}</p>
+            <p class="detalhe-servico">
+              <strong>Preço:</strong> R$ {{ (servico.valor ?? 0).toFixed(2) }}
+            </p>
+            <!-- <p class="detalhe-servico">
+              <strong>Status:</strong> {{ servico.ativo ? "Ativo" : "Inativo" }}
+            </p> -->
+          </div>
+          <button class="botao-editar" @click="abrirModalEditar(servico)">
+            Editar
+          </button>
+        </article>
+      </div>
+
+      <ModalGenerico
+        v-if="modalAberto"
+        :titulo="modalTitulo"
+        @fechar="fecharModal"
+      >
+        <FormularioServico
+          :dadosIniciais="servicoSelecionado"
+          :botaoTexto="botaoTextoModal"
+          @salvar="salvarServico"
+        />
+      </ModalGenerico>
     </div>
-
-    <ModalGenerico
-      v-if="modalAberto"
-      :titulo="modalTitulo"
-      @fechar="fecharModal"
-    >
-      <FormularioServico
-        :dadosIniciais="servicoSelecionado"
-        :botaoTexto="botaoTextoModal"
-        @salvar="salvarServico"
-      />
-    </ModalGenerico>
   </section>
+  <!-- Toast de mensagens -->
+  <Toast :message="toastMessage" :type="toastType" />
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import ModalGenerico from '@/components/ModalBase.vue'
-import FormularioServico from '@/views/FormularioServico.vue'
+import { ref, onMounted } from "vue";
+import ModalGenerico from "@/components/ModalBase.vue";
+import FormularioServico from "@/views/FormularioServico.vue";
+import ServicosEmpresaService from "@/services/ServicosEmpresaService";
+import { useGlobalStore } from "@/store/useGlobalStore";
+import LoadingPetON from "@/components/LoadingPetON.vue";
+import Toast from "@/components/ToastCustomizado.vue";
 
-const servicos = ref([
-  { id: 1, nome: 'Banho e Tosa', descricao: 'Banho completo e tosa', preco: 120.0, ativo: true },
-  { id: 2, nome: 'Vacinação', descricao: 'Vacinas essenciais para seu pet', preco: 80.0, ativo: true },
-  { id: 3, nome: 'Vacinação', descricao: 'Vacinas essenciais para seu pet', preco: 80.0, ativo: true },
-  { id: 4, nome: 'Vacinação', descricao: 'Vacinas essenciais para seu pet', preco: 80.0, ativo: true },
-  { id: 5, nome: 'Vacinação', descricao: 'Vacinas essenciais para seu pet', preco: 80.0, ativo: true },
-  { id: 6, nome: 'Vacinação', descricao: 'Vacinas essenciais para seu pet', preco: 80.0, ativo: true }
-])
+const store = useGlobalStore();
+const idEmpresaLogada = store.empresaLogada.idEmpresa;
 
-const modalAberto = ref(false)
-const servicoSelecionado = ref(null)
-const modalTitulo = ref('')
-const botaoTextoModal = ref('')
+const carregando = ref(false);
+const toastMessage = ref("");
+const toastType = ref("info");
+const modalAberto = ref(false);
+const servicoSelecionado = ref(null);
+const modalTitulo = ref("");
+const botaoTextoModal = ref("");
+const servicos = ref([]);
 
-function abrirModalNovo() {
-  servicoSelecionado.value = { nome: '', descricao: '', preco: 0, ativo: true }
-  modalTitulo.value = 'Adicionar Serviço'
-  botaoTextoModal.value = 'Adicionar'
-  modalAberto.value = true
+onMounted(async () => {
+  await buscarServicosDaEmpresa();
+});
+
+function showToast(msg, type = "info") {
+  toastMessage.value = msg;
+  toastType.value = type;
 }
 
-function abrirModalEditar(servico) {
-  servicoSelecionado.value = { ...servico }
-  modalTitulo.value = 'Editar Serviço'
-  botaoTextoModal.value = 'Salvar'
-  modalAberto.value = true
+async function buscarServicosDaEmpresa() {
+  carregando.value = true;
+  try {
+    const data = await ServicosEmpresaService.buscarServicosEmpresa(
+      idEmpresaLogada
+    );
+
+    if (data) servicos.value = data;
+    // showToast("Horários carregados com sucesso!", "success");
+  } catch (error) {
+    showToast("Erro ao carregar serviços", "error");
+  } finally {
+    carregando.value = false;
+  }
+}
+
+function abrirModalNovo() {
+  // servicoSelecionado.value = { nome: "", descricao: "", preco: 0, ativo: true };
+  modalTitulo.value = "Adicionar Serviço";
+  botaoTextoModal.value = "Adicionar";
+  modalAberto.value = true;
+}
+
+async function buscarServicosDaEmpresaComIdEmpresaEIdServico(idServicoParam) {
+  carregando.value = true;
+  try {
+    const data = await ServicosEmpresaService.buscarServicosEmpresa(
+      idEmpresaLogada,
+      idServicoParam
+    );
+
+    if (data) servicos.value = data;
+    // showToast("Horários carregados com sucesso!", "success");
+  } catch (error) {
+    showToast("Erro ao carregar serviços", "error");
+  } finally {
+    carregando.value = false;
+  }
+}
+
+async function abrirModalEditar(servico) {
+  servicoSelecionado.value = { ...servico };
+  const idServicoSelecionado = servico.idServico;
+  await buscarServicosDaEmpresaComIdEmpresaEIdServico(idServicoSelecionado);
+  modalTitulo.value = "Editar Serviço";
+  botaoTextoModal.value = "Salvar";
+  modalAberto.value = true;
 }
 
 function fecharModal() {
-  modalAberto.value = false
+  modalAberto.value = false;
 }
 
-function salvarServico(dados) {
-  if (servicoSelecionado.value && servicoSelecionado.value.id) {
-    // Editar
-    const index = servicos.value.findIndex(s => s.id === servicoSelecionado.value.id)
-    if (index !== -1) servicos.value[index] = { ...dados, id: servicoSelecionado.value.id }
-  } else {
-    // Adicionar
-    const novoId = Math.max(0, ...servicos.value.map(s => s.id)) + 1
-    servicos.value.push({ ...dados, id: novoId })
+async function adicionarServico(dto) {
+  carregando.value = true;
+  try {
+    const data = await ServicosEmpresaService.adicionarServicoEmpresa(dto);
+    if (data.data) showToast("Serviço adicionado com sucesso!", "success");
+  } catch (error) {
+    showToast("Erro ao adicionar serviços", "error");
+  } finally {
+    carregando.value = false;
   }
-  fecharModal()
+}
+
+async function atualizarServico(dto) {
+  carregando.value = true;
+  try {
+    const data = await ServicosEmpresaService.atualizarServicoEmpresa(dto);
+    if (data.data) showToast("Serviço ataulizado com com sucesso!", "success");
+  } catch (error) {
+    showToast("Erro ao atualizar serviços", "error");
+  } finally {
+    carregando.value = false;
+  }
+}
+
+async function salvarServico(dados) {
+  // public int IdServico { get; set; }
+  // public int IdEmpresa { get; set; }
+  // public string Descricao { get; set; }
+  // public decimal? Valor { get; set; }
+  // public decimal? QtdeHora { get; set; }
+  // public string Observacao { get; set; }
+  // public bool PossuiMensal { get; set; }
+  // public decimal? PrecoMensal { get; set; }
+
+  carregando.value = true;
+  try {
+    if (servicoSelecionado.value && servicoSelecionado.value.idServico) {
+      // Editar
+      const dto = {
+        ...dados,
+        idServico: servicoSelecionado.value.idServico,
+        idEmpresa: idEmpresaLogada,
+      };
+      await atualizarServico(dto);
+    } else {
+      // Adicionar
+      const dto = {
+        ...dados,
+        idEmpresa: idEmpresaLogada,
+      };
+      await adicionarServico(dto);
+    }
+    showToast("Serviço salvo com sucesso!", "success");
+    fecharModal();
+  } catch (error) {
+    showToast("Erro ao salvar serviço", "error");
+  } finally {
+    carregando.value = false;
+  }
 }
 </script>
 
@@ -131,7 +243,7 @@ function salvarServico(dados) {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .info-servico {
@@ -162,6 +274,4 @@ function salvarServico(dados) {
 .botao-editar:hover {
   background-color: #e0a800;
 }
-
-
 </style>
