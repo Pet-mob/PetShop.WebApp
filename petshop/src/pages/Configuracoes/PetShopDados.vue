@@ -1,66 +1,99 @@
 <template>
   <div class="empresa-container">
-    <h2 class="titulo">Dados da Empresa</h2>
+    <!-- Exibe o loading se estiver carregando -->
+    <LoadingPetON v-if="carregando" />
 
-    <div class="empresa-fotos-linha">
-      <div class="foto-perfil-bloco">
-        <label class="foto-perfil">
-          <img :src="perfilUrl" alt="Logo da empresa" />
-          <input type="file" @change="onFotoPerfilChange" hidden />
-        </label>
-        <div class="foto-legenda">Logo da empresa</div>
-      </div>
+    <!-- Conteúdo principal -->
+    <div v-else>
+      <h2 class="titulo">Dados da Empresa</h2>
 
-      <div class="foto-capa-bloco">
-        <label class="foto-capa">
-          <img :src="capaUrl" alt="Foto de capa" />
-          <input type="file" @change="onFotoCapaChange" hidden />
-        </label>
-        <div class="foto-legenda">Foto de capa</div>
-        <div class="foto-descricao">
-          Essa imagem será exibida no aplicativo quando o usuário for agendar um
-          horário com sua empresa.
+      <div class="empresa-fotos-linha">
+        <div class="foto-perfil-bloco">
+          <label class="foto-perfil">
+            <img :src="perfilUrl" alt="Logo da empresa" />
+            <input type="file" @change="onFotoPerfilChange" hidden />
+          </label>
+          <div class="foto-legenda">Logo da empresa</div>
+        </div>
+
+        <div class="foto-capa-bloco">
+          <label class="foto-capa">
+            <img :src="capaUrl" alt="Foto de capa" />
+            <input type="file" @change="onFotoCapaChange" hidden />
+          </label>
+          <div class="foto-legenda">Foto de capa</div>
+          <div class="foto-descricao">
+            Essa imagem será exibida no aplicativo quando o usuário for agendar
+            um horário com sua empresa.
+          </div>
         </div>
       </div>
+
+      <form class="formulario" @submit.prevent="salvar">
+        <div class="linha">
+          <div class="campo">
+            <label for="nome">Nome da Empresa</label>
+            <input
+              type="text"
+              id="nome"
+              v-model="empresa.descricaoNomeFisica"
+              required
+            />
+          </div>
+          <div class="campo">
+            <label for="cnpj">CNPJ</label>
+            <input
+              type="text"
+              id="cnpj"
+              :value="cnpjFormatado"
+              disabled
+              required
+            />
+          </div>
+        </div>
+
+        <div class="linha">
+          <div class="campo">
+            <label for="email">Email</label>
+            <input type="email" id="email" v-model="empresa.email" required />
+          </div>
+          <div class="campo">
+            <label for="telefone">Telefone</label>
+            <input
+              type="tel"
+              id="telefone"
+              v-model="telefoneFormatado"
+              @input="onTelefoneInput"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="botoes">
+          <button type="submit" class="btn">Salvar</button>
+        </div>
+      </form>
     </div>
-
-    <form class="formulario" @submit.prevent="salvar">
-      <div class="linha">
-        <div class="campo">
-          <label for="nome">Nome da Empresa</label>
-          <input type="text" id="nome" v-model="empresa.nome" required />
-        </div>
-        <div class="campo">
-          <label for="cnpj">CNPJ</label>
-          <input type="text" id="cnpj" v-model="empresa.cnpj" required />
-        </div>
-      </div>
-
-      <div class="linha">
-        <div class="campo">
-          <label for="email">Email</label>
-          <input type="email" id="email" v-model="empresa.email" required />
-        </div>
-        <div class="campo">
-          <label for="telefone">Telefone</label>
-          <input type="tel" id="telefone" v-model="empresa.telefone" required />
-        </div>
-      </div>
-
-      <div class="botoes">
-        <button type="submit" class="btn">Salvar</button>
-      </div>
-    </form>
+    <!-- Toast de mensagens -->
+    <Toast :message="toastMessage" :type="toastType" />
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, watch } from "vue";
 import perfilPadrao from "@/assets/perfil.png";
 import fotoCapaPadrao from "@/assets/LogoEscrita.png";
-
+import empresaService from "@/services/empresaService";
+import LoadingPetON from "@/components/LoadingPetON.vue";
+import Toast from "@/components/ToastCustomizado.vue";
+import { useGlobalStore } from "@/store/useGlobalStore";
+const store = useGlobalStore();
+const cnpjEmpresaLogada = store.cnpjLogado;
+const carregando = ref(false);
+const toastMessage = ref("");
+const toastType = ref("info");
 const empresa = ref({
-  nome: "",
+  descricaoNomeFisica: "",
   cnpj: "",
   email: "",
   telefone: "",
@@ -68,7 +101,72 @@ const empresa = ref({
 
 const perfilUrl = ref(perfilPadrao);
 const capaUrl = ref(fotoCapaPadrao);
+const cnpjFormatado = ref("");
+const telefoneFormatado = ref("");
 
+onMounted(async () => {
+  await buscarDadosDaEmpresa();
+});
+
+async function buscarDadosDaEmpresa() {
+  carregando.value = true;
+  try {
+    const data = await empresaService.buscarEmpresa(cnpjEmpresaLogada);
+    if (data.length > 0) {
+      empresa.value = data[0];
+      cnpjFormatado.value = formatarCnpj(empresa.value.cnpj);
+    }
+  } catch (error) {
+    showToast("Erro ao carregar dados da empresa", "error");
+  } finally {
+    carregando.value = false;
+  }
+}
+
+function formatarCnpj(valor) {
+  const apenasNumeros = (valor || "").replace(/\D/g, "").slice(0, 14);
+  let valorFormatado = apenasNumeros;
+  valorFormatado = valorFormatado.replace(/^(\d{2})(\d)/, "$1.$2");
+  valorFormatado = valorFormatado.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
+  valorFormatado = valorFormatado.replace(/\.(\d{3})(\d)/, ".$1/$2");
+  valorFormatado = valorFormatado.replace(/(\d{4})(\d)/, "$1-$2");
+  return valorFormatado;
+}
+
+// Função que formata o telefone
+function formatarTelefone(valor) {
+  // só números
+  valor = valor.replace(/\D/g, "").slice(0, 11);
+
+  if (valor.length > 10) {
+    valor = valor.replace(/^(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+  } else if (valor.length > 5) {
+    valor = valor.replace(/^(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3");
+  } else if (valor.length > 2) {
+    valor = valor.replace(/^(\d{2})(\d{0,5})/, "($1) $2");
+  } else if (valor.length > 0) {
+    valor = valor.replace(/^(\d*)/, "($1");
+  }
+
+  return valor;
+}
+
+// Atualiza o formato do telefone quando `empresa.telefone` mudar
+watch(
+  () => empresa.value.telefone,
+  (novo) => {
+    telefoneFormatado.value = formatarTelefone(novo);
+  },
+  { immediate: true }
+);
+
+// Quando usuário digita no input
+function onTelefoneInput(e) {
+  const valor = e.target.value;
+  const apenasNumeros = valor.replace(/\D/g, "");
+  empresa.value.telefone = apenasNumeros; // salva só números sem formatação
+  telefoneFormatado.value = formatarTelefone(valor); // atualiza o campo formatado
+}
 const onFotoPerfilChange = (e) => {
   const file = e.target.files[0];
   if (file) perfilUrl.value = URL.createObjectURL(file);
@@ -78,6 +176,11 @@ const onFotoCapaChange = (e) => {
   const file = e.target.files[0];
   if (file) capaUrl.value = URL.createObjectURL(file);
 };
+
+function showToast(msg, type = "info") {
+  toastMessage.value = msg;
+  toastType.value = type;
+}
 
 function salvar() {
   console.log("Empresa:", empresa.value);
