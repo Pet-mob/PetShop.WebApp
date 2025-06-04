@@ -87,8 +87,10 @@ import empresaService from "@/services/empresaService";
 import LoadingPetON from "@/components/LoadingPetON.vue";
 import Toast from "@/components/ToastCustomizado.vue";
 import { useGlobalStore } from "@/store/useGlobalStore";
+
 const store = useGlobalStore();
 const cnpjEmpresaLogada = store.cnpjLogado;
+const idEmpresaLogado = store.empresaLogada.idEmpresa;
 const carregando = ref(false);
 const toastMessage = ref("");
 const toastType = ref("info");
@@ -98,7 +100,6 @@ const empresa = ref({
   email: "",
   telefone: "",
 });
-
 const perfilUrl = ref(perfilPadrao);
 const capaUrl = ref(fotoCapaPadrao);
 const cnpjFormatado = ref("");
@@ -106,7 +107,37 @@ const telefoneFormatado = ref("");
 
 onMounted(async () => {
   await buscarDadosDaEmpresa();
+  await carregarFotos();
 });
+
+async function carregarFotos() {
+  await carregarLogoEmpresa();
+  await carregarCapaEmpresa();
+}
+
+const carregarLogoEmpresa = async () => {
+  carregando.value = true;
+  try {
+    const logo = await empresaService.buscarLogoEmpresa(idEmpresaLogado);
+    if (logo.length > 0) perfilUrl.value = logo[0].url;
+  } catch (error) {
+    showToast("Erro ao carregar logo da empresa", "error");
+  } finally {
+    carregando.value = false;
+  }
+};
+
+const carregarCapaEmpresa = async () => {
+  carregando.value = true;
+  try {
+    const logo = await empresaService.buscarCapaEmpresa(idEmpresaLogado);
+    if (logo.length > 0) capaUrl.value = logo[0].url;
+  } catch (error) {
+    showToast("Erro ao carregar capa da empresa", "error");
+  } finally {
+    carregando.value = false;
+  }
+};
 
 async function buscarDadosDaEmpresa() {
   carregando.value = true;
@@ -133,9 +164,7 @@ function formatarCnpj(valor) {
   return valorFormatado;
 }
 
-// Função que formata o telefone
 function formatarTelefone(valor) {
-  // só números
   valor = valor.replace(/\D/g, "").slice(0, 11);
 
   if (valor.length > 10) {
@@ -151,7 +180,6 @@ function formatarTelefone(valor) {
   return valor;
 }
 
-// Atualiza o formato do telefone quando `empresa.telefone` mudar
 watch(
   () => empresa.value.telefone,
   (novo) => {
@@ -160,21 +188,38 @@ watch(
   { immediate: true }
 );
 
-// Quando usuário digita no input
 function onTelefoneInput(e) {
   const valor = e.target.value;
   const apenasNumeros = valor.replace(/\D/g, "");
   empresa.value.telefone = apenasNumeros; // salva só números sem formatação
   telefoneFormatado.value = formatarTelefone(valor); // atualiza o campo formatado
 }
+
 const onFotoPerfilChange = (e) => {
   const file = e.target.files[0];
-  if (file) perfilUrl.value = URL.createObjectURL(file);
+  if (file) {
+    try {
+      perfilUrl.value = URL.createObjectURL(file);
+      empresaService.enviarLogoEmpresaPorIdEmpresa(file, idEmpresaLogado);
+
+      showToast("Logo atualizada com com sucesso!", "success");
+    } catch (error) {
+      showToast("Erro ao enviar logo da empresa", "error");
+    }
+  }
 };
 
 const onFotoCapaChange = (e) => {
   const file = e.target.files[0];
-  if (file) capaUrl.value = URL.createObjectURL(file);
+  if (file) {
+    try {
+      capaUrl.value = URL.createObjectURL(file);
+      empresaService.enviarCapaEmpresaPorIdEmpresa(file, idEmpresaLogado);
+      showToast("Capa atualizada com com sucesso!", "success");
+    } catch (error) {
+      showToast("Erro ao enviar capa da empresa", "error");
+    }
+  }
 };
 
 function showToast(msg, type = "info") {
@@ -182,8 +227,18 @@ function showToast(msg, type = "info") {
   toastType.value = type;
 }
 
-function salvar() {
-  console.log("Empresa:", empresa.value);
+async function salvar() {
+  carregando.value = true;
+  try {
+    const data = await empresaService.atualizarDadosEmpresa(empresa.value);
+    if (data) {
+      showToast("Dados da empresa atualizada com com sucesso!", "success");
+    }
+  } catch (error) {
+    showToast("Erro ao atualizar dados da empresa", "error");
+  } finally {
+    carregando.value = false;
+  }
 }
 </script>
 
