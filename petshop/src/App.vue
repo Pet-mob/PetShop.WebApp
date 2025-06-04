@@ -3,9 +3,12 @@
     <MenuHorizontal v-if="$route.meta.menu" />
     <router-view />
   </div>
+  <NotificacaoAgendamento />
+  <!-- <- fica sempre ativo -->
 </template>
 <script setup>
 import MenuHorizontal from "@/components/MenuHorizontal.vue";
+import NotificacaoAgendamento from "@/components/NotificacaoAgendamento.vue";
 </script>
 <style>
 html,
