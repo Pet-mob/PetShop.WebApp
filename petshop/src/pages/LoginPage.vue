@@ -85,12 +85,13 @@ const realizarLogin = async () => {
 
     // Supondo que a API retorna { token: '...' }
     localStorage.setItem("token", resultado.token);
+    localStorage.setItem("cnpj", cnpj.value);
 
-    if (lembrar.value) {
-      localStorage.setItem("cnpj", cnpj.value);
-    } else {
-      localStorage.removeItem("cnpj");
-    }
+    // if (lembrar.value) {
+    //   localStorage.setItem("cnpj", cnpj.value);
+    // } else {
+    //   localStorage.removeItem("cnpj");
+    // }
 
     store.definirCnpjLogado(cnpjSemFormatacao.value);
     showToast("Login realizado com sucesso!", "success");

@@ -1,11 +1,17 @@
 import { createRouter, createWebHistory } from "vue-router";
 import ConfiguracoesLayoutBase from "@/ui/layout/ConfiguracoesLayoutBase.vue";
 import configuracoesRoutes from "@/router/indexConfiguracoes";
-
 import { Settings } from "lucide-vue-next";
 import carregarDadosDoMenu from "@/middlewares/carregarDadosDoMenu";
+import { isLoggedIn } from "@/auth";
 
 const routes = [
+  {
+    path: "/",
+    redirect: () => {
+      return isLoggedIn() ? "/inicio" : "/login";
+    },
+  },
   {
     path: "/login",
     name: "Login",
@@ -16,7 +22,7 @@ const routes = [
     path: "/inicio",
     name: "Inicio",
     component: () => import("@/pages/DashboardPage.vue"),
-    meta: { menu: true },
+    meta: { menu: true, requiresAuth: true },
     beforeEnter: carregarDadosDoMenu,
   },
   {
@@ -37,22 +43,6 @@ const routes = [
     children: configuracoesRoutes,
     meta: { menu: true, icon: Settings },
   },
-  // {
-  //   path: '/fluxo-de-caixa',
-  //   name: 'FluxoDeCaixa',
-  //   component: () => import('@/views/FluxoDeCaixa.vue'),
-  //   meta: { menu: true }
-  // },
-  // {
-  //   path: '/',
-  //   redirect: '/dashboard'
-  // },
-  // {
-  //   path: '/:catchAll(.*)',
-  //   name: 'NotFound',
-  //   component: () => import('@/views/NotFound.vue'),
-  //   meta: { menu: false }
-  // }
 ];
 
 const router = createRouter({
@@ -61,38 +51,15 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = !!localStorage.getItem("token");
-  if (to.path !== "/login" && !isAuthenticated) {
+  const loggedIn = isLoggedIn();
+
+  if (to.meta.requiresAuth && !loggedIn) {
     next("/login");
+  } else if (to.path === "/login" && loggedIn) {
+    next("/inicio");
   } else {
     next();
   }
 });
 
 export default router;
-
-// import { createRouter, createWebHistory } from 'vue-router'
-// import HomeView from '../views/HomeView.vue'
-
-// const routes = [
-//   {
-//     path: '/',
-//     name: 'home',
-//     component: HomeView
-//   },
-//   {
-//     path: '/about',
-//     name: 'about',
-//     // route level code-splitting
-//     // this generates a separate chunk (about.[hash].js) for this route
-//     // which is lazy-loaded when the route is visited.
-//     component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-//   }
-// ]
-
-// const router = createRouter({
-//   history: createWebHistory(process.env.BASE_URL),
-//   routes
-// })
-
-// export default router
