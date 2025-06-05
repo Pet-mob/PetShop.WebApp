@@ -4,8 +4,13 @@
 
     <div class="input-group">
       <input v-model="linkGerado" readonly class="link-input" />
-      <button @click="copiarLink">Copiar</button>
-      <button @click="compartilharLink" v-if="podeCompartilhar">
+      <button type="submit" class="botoes" @click="copiarLink">Copiar</button>
+      <button
+        type="submit"
+        class="botoes"
+        @click="compartilharLink"
+        v-if="podeCompartilhar"
+      >
         Compartilhar
       </button>
     </div>
@@ -88,8 +93,13 @@ function compartilharLink() {
 }
 
 .botoes {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+  padding: 10px 24px;
+  background-color: #0065d1;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.2s;
 }
 </style>
