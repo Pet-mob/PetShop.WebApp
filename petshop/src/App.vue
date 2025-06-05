@@ -1,10 +1,10 @@
 <template>
   <div id="app">
     <MenuHorizontal v-if="$route.meta.menu" />
+    <NotificacaoAgendamento v-if="$route.meta.menu" />
+    <!-- <- fica sempre ativo -->
     <router-view />
   </div>
-  <NotificacaoAgendamento />
-  <!-- <- fica sempre ativo -->
 </template>
 <script setup>
 import MenuHorizontal from "@/components/MenuHorizontal.vue";
