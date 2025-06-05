@@ -1,0 +1,42 @@
+trigger:
+  branches:
+    include:
+      - develop
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  appName: 'petshop-webapp-dev'
+  workingDirectory: 'PetShop.WebApp'
+  nodeVersion: '18.x'
+
+stages:
+  - stage: BuildAndDeploy
+    displayName: Build and Deploy Vue App to Azure Web App
+    jobs:
+      - job: BuildAndDeployJob
+        steps:
+
+          - task: NodeTool@0
+            inputs:
+              versionSpec: '$(nodeVersion)'
+            displayName: 'Install Node.js'
+
+          - script: |
+              cd $(workingDirectory)
+              npm install
+            displayName: 'Install dependencies'
+
+          - script: |
+              cd $(workingDirectory)
+              npm run build
+            displayName: 'Build Vue app'
+
+          - task: AzureWebApp@1
+            displayName: 'Deploy to Azure Web App (Dev)'
+            inputs:
+              azureSubscription: 'AzureServiceConnection-Dev'
+              appType: 'webAppLinux'
+              appName: '$(appName)'
+              package: '$(workingDirectory)/dist'
