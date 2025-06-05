@@ -3,13 +3,14 @@ import ConfiguracoesLayoutBase from "@/ui/layout/ConfiguracoesLayoutBase.vue";
 import configuracoesRoutes from "@/router/indexConfiguracoes";
 import { Settings } from "lucide-vue-next";
 import carregarDadosDoMenu from "@/middlewares/carregarDadosDoMenu";
-import { isLoggedIn } from "@/auth";
+
+const loggedIn = !!localStorage.getItem("cnpj");
 
 const routes = [
   {
     path: "/",
     redirect: () => {
-      return isLoggedIn() ? "/inicio" : "/login";
+      return loggedIn ? "/inicio" : "/login";
     },
   },
   {
@@ -23,7 +24,6 @@ const routes = [
     name: "Inicio",
     component: () => import("@/pages/DashboardPage.vue"),
     meta: { menu: true },
-    beforeEnter: carregarDadosDoMenu,
   },
   {
     path: "/agenda",
@@ -50,15 +50,25 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
-  const loggedIn = isLoggedIn();
+router.beforeEach(async (to, from, next) => {
+  if (!loggedIn && to.path !== "/login") {
+    return next("/login");
+  }
 
-  if (to.meta.requiresAuth && !loggedIn) {
-    next("/login");
-  } else if (to.path === "/login" && loggedIn) {
-    next("/inicio");
+  if (to.path === "/login" && loggedIn) {
+    return next("/inicio");
+  }
+
+  // ⬇ Carrega dados do menu em qualquer rota diferente de /login
+  if (to.path !== "/login") {
+    try {
+      await carregarDadosDoMenu(to, from, next);
+    } catch (e) {
+      console.error("Erro ao carregar dados do menu:", e);
+      return next("/erro");
+    }
   } else {
-    next();
+    next(); // rota /login segue normalmente
   }
 });
 

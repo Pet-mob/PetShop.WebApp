@@ -65,7 +65,6 @@ function showToast(msg, type = "info") {
 const buscarEmpresaLogadaPorCnpj = async () => {
   try {
     carregando.value = true;
-
     const empresa = await empresaService.buscarEmpresa(store.cnpjLogado);
     if (empresa) {
       store.definirObjetoEmpresaLogada(empresa[0]);
