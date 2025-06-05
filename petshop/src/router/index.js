@@ -22,7 +22,7 @@ const routes = [
     path: "/inicio",
     name: "Inicio",
     component: () => import("@/pages/DashboardPage.vue"),
-    meta: { menu: true, requiresAuth: true },
+    meta: { menu: true },
     beforeEnter: carregarDadosDoMenu,
   },
   {

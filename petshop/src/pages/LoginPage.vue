@@ -78,14 +78,11 @@ const realizarLogin = async () => {
   carregando.value = true;
 
   try {
-    const resultado = await loginService.validarLogin(
-      cnpjSemFormatacao.value,
-      senha.value
-    );
+    await loginService.validarLogin(cnpjSemFormatacao.value, senha.value);
 
     // Supondo que a API retorna { token: '...' }
-    localStorage.setItem("token", resultado.token);
-    localStorage.setItem("cnpj", cnpj.value);
+    // localStorage.setItem("token", resultado.token);
+    localStorage.setItem("cnpj", cnpjSemFormatacao.value);
 
     // if (lembrar.value) {
     //   localStorage.setItem("cnpj", cnpj.value);
