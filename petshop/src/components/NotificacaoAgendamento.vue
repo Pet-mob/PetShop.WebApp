@@ -1,35 +1,49 @@
 <template>
   <div class="notificacoes-laterais">
-    <div
-      v-for="agendamento in agendamentosPendentes"
-      :key="agendamento.id"
-      class="card"
-    >
-      <p><strong>Cliente:</strong> {{ agendamento.cliente }}</p>
-      <p><strong>Serviço:</strong> {{ agendamento.servico }}</p>
-      <button
-        :disabled="isLoading(agendamento.id)"
-        @click="aceitar(agendamento.id)"
+    <TransitionGroup name="fade" tag="div" class="notificacoes-lista">
+      <div
+        v-for="agendamento in agendamentosPendentes"
+        :key="agendamento.id"
+        class="card"
       >
-        ✅ Aceitar
-      </button>
-      <button
-        :disabled="isLoading(agendamento.id)"
-        @click="recusar(agendamento.id)"
-      >
-        ❌ Recusar
-      </button>
-    </div>
+        <p><strong>Cliente:</strong> {{ agendamento.cliente }}</p>
+        <p><strong>Serviço:</strong> {{ agendamento.servico }}</p>
+        <button
+          :disabled="isLoading(agendamento.id)"
+          @click="aceitar(agendamento.id)"
+        >
+          ✅ Aceitar
+        </button>
+        <button
+          :disabled="isLoading(agendamento.id)"
+          @click="recusar(agendamento.id)"
+        >
+          ❌ Recusar
+        </button>
+      </div>
+    </TransitionGroup>
+
+    <!-- Toast customizado -->
+    <Toast :message="toastMessage" :type="toastType" />
   </div>
 </template>
 
 <script setup>
 import { onMounted, onBeforeUnmount, ref, watch } from "vue";
 import { useSignalR } from "@/composables/useSignalR";
+import Toast from "@/components/ToastCustomizado.vue";
 
 const agendamentosPendentes = ref([]);
 const loadingIds = ref([]);
 const { novoAgendamento, startConnection, stopConnection } = useSignalR();
+
+const toastMessage = ref("");
+const toastType = ref("info");
+
+function showToast(msg, type = "info") {
+  toastMessage.value = msg;
+  toastType.value = type;
+}
 
 onMounted(() => {
   startConnection();
@@ -42,6 +56,7 @@ onBeforeUnmount(() => {
 watch(novoAgendamento, (novo) => {
   if (novo && !agendamentosPendentes.value.find((a) => a.id === novo.id)) {
     agendamentosPendentes.value.push(novo);
+    showToast("📥 Novo agendamento recebido!", "info");
   }
 });
 
@@ -58,11 +73,15 @@ async function aceitar(id) {
       agendamentosPendentes.value = agendamentosPendentes.value.filter(
         (a) => a.id !== id
       );
+      showToast("✅ Agendamento aceito!", "success");
     } else {
-      console.error("❌ Falha ao aceitar:", await res.text());
+      const erro = await res.text();
+      console.error("❌ Falha ao aceitar:", erro);
+      showToast("Erro ao aceitar: " + erro, "error");
     }
   } catch (err) {
-    console.error("❌ Erro de rede ao aceitar:", err);
+    console.error("❌ Erro de rede:", err);
+    showToast("Erro de rede ao aceitar", "error");
   } finally {
     loadingIds.value = loadingIds.value.filter((i) => i !== id);
   }
@@ -79,11 +98,15 @@ async function recusar(id) {
       agendamentosPendentes.value = agendamentosPendentes.value.filter(
         (a) => a.id !== id
       );
+      showToast("❌ Agendamento recusado!", "warning");
     } else {
-      console.error("❌ Falha ao recusar:", await res.text());
+      const erro = await res.text();
+      console.error("❌ Falha ao recusar:", erro);
+      showToast("Erro ao recusar: " + erro, "error");
     }
   } catch (err) {
-    console.error("❌ Erro de rede ao recusar:", err);
+    console.error("❌ Erro de rede:", err);
+    showToast("Erro de rede ao recusar", "error");
   } finally {
     loadingIds.value = loadingIds.value.filter((i) => i !== id);
   }
@@ -95,20 +118,36 @@ async function recusar(id) {
   position: fixed;
   right: 0;
   top: 60px;
-  width: 300px;
+  width: 320px;
   background: #f4f4f4;
   border-left: 2px solid #ccc;
   padding: 1rem;
   z-index: 1000;
+  overflow-y: auto;
+  max-height: 90vh;
 }
 .card {
   background: white;
   border: 1px solid #ccc;
   padding: 10px;
   margin-bottom: 10px;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
 }
 button[disabled] {
   opacity: 0.6;
   pointer-events: none;
+}
+
+/* Animações de entrada/saída */
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.4s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateX(20px);
 }
 </style>
