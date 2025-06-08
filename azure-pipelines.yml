@@ -55,9 +55,8 @@ steps:
 
 # Deploy para Azure Static Web App
   - task: AzureStaticWebApp@0
-    displayName: 'Deploy para Azure Static Web App (Prod)'
+    displayName: 'Deploy Vue para Azure Static Web App'
     inputs:
-      azure_static_web_apps_api_token: $(STATIC_WEBAPP_TOKEN)  # Token secreto
-      app_location: "/petshop"          # pasta do projeto Vue
-      output_location: "dist"           # pasta gerada pelo build (npm run build)
-      skip_app_build: true              # já fez o build antes no pipeline
+      azure_static_web_apps_api_token: $(STATIC_WEBAPP_TOKEN)
+      app_location: "petshop"          # Onde está o package.json
+      output_location: "dist"          # Onde o Vue gera o index.html
