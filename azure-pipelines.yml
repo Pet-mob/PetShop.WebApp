@@ -1,55 +1,63 @@
-# Dispara a pipeline automaticamente quando houver commit na branch 'prod'
+# Dispara a pipeline automaticamente quando houver commit na branch 'master'
 trigger:
   branches:
     include:
       - master
 
-# Variáveis usadas no pipeline — edite conforme seu projeto
+# Variáveis usadas no pipeline
 variables:
   environment: 'prod'
-  webAppName: 'petshop-webapp-prod'               # Nome do App Service no Azure (Web App para o ambiente de desenvolvimento)
-  resourceGroup: 'rg-peton-prod'                       # Nome do Resource Group (opcional neste pipeline)
-  azureSubscription: 'AzureServiceConnection-Prod'     # Nome da Service Connection configurada no Azure DevOps prod
+  webAppName: 'petshop-webapp-prod'
+  resourceGroup: 'rg-peton-prod'
+  azureSubscription: 'AzureServiceConnection-Prod'
 
-# Define o tipo de máquina usada para rodar o pipeline
+# Tipo de máquina
 pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-  # Etapa para instalar o Node.js na versão desejada (ajuste conforme sua aplicação)
+  # Instala o Node.js
   - task: NodeTool@0
     inputs:
-      versionSpec: '22.x'                             # Versão do Node.js a ser usada
+      versionSpec: '22.x'
     displayName: 'Instalar Node.js v22.x'
 
-  # Etapa para instalar as dependências do projeto Node.js (usa o package.json)
+  # Instala dependências dentro da pasta do projeto
   - script: |
       cd petshop
-      node -v      
+      node -v
       npm install
-    displayName: 'Instalar dependências do Node.js'
+    displayName: 'Instalar dependências do Vue.js'
 
-  # Etapa de build — somente se o projeto Node.js tiver esse processo (por exemplo, apps com Webpack, Next.js, etc.)
+  # Gera a build (gera a pasta /dist)
   - script: |
       cd petshop
       npm run build
-    displayName: 'Build do projeto Node.js (opcional)' 
+    displayName: 'Build do projeto Vue.js'
 
-  # Etapa para criar um arquivo .zip com o conteúdo do projeto para publicação no Azure
-  - task: ArchiveFiles@2
-    displayName: 'Arquivar arquivos para deploy'
+  # Copia a pasta dist para o staging
+  - task: CopyFiles@2
+    displayName: 'Copiar arquivos da build para staging'
     inputs:
-      rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+      contents: '**'
+      sourceFolder: 'petshop/dist'
+      targetFolder: '$(Build.ArtifactStagingDirectory)'
+
+  # Cria o zip do conteúdo da build
+  - task: ArchiveFiles@2
+    displayName: 'Arquivar build para deploy'
+    inputs:
+      rootFolderOrFile: '$(Build.ArtifactStagingDirectory)'
       includeRootFolder: false
       archiveType: 'zip'
-      archiveFile: '$(Build.ArtifactStagingDirectory)/nodeapp.zip'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/vueapp.zip'
       replaceExistingArchive: true
 
-  # Etapa de deploy: envia o arquivo zipado para o Azure Web App (Linux)
+  # Deploy para o Azure Web App
   - task: AzureWebApp@1
     displayName: 'Deploy para Azure Web App (Prod)'
     inputs:
       azureSubscription: $(azureSubscription)
-      appType: 'webAppLinux'                          # O App Service deve ser do tipo Linux
+      appType: 'webAppLinux'
       appName: $(webAppName)
-      package: '$(Build.ArtifactStagingDirectory)/nodeapp.zip'
+      package: '$(Build.ArtifactStagingDirectory)/vueapp.zip'
