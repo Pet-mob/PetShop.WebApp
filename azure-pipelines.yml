@@ -19,16 +19,19 @@ steps:
   # Etapa para instalar o Node.js na versão desejada (ajuste conforme sua aplicação)
   - task: NodeTool@0
     inputs:
-      versionSpec: '18.x'                             # Versão do Node.js a ser usada
-    displayName: 'Instalar Node.js'
+      versionSpec: '22.x'                             # Versão do Node.js a ser usada
+    displayName: 'Instalar Node.js v22.x'
 
   # Etapa para instalar as dependências do projeto Node.js (usa o package.json)
   - script: |
+      cd petshop
+      node -v      
       npm install
     displayName: 'Instalar dependências do Node.js'
 
   # Etapa de build — somente se o projeto Node.js tiver esse processo (por exemplo, apps com Webpack, Next.js, etc.)
   - script: |
+      cd petshop
       npm run build
     displayName: 'Build do projeto Node.js (opcional)' 
 
