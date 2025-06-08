@@ -7,7 +7,7 @@ trigger:
 # Variáveis usadas no pipeline — edite conforme seu projeto
 variables:
   environment: 'dev'
-  webAppName: 'petshop-node-webapp-dev'               # Nome do App Service no Azure (Web App para o ambiente de desenvolvimento)
+  webAppName: 'petshop-webapp-dev'               # Nome do App Service no Azure (Web App para o ambiente de desenvolvimento)
   resourceGroup: 'rg-peton-dev'                       # Nome do Resource Group (opcional neste pipeline)
   azureSubscription: 'AzureServiceConnection-Dev'     # Nome da Service Connection configurada no Azure DevOps Dev
 
