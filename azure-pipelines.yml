@@ -54,10 +54,10 @@ steps:
       replaceExistingArchive: true
 
 # Deploy para Azure Static Web App
-- task: AzureStaticWebApp@0
-  displayName: 'Deploy para Azure Static Web App (Prod)'
-  inputs:
-    azure_static_web_apps_api_token: $(STATIC_WEBAPP_TOKEN)  # Token secreto
-    app_location: "/petshop"          # pasta do projeto Vue
-    output_location: "dist"           # pasta gerada pelo build (npm run build)
-    skip_app_build: true              # já fez o build antes no pipeline
+  - task: AzureStaticWebApp@0
+    displayName: 'Deploy para Azure Static Web App (Prod)'
+    inputs:
+      azure_static_web_apps_api_token: $(STATIC_WEBAPP_TOKEN)  # Token secreto
+      app_location: "/petshop"          # pasta do projeto Vue
+      output_location: "dist"           # pasta gerada pelo build (npm run build)
+      skip_app_build: true              # já fez o build antes no pipeline
