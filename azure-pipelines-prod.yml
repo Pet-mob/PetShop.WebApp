@@ -1,33 +1,52 @@
+# Dispara a pipeline automaticamente quando houver commit na branch 'develop'
 trigger:
   branches:
     include:
-      - master  # ou 'prod', caso use esse nome
+      - master
 
+# Variáveis usadas no pipeline — edite conforme seu projeto
 variables:
   environment: 'prod'
-  webAppName: 'peton-prod'
-  resourceGroup: 'peton-prod-rg'
-  azureSubscription: 'azure-subscription'
+  webAppName: 'petshop-webapp-prod'               # Nome do App Service no Azure (Web App para o ambiente de desenvolvimento)
+  resourceGroup: 'rg-peton-prod'                       # Nome do Resource Group (opcional neste pipeline)
+  azureSubscription: 'AzureServiceConnection-Prod'     # Nome da Service Connection configurada no Azure DevOps Dev
 
+# Define o tipo de máquina usada para rodar o pipeline
 pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-  - task: UseDotNet@2
+  # Etapa para instalar o Node.js na versão desejada (ajuste conforme sua aplicação)
+  - task: NodeTool@0
     inputs:
-      packageType: 'sdk'
-      version: '8.x'
-      installationPath: $(Agent.ToolsDirectory)/dotnet
+      versionSpec: '18.x'                             # Versão do Node.js a ser usada
+    displayName: 'Instalar Node.js'
 
-  - task: DotNetCoreCLI@2
+  # Etapa para instalar as dependências do projeto Node.js (usa o package.json)
+  - script: |
+      npm install
+    displayName: 'Instalar dependências do Node.js'
+
+  # Etapa de build — somente se o projeto Node.js tiver esse processo (por exemplo, apps com Webpack, Next.js, etc.)
+  - script: |
+      npm run build
+    displayName: 'Build do projeto Node.js (opcional)' 
+
+  # Etapa para criar um arquivo .zip com o conteúdo do projeto para publicação no Azure
+  - task: ArchiveFiles@2
+    displayName: 'Arquivar arquivos para deploy'
     inputs:
-      command: 'publish'
-      publishWebProjects: true
-      arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)'
-      zipAfterPublish: true
+      rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+      includeRootFolder: false
+      archiveType: 'zip'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/nodeapp.zip'
+      replaceExistingArchive: true
 
+  # Etapa de deploy: envia o arquivo zipado para o Azure Web App (Linux)
   - task: AzureWebApp@1
+    displayName: 'Deploy para Azure Web App (Prod)'
     inputs:
       azureSubscription: $(azureSubscription)
+      appType: 'webAppLinux'                          # O App Service deve ser do tipo Linux
       appName: $(webAppName)
-      package: '$(Build.ArtifactStagingDirectory)/**/*.zip'
+      package: '$(Build.ArtifactStagingDirectory)/nodeapp.zip'
