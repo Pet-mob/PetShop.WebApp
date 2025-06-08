@@ -1,4 +1,4 @@
-# Dispara a pipeline automaticamente quando houver commit na branch 'develop'
+# Dispara a pipeline automaticamente quando houver commit na branch 'prod'
 trigger:
   branches:
     include:
@@ -9,7 +9,7 @@ variables:
   environment: 'prod'
   webAppName: 'petshop-webapp-prod'               # Nome do App Service no Azure (Web App para o ambiente de desenvolvimento)
   resourceGroup: 'rg-peton-prod'                       # Nome do Resource Group (opcional neste pipeline)
-  azureSubscription: 'AzureServiceConnection-Prod'     # Nome da Service Connection configurada no Azure DevOps Dev
+  azureSubscription: 'AzureServiceConnection-Prod'     # Nome da Service Connection configurada no Azure DevOps prod
 
 # Define o tipo de máquina usada para rodar o pipeline
 pool:
