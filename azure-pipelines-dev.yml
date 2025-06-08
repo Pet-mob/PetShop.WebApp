@@ -42,11 +42,10 @@ steps:
       archiveFile: '$(Build.ArtifactStagingDirectory)/nodeapp.zip'
       replaceExistingArchive: true
 
-  # Etapa de deploy: envia o arquivo zipado para o Azure Web App (Linux)
-  - task: AzureWebApp@1
-    displayName: 'Deploy para Azure Web App (Dev)'
+# Deploy para Azure Static Web App
+  - task: AzureStaticWebApp@0
+    displayName: 'Deploy Vue para Azure Static Web App'
     inputs:
-      azureSubscription: $(azureSubscription)
-      appType: 'webAppLinux'                          # O App Service deve ser do tipo Linux
-      appName: $(webAppName)
-      package: '$(Build.ArtifactStagingDirectory)/nodeapp.zip'
+      azure_static_web_apps_api_token: $(STATIC_WEBAPP_TOKEN)
+      app_location: "petshop"          # Onde está o package.json
+      output_location: "dist"          # Onde o Vue gera o index.html
