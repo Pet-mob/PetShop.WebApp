@@ -1,77 +1,52 @@
+# Dispara a pipeline automaticamente quando houver commit na branch 'develop'
 trigger:
   branches:
     include:
       - develop
-      - main
 
+# Variáveis usadas no pipeline — edite conforme seu projeto
+variables:
+  environment: 'dev'
+  webAppName: 'petshop-node-webapp-dev'               # Nome do App Service no Azure (Web App para o ambiente de desenvolvimento)
+  resourceGroup: 'rg-peton-dev'                       # Nome do Resource Group (opcional neste pipeline)
+  azureSubscription: 'AzureServiceConnection-Dev'     # Nome da Service Connection configurada no Azure DevOps Dev
+
+# Define o tipo de máquina usada para rodar o pipeline
 pool:
   vmImage: 'ubuntu-latest'
 
-variables:
-  workingDirectory: 'PetShop.WebApp'
-  nodeVersion: '18.x'
+steps:
+  # Etapa para instalar o Node.js na versão desejada (ajuste conforme sua aplicação)
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '18.x'                             # Versão do Node.js a ser usada
+    displayName: 'Instalar Node.js'
 
-stages:
-  - stage: BuildAndDeployDev
-    displayName: Build and Deploy Dev
-    condition: eq(variables['Build.SourceBranch'], 'refs/heads/develop')
-    variables:
-      appName: 'petshop-webapp-dev'
-      azureSubscription: 'AzureServiceConnection-Dev'
-    jobs:
-      - job: BuildAndDeployJobDev
-        steps:
-          - task: NodeTool@0
-            inputs:
-              versionSpec: '$(nodeVersion)'
-            displayName: 'Install Node.js'
+  # Etapa para instalar as dependências do projeto Node.js (usa o package.json)
+  - script: |
+      npm install
+    displayName: 'Instalar dependências do Node.js'
 
-          - script: |
-              cd $(workingDirectory)
-              npm install
-            displayName: 'Install dependencies'
+  # Etapa de build — somente se o projeto Node.js tiver esse processo (por exemplo, apps com Webpack, Next.js, etc.)
+  - script: |
+      npm run build
+    displayName: 'Build do projeto Node.js (opcional)' 
 
-          - script: |
-              cd $(workingDirectory)
-              npm run build
-            displayName: 'Build Vue app'
+  # Etapa para criar um arquivo .zip com o conteúdo do projeto para publicação no Azure
+  - task: ArchiveFiles@2
+    displayName: 'Arquivar arquivos para deploy'
+    inputs:
+      rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+      includeRootFolder: false
+      archiveType: 'zip'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/nodeapp.zip'
+      replaceExistingArchive: true
 
-          - task: AzureWebApp@1
-            displayName: 'Deploy to Azure Web App (Dev)'
-            inputs:
-              azureSubscription: '$(azureSubscription)'
-              appType: 'webAppLinux'
-              appName: '$(appName)'
-              package: '$(workingDirectory)/dist'
-
-  - stage: BuildAndDeployProd
-    displayName: Build and Deploy Prod
-    condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
-    variables:
-      appName: 'petshop-webapp-prod'
-      azureSubscription: 'AzureServiceConnection-Prod'
-    jobs:
-      - job: BuildAndDeployJobProd
-        steps:
-          - task: NodeTool@0
-            inputs:
-              versionSpec: '$(nodeVersion)'
-            displayName: 'Install Node.js'
-
-          - script: |
-              cd $(workingDirectory)
-              npm install
-            displayName: 'Install dependencies'
-
-          - script: |
-              cd $(workingDirectory)
-              npm run build
-            displayName: 'Build Vue app'
-
-          - task: AzureWebApp@1
-            displayName: 'Deploy to Azure Web App (Prod)'
-            inputs:
-              azureSubscription: '$(azureSubscription)'
-              appType: 'webAppLinux'
-              appName: '$(appName)'
-              package: '$(workingDirectory)/dist'
+  # Etapa de deploy: envia o arquivo zipado para o Azure Web App (Linux)
+  - task: AzureWebApp@1
+    displayName: 'Deploy para Azure Web App (Dev)'
+    inputs:
+      azureSubscription: $(azureSubscription)
+      appType: 'webAppLinux'                          # O App Service deve ser do tipo Linux
+      appName: $(webAppName)
+      package: '$(Build.ArtifactStagingDirectory)/nodeapp.zip'
