@@ -8,7 +8,7 @@ let connection = null;
 export function useSignalR() {
   const startConnection = async () => {
     connection = new HubConnectionBuilder()
-      .withUrl("http://localhost:5000/hubs/agendamento") // Ajuste se for diferente
+      .withUrl(process.env.VUE_APP_SIGNALR_URL) // Ajuste se for diferente
       .configureLogging(LogLevel.Information)
       .withAutomaticReconnect()
       .build();

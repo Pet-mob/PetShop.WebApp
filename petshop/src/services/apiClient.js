@@ -2,11 +2,11 @@ import axios from "axios";
 
 // Base URL da API
 const apiClient = axios.create({
-  baseURL: "https://localhost:44329/api/",
+  baseURL: process.env.VUE_APP_API_URL, // usa a variável do .env
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 10000, // opcional: tempo limite de 10 segundos
+  timeout: 10000,
 });
 
 // Interceptor de requisição (ex: adicionar token JWT)
