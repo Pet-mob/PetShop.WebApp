@@ -10,19 +10,19 @@ const apiClient = axios.create({
 });
 
 // Interceptor de requisição (ex: adicionar token JWT)
-apiClient.interceptors.request.use(
-  (config) => {
-    // Exemplo: adicionar token se existir
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+// apiClient.interceptors.request.use(
+//   (config) => {
+//     // Exemplo: adicionar token se existir
+//     const token = localStorage.getItem("token");
+//     if (token) {
+//       config.headers.Authorization = `Bearer ${token}`;
+//     }
+//     return config;
+//   },
+//   (error) => {
+//     return Promise.reject(error);
+//   }
+// );
 
 // Interceptor de resposta (ex: tratamento global de erros)
 apiClient.interceptors.response.use(
