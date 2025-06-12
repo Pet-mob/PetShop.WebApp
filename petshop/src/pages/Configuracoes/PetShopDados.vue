@@ -89,7 +89,7 @@ import Toast from "@/components/ToastCustomizado.vue";
 import { useGlobalStore } from "@/store/useGlobalStore";
 
 const store = useGlobalStore();
-const cnpjEmpresaLogada = store.cnpjLogado;
+const cnpjEmpresaLogada = store.cnpjLogado.value;
 const idEmpresaLogado = store.empresaLogada.idEmpresa;
 const carregando = ref(false);
 const toastMessage = ref("");
