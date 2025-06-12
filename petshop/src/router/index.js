@@ -4,13 +4,12 @@ import configuracoesRoutes from "@/router/indexConfiguracoes";
 import { Settings } from "lucide-vue-next";
 import carregarDadosDoMenu from "@/middlewares/carregarDadosDoMenu";
 
-const loggedIn = !!localStorage.getItem("cnpj");
-
 const routes = [
   {
     path: "/",
     redirect: () => {
-      return loggedIn ? "/inicio" : "/login";
+      // 👇 Isso precisa ser dinâmico
+      return localStorage.getItem("cnpj") ? "/inicio" : "/login";
     },
   },
   {
@@ -51,6 +50,8 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
+  const loggedIn = !!localStorage.getItem("cnpj"); // 👈 verificação dinâmica aqui
+
   if (!loggedIn && to.path !== "/login") {
     return next("/login");
   }
@@ -59,7 +60,6 @@ router.beforeEach(async (to, from, next) => {
     return next("/inicio");
   }
 
-  // ⬇ Carrega dados do menu em qualquer rota diferente de /login
   if (to.path !== "/login") {
     try {
       await carregarDadosDoMenu(to, from, next);
@@ -68,7 +68,7 @@ router.beforeEach(async (to, from, next) => {
       return next("/erro");
     }
   } else {
-    next(); // rota /login segue normalmente
+    next();
   }
 });
 
