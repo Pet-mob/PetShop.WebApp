@@ -90,7 +90,7 @@ import { useGlobalStore } from "@/store/useGlobalStore";
 
 const store = useGlobalStore();
 const cnpjEmpresaLogada = store.cnpjLogado.value;
-const idEmpresaLogado = store.empresaLogada.idEmpresa;
+const idEmpresaLogado = store.empresaLogada.value.idEmpresa;
 const carregando = ref(false);
 const toastMessage = ref("");
 const toastType = ref("info");
