@@ -24,9 +24,10 @@ import { ref, computed } from "vue";
 import { useGlobalStore } from "@/store/useGlobalStore";
 
 const store = useGlobalStore();
-const idEmpresaLogado = store.empresaLogada.value.idEmpresa;
+const empresaLogada = store.empresaLogada;
+const idEmpresaLogada = empresaLogada.idEmpresa;
 
-const idEmpresa = idEmpresaLogado; // Pode ser passado por props ou vindo da store
+const idEmpresa = idEmpresaLogada; // Pode ser passado por props ou vindo da store
 const baseUrl = "https://peton.app/redirect";
 
 const linkGerado = computed(() => `${baseUrl}?empresa=${idEmpresa}`);
