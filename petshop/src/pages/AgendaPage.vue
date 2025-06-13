@@ -86,7 +86,7 @@ const inputData = ref(null);
 const carregando = ref(false);
 const agendamentos = ref([]);
 const empresaLogada = store.empresaLogada;
-const idEmpresaLogada = empresaLogada.value.idEmpresa;
+const idEmpresaLogada = empresaLogada.idEmpresa;
 
 const intervaloSemana = computed(() => {
   const inicio = dayjs(dataFiltro.value)
