@@ -123,7 +123,7 @@ const carregarLogoEmpresa = async () => {
     const logo = await empresaService.buscarLogoEmpresa(idEmpresaLogado);
     if (logo.length > 0) perfilUrl.value = logo[0].url;
   } catch (error) {
-    showToast("Erro ao carregar logo da empresa", "error");
+    // showToast("Erro ao carregar logo da empresa", "error");
   } finally {
     carregando.value = false;
   }
@@ -135,7 +135,7 @@ const carregarCapaEmpresa = async () => {
     const logo = await empresaService.buscarCapaEmpresa(idEmpresaLogado);
     if (logo.length > 0) capaUrl.value = logo[0].url;
   } catch (error) {
-    showToast("Erro ao carregar capa da empresa", "error");
+    // showToast("Erro ao carregar capa da empresa", "error");
   } finally {
     carregando.value = false;
   }
