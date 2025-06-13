@@ -24,7 +24,7 @@ export default async function carregarDadosDoMenu(to, from, next) {
     }
 
     // Salva a empresa na store global
-    store.definirObjetoEmpresaLogada(empresa);
+    store.definirObjetoEmpresaLogada(empresa[0]);
 
     // Continua para a rota
     return next();
