@@ -66,7 +66,8 @@ import LoadingPetON from "@/components/LoadingPetON.vue";
 import Toast from "@/components/ToastCustomizado.vue";
 
 const store = useGlobalStore();
-const idEmpresaLogada = store.empresaLogada.value.idEmpresa;
+const empresaLogada = store.empresaLogada;
+const idEmpresaLogada = empresaLogada.idEmpresa;
 
 const carregando = ref(false);
 const toastMessage = ref("");
