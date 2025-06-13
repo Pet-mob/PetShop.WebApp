@@ -1,7 +1,10 @@
 module.exports = {
   productionSourceMap: true,
-  publicPath: './',
+  publicPath: "/", // Mude para "/"
   configureWebpack: {
     devtool: "source-map",
+  },
+  devServer: {
+    historyApiFallback: true,
   },
 };

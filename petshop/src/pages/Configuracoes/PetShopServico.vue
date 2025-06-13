@@ -57,7 +57,7 @@ import ModalGenerico from "@/components/ModalBase.vue";
 import FormularioServico from "@/views/FormularioServico.vue";
 import ServicosEmpresaService from "@/services/ServicosEmpresaService";
 import { useGlobalStore } from "@/store/useGlobalStore";
-import LoadingPetON from "@/components/LoadingPetON.vue";
+import LoadingPetON from "@/components/LoadingPetMob.vue";
 import Toast from "@/components/ToastCustomizado.vue";
 
 const store = useGlobalStore();

@@ -8,12 +8,12 @@
       >
         Semanal
       </button>
-      <button
+      <!-- <button
         :class="['tab-btn', { active: visualizacao === 'mensal' }]"
         disabled
       >
         Mensal
-      </button>
+      </button> -->
     </div>
 
     <!-- Navegação -->

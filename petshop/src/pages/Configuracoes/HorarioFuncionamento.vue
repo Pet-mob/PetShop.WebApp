@@ -62,7 +62,7 @@
 import { onMounted, reactive, ref } from "vue";
 import empresaService from "@/services/empresaService";
 import { useGlobalStore } from "@/store/useGlobalStore";
-import LoadingPetON from "@/components/LoadingPetON.vue";
+import LoadingPetON from "@/components/LoadingPetMob.vue";
 import Toast from "@/components/ToastCustomizado.vue";
 
 const store = useGlobalStore();

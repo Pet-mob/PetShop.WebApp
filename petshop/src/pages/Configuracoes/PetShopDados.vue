@@ -82,9 +82,9 @@
 <script setup>
 import { ref, onMounted, watch } from "vue";
 import perfilPadrao from "@/assets/perfil.png";
-import fotoCapaPadrao from "@/assets/LogoEscrita.png";
+import fotoCapaPadrao from "@/assets/LogoEscritaPetMob.png";
 import empresaService from "@/services/empresaService";
-import LoadingPetON from "@/components/LoadingPetON.vue";
+import LoadingPetON from "@/components/LoadingPetMob.vue";
 import Toast from "@/components/ToastCustomizado.vue";
 import { useGlobalStore } from "@/store/useGlobalStore";
 

@@ -1,7 +1,7 @@
 <template>
   <div class="loading-container">
     <div class="logo-wrapper">
-      <img src="../assets/LogoPetON.png" alt="Pet.ON" class="logo" />
+      <img src="../assets/LogoSemEscrita.png" alt="Pet.ON" class="logo" />
       <div class="spinner"></div>
     </div>
     <p class="loading-text">Carregando...</p>

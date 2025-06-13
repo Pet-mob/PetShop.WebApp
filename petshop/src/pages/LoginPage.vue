@@ -5,8 +5,8 @@
 
     <!-- Oculta o card de login durante o loading -->
     <div class="card-login" v-else>
-      <img src="@/assets/LogoPetON.png" alt="Logo Pet.ON" class="logo" />
-      <h2>Bem-vindo</h2>
+      <img :src="logo" alt="Logo Pet.ON" class="logo" />
+      <h3>Bem-vindo</h3>
       <p>Faça login com seu CNPJ e senha cadastrados.</p>
 
       <form @submit.prevent="realizarLogin">
@@ -45,9 +45,10 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import logo from "@/assets/LogoLadoCentralizado.png";
 import loginService from "@/services/loginService";
 import Toast from "@/components/ToastCustomizado.vue";
-import LoadingPetON from "@/components/LoadingPetON.vue";
+import LoadingPetON from "@/components/LoadingPetMob.vue";
 import useCnpjFormatado from "@/composables/useCnpjFormatado";
 import { useGlobalStore } from "@/store/useGlobalStore";
 
@@ -144,7 +145,7 @@ const realizarLogin = async () => {
 }
 
 .logo {
-  width: 180px;
+  width: 380px;
   margin-bottom: 1rem;
 }
 
