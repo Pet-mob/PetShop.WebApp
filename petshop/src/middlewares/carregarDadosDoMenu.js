@@ -2,28 +2,36 @@ import { useGlobalStore } from "@/store/useGlobalStore";
 import empresaService from "@/services/empresaService";
 
 export default async function carregarDadosDoMenu(to, from, next) {
+  const store = useGlobalStore();
+  store.carregando = true;
+
   try {
-    const store = useGlobalStore();
-
-    store.carregando = true;
-
-    // Se o valor em memória sumiu (por causa de F5), tenta pegar do localStorage
+    // Recupera o CNPJ logado da store ou localStorage
     const cnpj = store.cnpjLogado || localStorage.getItem("cnpj");
 
     if (!cnpj) {
       console.warn("CNPJ não encontrado, redirecionando para login");
-      return next("/login"); // ou outra ação
+      return next("/login");
     }
 
-    const [empresa] = await Promise.all([empresaService.buscarEmpresa(cnpj)]);
+    // Chama a API e espera o retorno
+    const empresa = await empresaService.buscarEmpresa(cnpj);
 
-    store.definirObjetoEmpresaLogada(empresa[0]);
-    next();
+    // Se não veio empresa, redireciona para erro
+    if (!empresa) {
+      console.warn("Empresa não encontrada para o CNPJ:", cnpj);
+      return next("/erro");
+    }
+
+    // Salva a empresa na store global
+    store.definirObjetoEmpresaLogada(empresa);
+
+    // Continua para a rota
+    return next();
   } catch (erro) {
     console.error("Erro ao carregar dados do menu:", erro);
-    next("/erro");
+    return next("/erro");
   } finally {
-    const store = useGlobalStore();
     store.carregando = false;
   }
 }
