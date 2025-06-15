@@ -212,6 +212,7 @@ async function salvarServico(dados) {
 <style scoped>
 .secao-servicos {
   padding: 1.5rem;
+  padding-bottom: 70px;
   max-width: 900px;
   margin: 0 auto;
 }
