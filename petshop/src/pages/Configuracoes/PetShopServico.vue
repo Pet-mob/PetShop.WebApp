@@ -28,9 +28,14 @@
               <strong>Status:</strong> {{ servico.ativo ? "Ativo" : "Inativo" }}
             </p> -->
           </div>
-          <button class="botao-editar" @click="abrirModalEditar(servico)">
-            Editar
-          </button>
+          <div class="card_botoes">
+            <button class="botao-editar" @click="abrirModalEditar(servico)">
+              Editar
+            </button>
+            <button class="botao-excluir" @click="excluirServico(servico)">
+              Excluir
+            </button>
+          </div>
         </article>
       </div>
 
@@ -162,6 +167,21 @@ async function atualizarServico(dto) {
   }
 }
 
+async function excluirServico(dto) {
+  carregando.value = true;
+  try {
+    const data = await ServicosEmpresaService.excluirServicoEmpresa(dto);
+    if (data.data) {
+      showToast("Serviço excluido com com sucesso!", "success");
+      await buscarServicosDaEmpresa();
+    }
+  } catch (error) {
+    showToast("Erro ao excluir serviços", "error");
+  } finally {
+    carregando.value = false;
+  }
+}
+
 async function salvarServico(dados) {
   carregando.value = true;
   try {
@@ -208,6 +228,11 @@ async function salvarServico(dados) {
 .titulo {
   font-size: 1.75rem;
   font-weight: 700;
+}
+
+.card_botoes {
+  display: flex;
+  gap: 1rem;
 }
 
 .botao-adicionar {
@@ -259,6 +284,17 @@ async function salvarServico(dados) {
   align-self: flex-start;
   padding: 0.5rem 1rem;
   background-color: #ffc107;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.botao-excluir {
+  align-self: flex-start;
+  padding: 0.5rem 1rem;
+  background-color: #ee363f;
   border: none;
   border-radius: 6px;
   font-weight: 600;

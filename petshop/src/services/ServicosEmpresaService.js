@@ -43,9 +43,20 @@ const adicionarServicoEmpresa = (dto) => {
   });
 };
 
+const excluirServicoEmpresa = (dto) => {
+  const { idEmpresa, idServico } = dto;
+  return new Promise((resolve, reject) => {
+    apiClient
+      .delete(`Servicos?idEmpresa=${idEmpresa}&idServico=${idServico}`)
+      .then((response) => resolve(response))
+      .catch((error) => reject(error));
+  });
+};
+
 export default {
   buscarServicosEmpresa,
   buscarServicosEmpresaPorIdEmpresaEIdServico,
   atualizarServicoEmpresa,
   adicionarServicoEmpresa,
+  excluirServicoEmpresa,
 };
