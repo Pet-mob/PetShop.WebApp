@@ -1,15 +1,12 @@
 <template>
   <div class="horario-funcionamento">
-    <!-- Exibe o loading se estiver carregando -->
     <LoadingPetON v-if="carregando" />
 
-    <!-- Conteúdo principal -->
     <div v-else>
       <div class="cabecalho">
         <h2 class="titulo">Configurar horários</h2>
       </div>
 
-      <!-- Lista de dias -->
       <div class="dias-container">
         <div v-for="dia in diasDaSemana" :key="dia.value" class="dia-card">
           <div class="switch-container">
@@ -47,13 +44,11 @@
         </div>
       </div>
 
-      <!-- Botão de salvar -->
       <button class="botao-salvar" @click="salvarHorarios">
         Salvar Horários
       </button>
     </div>
 
-    <!-- Toast de mensagens -->
     <Toast :message="toastMessage" :type="toastType" />
   </div>
 </template>
@@ -131,8 +126,6 @@ async function buscarHorariosDeFuncionamentoDaEmpresa() {
         fechamento: entrada.horarioFechamento.slice(0, 5),
       };
     }
-
-    // showToast("Horários carregados com sucesso!", "success");
   } catch (error) {
     showToast("Erro ao carregar horários de funcionamento", "error");
   } finally {
@@ -184,42 +177,37 @@ async function salvarHorarios() {
 
 <style scoped>
 .horario-funcionamento {
-  padding: 20px;
+  padding: 20px 10px;
+  padding-bottom: 70px;
+  max-width: 480px;
+  margin: 0 auto;
 }
 
 .cabecalho {
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   position: relative;
-}
-
-.botao-voltar {
-  position: absolute;
-  left: 0;
-  background: none;
-  border: none;
-  font-size: 24px;
 }
 
 .titulo {
   flex: 1;
   text-align: center;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: bold;
 }
 
 .dias-container {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 12px;
 }
 
 .dia-card {
   background: #f9f9f9;
-  padding: 15px;
+  padding: 12px;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .switch-container {
@@ -231,17 +219,17 @@ async function salvarHorarios() {
 .dia-texto {
   font-weight: 500;
   font-size: 16px;
-  color: #333;
 }
 
 .horario-container {
   display: flex;
-  margin-top: 15px;
+  flex-wrap: wrap;
+  margin-top: 12px;
   gap: 10px;
 }
 
 .picker-container {
-  flex: 1;
+  flex: 1 1 45%;
   display: flex;
   flex-direction: column;
 }
@@ -261,15 +249,44 @@ select {
 }
 
 .botao-salvar {
-  margin-top: 30px;
-  padding: 15px;
+  margin-top: 25px;
+  padding: 14px;
   background-color: #28a745;
   color: #fff;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
   border: none;
   border-radius: 8px;
   width: 100%;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.botao-salvar:hover {
+  background-color: #218838;
+}
+
+/* Responsividade para telas pequenas */
+@media (max-width: 400px) {
+  .titulo {
+    font-size: 18px;
+  }
+
+  .dia-texto {
+    font-size: 14px;
+  }
+
+  .picker-container {
+    flex: 1 1 100%;
+  }
+
+  select {
+    font-size: 14px;
+  }
+
+  .botao-salvar {
+    font-size: 16px;
+    padding: 12px;
+  }
 }
 </style>

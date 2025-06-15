@@ -3,19 +3,26 @@
     <h3 class="titulo">Compartilhar link de agendamento</h3>
 
     <div class="input-group">
-      <input v-model="linkGerado" readonly class="link-input" />
-      <button type="submit" class="botoes" @click="copiarLink">Copiar</button>
-      <button
-        type="submit"
-        class="botoes"
-        @click="compartilharLink"
-        v-if="podeCompartilhar"
-      >
-        Compartilhar
-      </button>
+      <input
+        v-model="linkGerado"
+        readonly
+        class="link-input"
+        aria-label="Link de agendamento"
+      />
+      <div class="botoes-container">
+        <button type="button" class="botao" @click="copiarLink">Copiar</button>
+        <button
+          type="button"
+          class="botao"
+          v-if="podeCompartilhar"
+          @click="compartilharLink"
+        >
+          Compartilhar
+        </button>
+      </div>
     </div>
 
-    <p v-if="copiado" class="sucesso">Link copiado com sucesso!</p>
+    <p v-if="copiado" class="mensagem-sucesso">Link copiado com sucesso!</p>
   </div>
 </template>
 
@@ -23,16 +30,17 @@
 import { ref, computed } from "vue";
 import { useGlobalStore } from "@/store/useGlobalStore";
 
+// Dados da empresa
 const store = useGlobalStore();
-const empresaLogada = store.empresaLogada;
-const idEmpresaLogada = empresaLogada.idEmpresa;
-
-const idEmpresa = idEmpresaLogada; // Pode ser passado por props ou vindo da store
+const idEmpresa = store.empresaLogada?.idEmpresa ?? "";
 const baseUrl = "https://peton.app/redirect";
 
+// Computado e estados
 const linkGerado = computed(() => `${baseUrl}?empresa=${idEmpresa}`);
 const copiado = ref(false);
+const podeCompartilhar = computed(() => !!navigator.share);
 
+// Ações
 function copiarLink() {
   navigator.clipboard.writeText(linkGerado.value).then(() => {
     copiado.value = true;
@@ -40,67 +48,76 @@ function copiarLink() {
   });
 }
 
-const podeCompartilhar = computed(() => !!navigator.share);
-
 function compartilharLink() {
-  if (!podeCompartilhar.value) return;
-
   navigator
     .share({
       title: "Agende com a Pet.ON",
-      text: "Clique no link para agendar o serviço para seu pet:",
+      text: "Clique no link para agendar o serviço do seu pet:",
       url: linkGerado.value,
     })
-    .catch((error) => {
-      console.error("Erro ao compartilhar:", error);
-    });
+    .catch((err) => console.error("Erro ao compartilhar:", err));
 }
 </script>
 
 <style scoped>
-.titulo {
-  font-size: 22px;
-  font-weight: 600;
-  margin-bottom: 32px;
-  color: #333;
-  text-align: left;
-}
-
 .link-agendamento {
   max-width: 100%;
-  padding: 32px;
+  padding: 24px;
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
 
-.input-group {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.link-input {
-  flex: 1;
-  padding: 0.5rem;
-}
-
-.sucesso {
+.titulo {
   font-size: 22px;
-  font-weight: 500;
-  margin-bottom: 32px;
-  color: green;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #333;
   text-align: left;
 }
 
-.botoes {
-  padding: 10px 24px;
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 16px; /* <-- Aqui adicionamos espaço após os botões */
+}
+
+.link-input {
+  width: 100%;
+  padding: 10px;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  word-break: break-all;
+}
+
+.botoes-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.botao {
+  padding: 10px 16px;
   background-color: #0065d1;
   color: white;
   border: none;
   border-radius: 8px;
-  font-size: 15px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background-color 0.2s ease;
+}
+
+.botao:hover {
+  background-color: #004ea8;
+}
+
+.mensagem-sucesso {
+  font-size: 16px;
+  color: green;
+  margin-top: 12px;
+  text-align: left;
 }
 </style>

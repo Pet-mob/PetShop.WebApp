@@ -3,12 +3,12 @@
     <div class="menu-left">
       <router-link to="/inicio" class="nav-button" active-class="active-button">
         <Home class="icon" />
-        <span>Início</span>
+        <span class="nav-label">Início</span>
       </router-link>
 
       <router-link to="/agenda" class="nav-button" active-class="active-button">
         <Calendar class="icon" />
-        <span>Agenda</span>
+        <span class="nav-label">Agenda</span>
       </router-link>
     </div>
 
@@ -19,16 +19,16 @@
         active-class="active-button"
       >
         <Settings class="icon" />
-        <span>Configurações</span>
+        <span class="nav-label">Configurações</span>
       </router-link>
-
-      <!-- <img src="@/assets/perfil.png" class="profile-icon" alt="Perfil" /> -->
     </div>
   </nav>
 </template>
+
 <script setup>
 import { Home, Calendar, Settings } from "lucide-vue-next";
 </script>
+
 <style scoped>
 .top-menu {
   display: flex;
@@ -37,14 +37,11 @@ import { Home, Calendar, Settings } from "lucide-vue-next";
   background-color: #dadada;
   padding: 1rem 2.5rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 10;
 }
 
-.menu-left {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-
+.menu-left,
 .menu-right {
   display: flex;
   align-items: center;
@@ -61,7 +58,8 @@ import { Home, Calendar, Settings } from "lucide-vue-next";
   border-radius: 999px;
   transition: all 0.3s ease;
   text-decoration: none;
-  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .nav-button:hover {
@@ -78,24 +76,50 @@ import { Home, Calendar, Settings } from "lucide-vue-next";
   box-shadow: 0 0 12px #73aff090;
 }
 
-.profile-icon {
-  height: 40px;
-  width: 40px;
-  border-radius: 50%;
-  border: 2px solid #73aff0;
-  object-fit: cover;
-  cursor: pointer;
-  transition: transform 0.3s ease;
-}
-
-.profile-icon:hover {
-  transform: scale(1.05);
-}
-
 .icon {
   width: 18px;
   height: 18px;
   margin-right: 0.5rem;
   vertical-align: middle;
+}
+
+.nav-label {
+  display: inline;
+}
+
+/* 📱 Mobile Responsiveness */
+@media (max-width: 768px) {
+  .top-menu {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    justify-content: space-around;
+    padding: 0.6rem 1rem;
+    background-color: #dadada;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .menu-left,
+  .menu-right {
+    gap: 0.8rem;
+  }
+
+  .nav-button {
+    flex-direction: column;
+    padding: 0.4rem;
+    font-size: 0.75rem;
+  }
+
+  .icon {
+    margin: 0;
+    width: 22px;
+    height: 22px;
+  }
+
+  .nav-label {
+    margin-top: 0.2rem;
+    font-size: 0.7rem;
+  }
 }
 </style>

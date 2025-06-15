@@ -50,13 +50,14 @@ function fecharModal() {
   align-items: center;
   justify-content: center;
   z-index: 9999;
+  padding: 1rem;
 }
 
 .container-modal {
-  background: white; /* Corrigido aqui */
+  background: white;
   border-radius: 8px;
-  /* max-width: 500px; */
-  /* width: 90%; aumentar cada vez que estiver montando a modal */
+  width: 100%;
+  max-width: 500px;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
@@ -70,6 +71,7 @@ function fecharModal() {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background-color: #f9f9f9;
 }
 
 .titulo-modal {
@@ -83,6 +85,11 @@ function fecharModal() {
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
+  color: #333;
+}
+
+.botao-fechar-modal:hover {
+  color: #d00;
 }
 
 .corpo-modal {
@@ -95,5 +102,26 @@ function fecharModal() {
   padding: 1rem;
   border-top: 1px solid #ddd;
   text-align: right;
+  background-color: #f9f9f9;
+}
+
+/* Responsivo */
+@media (max-width: 600px) {
+  .container-modal {
+    max-width: 95%;
+    max-height: 95vh;
+  }
+
+  .titulo-modal {
+    font-size: 1.1rem;
+  }
+
+  .corpo-modal {
+    padding: 0.75rem;
+  }
+
+  .rodape-modal {
+    padding: 0.75rem;
+  }
 }
 </style>

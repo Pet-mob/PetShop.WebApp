@@ -9,17 +9,37 @@
 
       <div class="empresa-fotos-linha">
         <div class="foto-perfil-bloco">
-          <label class="foto-perfil">
+          <label
+            class="foto-perfil"
+            tabindex="0"
+            role="button"
+            aria-label="Alterar logo da empresa"
+          >
             <img :src="perfilUrl" alt="Logo da empresa" />
-            <input type="file" @change="onFotoPerfilChange" hidden />
+            <input
+              type="file"
+              @change="onFotoPerfilChange"
+              hidden
+              accept="image/*"
+            />
           </label>
           <div class="foto-legenda">Logo da empresa</div>
         </div>
 
         <div class="foto-capa-bloco">
-          <label class="foto-capa">
+          <label
+            class="foto-capa"
+            tabindex="0"
+            role="button"
+            aria-label="Alterar foto de capa da empresa"
+          >
             <img :src="capaUrl" alt="Foto de capa" />
-            <input type="file" @change="onFotoCapaChange" hidden />
+            <input
+              type="file"
+              @change="onFotoCapaChange"
+              hidden
+              accept="image/*"
+            />
           </label>
           <div class="foto-legenda">Foto de capa</div>
           <div class="foto-descricao">
@@ -29,7 +49,7 @@
         </div>
       </div>
 
-      <form class="formulario" @submit.prevent="salvar">
+      <form class="formulario" @submit.prevent="salvar" novalidate>
         <div class="linha">
           <div class="campo">
             <label for="nome">Nome da Empresa</label>
@@ -38,6 +58,8 @@
               id="nome"
               v-model="empresa.descricaoNomeFisica"
               required
+              autocomplete="organization"
+              placeholder="Digite o nome da empresa"
             />
           </div>
           <div class="campo">
@@ -47,6 +69,7 @@
               id="cnpj"
               :value="cnpjFormatado"
               disabled
+              aria-disabled="true"
               required
             />
           </div>
@@ -55,7 +78,14 @@
         <div class="linha">
           <div class="campo">
             <label for="email">Email</label>
-            <input type="email" id="email" v-model="empresa.email" required />
+            <input
+              type="email"
+              id="email"
+              v-model="empresa.email"
+              required
+              autocomplete="email"
+              placeholder="exemplo@empresa.com"
+            />
           </div>
           <div class="campo">
             <label for="telefone">Telefone</label>
@@ -65,12 +95,13 @@
               v-model="telefoneFormatado"
               @input="onTelefoneInput"
               required
+              placeholder="(XX) XXXXX-XXXX"
             />
           </div>
         </div>
 
         <div class="botoes">
-          <button type="submit" class="btn">Salvar</button>
+          <button type="submit" class="btn" aria-live="polite">Salvar</button>
         </div>
       </form>
     </div>
@@ -203,7 +234,6 @@ const onFotoPerfilChange = (e) => {
     try {
       perfilUrl.value = URL.createObjectURL(file);
       empresaService.enviarLogoEmpresaPorIdEmpresa(file, idEmpresaLogado);
-
       showToast("Logo atualizada com com sucesso!", "success");
     } catch (error) {
       showToast("Erro ao enviar logo da empresa", "error");
@@ -248,6 +278,7 @@ async function salvar() {
 .empresa-container {
   max-width: 100%;
   padding: 32px;
+  padding-bottom: 70px; /* espaço extra para o menu inferior */
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
@@ -277,6 +308,21 @@ async function salvar() {
   flex-direction: column;
   align-items: center;
   flex: 1;
+  min-width: 180px;
+}
+
+.foto-perfil,
+.foto-capa {
+  cursor: pointer;
+  position: relative;
+  display: inline-block;
+  outline-offset: 4px;
+}
+
+.foto-perfil:focus,
+.foto-capa:focus {
+  outline: 2px solid #4caf50;
+  border-radius: 8px;
 }
 
 .foto-perfil img {
@@ -285,7 +331,6 @@ async function salvar() {
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #ccc;
-  cursor: pointer;
 }
 
 .foto-capa img {
@@ -295,7 +340,6 @@ async function salvar() {
   border-radius: 8px;
   object-fit: cover;
   border: 2px solid #ccc;
-  cursor: pointer;
 }
 
 .foto-legenda {
@@ -303,6 +347,7 @@ async function salvar() {
   font-size: 14px;
   color: #333;
   font-weight: 500;
+  text-align: center;
 }
 
 .foto-descricao {
@@ -329,6 +374,7 @@ async function salvar() {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 220px;
 }
 
 .campo label {
@@ -345,6 +391,13 @@ async function salvar() {
   border-radius: 8px;
   font-size: 14px;
   background-color: #fefefe;
+  transition: border-color 0.3s;
+}
+
+.campo input:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
 }
 
 .botoes {
@@ -361,10 +414,25 @@ async function salvar() {
   border-radius: 8px;
   font-size: 15px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background-color 0.2s;
 }
 
-.btn:hover {
+.btn:hover,
+.btn:focus {
   background-color: #43a047;
+  outline: none;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .empresa-fotos-linha {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .linha {
+    flex-direction: column;
+    gap: 16px;
+  }
 }
 </style>

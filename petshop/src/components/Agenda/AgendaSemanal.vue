@@ -10,7 +10,11 @@
         <section>
           <p class="section-title">Horários</p>
           <ul>
-            <li v-for="(item, idx) in dia.horarios" :key="idx">
+            <li
+              v-for="(item, idx) in dia.horarios"
+              :key="idx"
+              title="Horário - Usuário"
+            >
               {{ item.hora }} - {{ item.usuario }}
             </li>
           </ul>
@@ -40,23 +44,6 @@ const props = defineProps({
 
 const semana = ref([]);
 
-// onMounted(async () => {
-//   emit("carregando");
-//   console.log("emit:carregando");
-//   const dados = await carregarAgenda(); // sua função real
-
-//   if (!dados || dados.length === 0) {
-//     emit("dados-vazios");
-//     console.log("emit:dados-vazios");
-//   } else {
-//     emit("dados-encontrados");
-//     console.log("emit:dados-encontrados");
-//   }
-
-//   console.log("emit:carregado");
-//   emit("carregado");
-// });
-
 const carregarAgenda = async () => {
   try {
     const resposta = await AgendaService.buscarAgenda(
@@ -72,7 +59,6 @@ const carregarAgenda = async () => {
   }
 };
 
-// Reage a mudanças no dataFiltro
 watch(
   () => props.dataFiltro,
   async () => {
@@ -90,20 +76,17 @@ watch(
 </script>
 
 <style scoped>
-/* Container principal */
 .agenda-semanal-container {
   min-height: 10vh;
-  padding: 1rem;
+  padding: 0.75rem 0.75rem;
 }
 
-/* Grid responsivo */
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 1rem;
 }
 
-/* Card */
 .card {
   background-color: white;
   border-radius: 1rem;
@@ -114,34 +97,34 @@ watch(
   justify-content: space-between;
   transition: box-shadow 0.3s ease;
   min-height: 120px;
+  word-wrap: break-word;
+  word-break: break-word;
 }
 
 .card:hover {
   box-shadow: 0 8px 20px #6b7280;
 }
 
-/* Header */
 .card header {
   text-align: center;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
 .card header h3 {
   color: #374151;
-  font-weight: 550;
-  font-size: 1.1rem;
+  font-weight: 600;
+  font-size: 1rem;
   margin: 0;
 }
 
 .card header span {
   color: #6b7280;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
 }
 
-/* Conteúdo */
 .card section {
   color: #374151;
-  font-size: 0.875rem;
+  font-size: 0.85rem;
 }
 
 .section-title {
@@ -155,7 +138,7 @@ watch(
   list-style: disc;
   padding-left: 1.2rem;
   margin: 0;
-  max-height: 600px;
+  max-height: 400px;
   overflow-y: auto;
 }
 
@@ -166,5 +149,6 @@ watch(
   margin-bottom: 0.25rem;
   font-family: monospace;
   color: #6b7280;
+  cursor: default;
 }
 </style>

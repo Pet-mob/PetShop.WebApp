@@ -2,6 +2,7 @@
   <div class="container-dashboard">
     <!-- Exibe o loading se estiver carregando -->
     <LoadingPetON v-if="carregando" />
+
     <!-- Oculta o card de login durante o loading -->
     <div v-else>
       <div class="cartoes">
@@ -27,6 +28,7 @@
         <h3>Serviços na última semana</h3>
         <GraficoServicos :dadosSemana="dadosSemana" />
       </div>
+
       <Toast :message="toastMessage" :type="toastType" />
     </div>
   </div>
@@ -43,7 +45,6 @@ import LoadingPetON from "@/components/LoadingPetMob.vue";
 
 const store = useGlobalStore();
 
-// Refs reativos
 const carregando = ref(false);
 const petsAgendadosHoje = ref(0);
 const servicosConcluidos = ref(0);
@@ -90,7 +91,7 @@ const buscarEmpresaLogadaPorCnpj = async () => {
 
 const buscarDashboard = async (idEmpresaParam) => {
   try {
-    const dataAtual = new Date(); // ou new Date().toISOString()
+    const dataAtual = new Date();
     return await dashboardService.buscarDashboard(dataAtual, idEmpresaParam);
   } catch (error) {
     console.error("Erro ao buscar dashboard:", error);
@@ -131,7 +132,7 @@ const buscarDashboard = async (idEmpresaParam) => {
 }
 
 .cartao p {
-  font-size: 1.8rem;
+  font-size: clamp(1.2rem, 4vw, 1.8rem);
   font-weight: 700;
   color: #333;
   margin: 0;
@@ -139,5 +140,35 @@ const buscarDashboard = async (idEmpresaParam) => {
 
 .grafico {
   margin-top: 3rem;
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* 📱 Ajustes para dispositivos móveis */
+@media (max-width: 600px) {
+  .container-dashboard {
+    padding: 1rem;
+  }
+
+  .cartoes {
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .cartao {
+    padding: 1rem;
+  }
+
+  .cartao h2 {
+    font-size: 1rem;
+  }
+
+  .cartao p {
+    font-size: clamp(1rem, 5vw, 1.4rem);
+  }
+
+  .grafico {
+    margin-top: 2rem;
+  }
 }
 </style>

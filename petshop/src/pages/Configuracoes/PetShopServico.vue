@@ -24,9 +24,6 @@
             <p class="detalhe-servico">
               <strong>Preço:</strong> R$ {{ (servico.valor ?? 0).toFixed(2) }}
             </p>
-            <!-- <p class="detalhe-servico">
-              <strong>Status:</strong> {{ servico.ativo ? "Ativo" : "Inativo" }}
-            </p> -->
           </div>
           <div class="card_botoes">
             <button class="botao-editar" @click="abrirModalEditar(servico)">
@@ -52,6 +49,7 @@
       </ModalGenerico>
     </div>
   </section>
+
   <!-- Toast de mensagens -->
   <Toast :message="toastMessage" :type="toastType" />
 </template>
@@ -222,6 +220,8 @@ async function salvarServico(dados) {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   margin-bottom: 1rem;
 }
 
@@ -232,12 +232,13 @@ async function salvarServico(dados) {
 
 .card_botoes {
   display: flex;
-  gap: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .botao-adicionar {
   background-color: #28a745;
-  color: branco;
+  color: white;
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 6px;
@@ -278,31 +279,70 @@ async function salvarServico(dados) {
 
 .detalhe-servico {
   margin: 0.1rem 0;
+  font-size: 0.95rem;
+}
+
+.botao-editar,
+.botao-excluir {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .botao-editar {
-  align-self: flex-start;
-  padding: 0.5rem 1rem;
   background-color: #ffc107;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.botao-excluir {
-  align-self: flex-start;
-  padding: 0.5rem 1rem;
-  background-color: #ee363f;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
 }
 
 .botao-editar:hover {
   background-color: #e0a800;
+}
+
+.botao-excluir {
+  background-color: #ee363f;
+  color: white;
+}
+
+.botao-excluir:hover {
+  background-color: #cc1f26;
+}
+
+/* Responsividade Mobile */
+@media (max-width: 600px) {
+  .cabecalho-secao {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .titulo {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .botao-adicionar {
+    width: 100%;
+    text-align: center;
+  }
+
+  .lista-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .item-grid {
+    padding: 1rem;
+  }
+
+  .card_botoes {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .botao-editar,
+  .botao-excluir {
+    width: 100%;
+    text-align: center;
+  }
 }
 </style>
