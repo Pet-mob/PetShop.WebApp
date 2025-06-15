@@ -136,6 +136,9 @@ async function fecharModal() {
 }
 
 async function adicionarServico(dto) {
+  if (dto.duracao === undefined || dto.duracao === null) {
+    dto.duracao = 0;
+  }
   carregando.value = true;
   try {
     const data = await ServicosEmpresaService.adicionarServicoEmpresa(dto);
