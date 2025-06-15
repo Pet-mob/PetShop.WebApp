@@ -84,7 +84,7 @@ function compartilharLink() {
 }
 
 .link-input {
-  width: 100%;
+  width: 90%;
   padding: 10px;
   font-size: 15px;
   border: 1px solid #ccc;
