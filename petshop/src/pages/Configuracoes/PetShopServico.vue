@@ -98,6 +98,7 @@ async function buscarServicosDaEmpresa() {
 }
 
 function abrirModalNovo() {
+  servicoSelecionado.value = null;
   modalTitulo.value = "Adicionar Serviço";
   botaoTextoModal.value = "Adicionar";
   modalAberto.value = true;
