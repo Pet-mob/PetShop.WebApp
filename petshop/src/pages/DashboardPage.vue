@@ -169,6 +169,7 @@ const buscarDashboard = async (idEmpresaParam) => {
 
   .grafico {
     margin-top: 2rem;
+    padding-bottom: 5rem;
   }
 }
 </style>
