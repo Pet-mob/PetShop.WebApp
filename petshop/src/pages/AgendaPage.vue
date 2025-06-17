@@ -46,8 +46,9 @@
       <div class="cards-dias">
         <div v-for="dia in diasSemana" :key="dia.data" class="card-dia">
           <div class="header-dia">
-            <span class="nome-dia">{{ dia.nome }}</span>
-            <span class="data-dia">{{ dia.data.format("DD/MM") }}</span>
+            <span class="nome-dia"
+              >{{ dia.nome }} - {{ dia.data.format("DD/MM") }}</span
+            >
           </div>
 
           <div class="agendamentos-dia">
@@ -178,7 +179,7 @@ watch(
 .agenda-container {
   padding: 1rem;
   background-color: #f9fafb;
-  min-height: 100vh;
+  min-height: 100%;
 }
 
 /* Tabs */
@@ -270,17 +271,21 @@ watch(
   -webkit-overflow-scrolling: touch;
   padding-bottom: 1rem;
 }
+
 .card-dia {
   background: white;
   border-radius: 8px;
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
   padding: 1rem;
+  height: 470px; /* altura fixa */
   min-width: 160px;
   flex-shrink: 0;
   scroll-snap-align: start;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
 }
+
 .header-dia {
   border-bottom: 1px solid #ccc;
   padding-bottom: 0.5rem;
@@ -294,8 +299,10 @@ watch(
 .data-dia {
   font-weight: 600;
 }
+
 .agendamentos-dia {
-  max-height: 320px;
+  /* max-height: 320px; */
+  flex: 1;
   overflow-y: auto;
 }
 .agendamento-item {
@@ -329,6 +336,7 @@ watch(
 
   .card-dia {
     min-width: 140px;
+    height: 600px;
   }
 
   .agendamento-item {
