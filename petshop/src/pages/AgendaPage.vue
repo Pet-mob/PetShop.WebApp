@@ -52,18 +52,18 @@
 
           <div class="agendamentos-dia">
             <div
-              v-if="agendamentosPorDia(dia.data).length === 0"
+              v-if="agendamentosDoDia(dia.data).length === 0"
               class="sem-agendamentos"
             >
               Nenhum agendamento
             </div>
             <div
-              v-for="ag in agendamentosPorDia(dia.data)"
+              v-for="ag in agendamentosDoDia(dia.data)"
               :key="ag.idAgendamento"
               class="agendamento-item"
             >
-              <strong>{{ ag.NomeAnimal }}</strong> <br />
-              <small>{{ ag.HorarioInicial }} - {{ ag.DescricaoServico }}</small>
+              <strong>{{ ag.nomeAnimal }}</strong> <br />
+              <small>{{ ag.horarioInicial }} - {{ ag.descricaoServico }}</small>
             </div>
           </div>
         </div>
@@ -132,10 +132,12 @@ const diasSemana = computed(() => {
   });
 });
 
-function agendamentosPorDia(dia) {
-  return agendamentos.value.filter(
-    (ag) => dayjs(ag.Data).format("YYYY-MM-DD") === dia.format("YYYY-MM-DD")
-  );
+function agendamentosDoDia(dia) {
+  const diaFormatado = dayjs(dia).format("YYYY-MM-DD");
+  return agendamentos.value.filter((ag) => {
+    const agFormatado = dayjs(ag.data).format("YYYY-MM-DD");
+    return agFormatado === diaFormatado;
+  });
 }
 
 async function buscarAgendamentos() {
@@ -296,13 +298,11 @@ watch(
 }
 
 .agenda-semanal {
-  /* max-width: 900px; */
   margin: 0 auto;
-  /* padding: 20px; */
 }
 
 .cards-dias {
-  display: flex;
+  display: inline-flex;
   gap: 1rem;
 }
 
