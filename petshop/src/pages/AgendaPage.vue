@@ -8,12 +8,6 @@
       >
         Semanal
       </button>
-      <!-- <button
-        :class="['tab-btn', { active: visualizacao === 'mensal' }]"
-        disabled
-      >
-        Mensal
-      </button> -->
     </div>
 
     <!-- Navegação -->
@@ -43,29 +37,35 @@
       </div>
     </div>
 
-    <!-- Estado de carregamento -->
+    <!--Conteudo-->
+    <!--TODO: isolar em um componente, fazer um componente pra isso-->
     <div v-if="carregando" class="text-center text-gray-400 py-6">
       <span class="animate-pulse">Carregando agendamentos...</span>
     </div>
+    <div v-else class="agenda-semanal">
+      <div class="cards-dias">
+        <div v-for="dia in diasSemana" :key="dia.data" class="card-dia">
+          <div class="header-dia">
+            <span class="nome-dia">{{ dia.nome }}</span>
+            <span class="data-dia">{{ dia.data.format("DD/MM") }}</span>
+          </div>
 
-    <!-- Agenda semanal -->
-    <div v-else>
-      <div
-        v-if="agendamentos.length === 0"
-        class="text-center text-gray-500 py-6"
-      >
-        Nenhum agendamento para esse período.
-      </div>
-      <div v-else class="grid gap-4">
-        <div
-          v-for="(item, index) in agendamentos"
-          :key="index"
-          class="bg-white p-4 rounded shadow"
-        >
-          <h3 class="font-semibold text-lg truncate">{{ item.nomePet }}</h3>
-          <p><strong>Serviço:</strong> {{ item.servico }}</p>
-          <p><strong>Data:</strong> {{ formatarData(item.data) }}</p>
-          <p><strong>Hora:</strong> {{ item.hora }}</p>
+          <div class="agendamentos-dia">
+            <div
+              v-if="agendamentosPorDia(dia.data).length === 0"
+              class="sem-agendamentos"
+            >
+              Nenhum agendamento
+            </div>
+            <div
+              v-for="ag in agendamentosPorDia(dia.data)"
+              :key="ag.idAgendamento"
+              class="agendamento-item"
+            >
+              <strong>{{ ag.NomeAnimal }}</strong> <br />
+              <small>{{ ag.HorarioInicial }} - {{ ag.DescricaoServico }}</small>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -121,18 +121,40 @@ function aplicarFiltro() {
   dataFiltro.value = inputData.value.value;
 }
 
-function formatarData(data) {
-  return dayjs(data).format("DD/MM/YYYY");
+const diasSemana = computed(() => {
+  return [...Array(7).keys()].map((i) => {
+    return {
+      nome: dayjs().day(i).locale("pt-br").format("ddd"),
+      data: dayjs(dataFiltro.value)
+        .startOf("week")
+        .add(1 + i, "day"),
+    };
+  });
+});
+
+function agendamentosPorDia(dia) {
+  return agendamentos.value.filter(
+    (ag) => dayjs(ag.Data).format("YYYY-MM-DD") === dia.format("YYYY-MM-DD")
+  );
 }
 
 async function buscarAgendamentos() {
   carregando.value = true;
+  const dataInicio = dayjs(dataFiltro.value)
+    .startOf("week")
+    .add(1, "day")
+    .format("YYYY-MM-DD");
+  const dataFim = dayjs(dataFiltro.value)
+    .endOf("week")
+    .add(1, "day")
+    .format("YYYY-MM-DD");
   try {
-    const data = await AgendaService.buscarAgenda(
-      dataFiltro.value,
+    const dados = await AgendaService.buscarAgenda(
+      dataInicio,
+      dataFim,
       idEmpresaLogada
     );
-    agendamentos.value = data;
+    agendamentos.value = dados;
   } catch (error) {
     console.error("Erro ao buscar agendamentos:", error);
     agendamentos.value = [];
@@ -154,15 +176,8 @@ watch(
 .agenda-container {
   min-height: 10vh;
   padding-left: 0.75rem;
+  margin-top: 10px;
   padding-right: 0.75rem;
-}
-.filtro-navegacao {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
 }
 
 .tabs {
@@ -198,6 +213,15 @@ watch(
 .tab-btn.active {
   border-bottom-color: #000000;
   color: #000000;
+}
+
+.filtro-navegacao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .input-date-hidden {
@@ -271,19 +295,61 @@ watch(
   transform: scale(0.95);
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: 1fr;
+.agenda-semanal {
+  /* max-width: 900px; */
+  margin: 0 auto;
+  /* padding: 20px; */
+}
+
+.cards-dias {
+  display: flex;
   gap: 1rem;
 }
 
-.bg-white {
-  word-break: break-word;
+.card-dia {
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 1px 5px rgb(0 0 0 / 0.1);
+  padding: 1rem;
+  min-width: 120px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-h3.truncate {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.header-dia {
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.nome-dia {
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.data-dia {
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.agendamentos-dia {
+  height: 400px;
+}
+
+.agendamento-item {
+  background: #e8f0fe;
+  border-radius: 4px;
+  padding: 0.3rem 0.6rem;
+  margin-bottom: 0.4rem;
+  font-size: 0.85rem;
+}
+
+.sem-agendamentos {
+  font-style: italic;
+  color: #777;
+  text-align: center;
+  margin-top: 1rem;
 }
 </style>

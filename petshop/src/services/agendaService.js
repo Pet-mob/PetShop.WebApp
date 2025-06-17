@@ -1,8 +1,9 @@
 import apiClient from "@/services/apiClient"; // Certifique-se de que o caminho está correto
 
-const buscarAgenda = (dataParam, idEmpresaParam) => {
+const buscarAgenda = (dataInicioParam, dataFimParam, idEmpresaParam) => {
   const dashboardDto = {
-    dataFiltro: dataParam,
+    dataFiltroInicio: dataInicioParam,
+    dataFiltroFim: dataFimParam,
     idEmpresa: idEmpresaParam,
   };
   return new Promise((resolve, reject) => {
