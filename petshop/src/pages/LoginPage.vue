@@ -145,8 +145,10 @@ const realizarLogin = async () => {
 }
 
 .logo {
-  width: 380px;
+  width: 100%;
+  max-width: 380px;
   margin-bottom: 1rem;
+  height: auto;
 }
 
 h2 {
