@@ -19,13 +19,12 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background-color: #f0f8ff; /* ou um tom suave da paleta Pet.ON */
 }
 
 .logo-wrapper {
   position: relative;
-  width: 120px;
-  height: 120px;
+  width: 130px;
+  height: 130px;
 }
 
 .logo {
