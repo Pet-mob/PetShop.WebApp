@@ -96,7 +96,7 @@ router.beforeEach(async (to, from, next) => {
     return next("/inicio");
   }
 
-  if (to.path !== "/login") {
+  if (to.path !== "/login" && to.path !== "/erro") {
     try {
       await carregarDadosDoMenu(to, from, next);
     } catch (e) {
