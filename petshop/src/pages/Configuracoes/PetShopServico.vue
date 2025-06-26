@@ -5,6 +5,32 @@
 
     <!-- Conteúdo principal -->
     <div v-else>
+      <!-- NOVO BLOCO: Modo de Agendamento -->
+      <div class="modelo-trabalho">
+        <h2 class="titulo-modelo">Como você deseja oferecer seus serviços?</h2>
+
+        <div class="opcoes-modelo">
+          <div
+            class="card-modelo"
+            :class="{ ativo: modoAgendamento === 'agrupado' }"
+            @click="setarModo('agrupado')"
+          >
+            <h3>Serviços Agrupados</h3>
+            <p>O cliente escolhe apenas 1 serviço por agendamento.</p>
+          </div>
+
+          <div
+            class="card-modelo"
+            :class="{ ativo: modoAgendamento === 'separado' }"
+            @click="setarModo('separado')"
+          >
+            <h3>Serviços Separados</h3>
+            <p>O cliente pode marcar vários serviços em uma só vez.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cabeçalho da Seção -->
       <header class="cabecalho-secao">
         <h1 class="titulo">Serviços</h1>
         <button class="botao-adicionar" @click="abrirModalNovo">
@@ -12,6 +38,7 @@
         </button>
       </header>
 
+      <!-- Lista de Serviços -->
       <div class="lista-grid">
         <article
           v-for="servico in servicos"
@@ -36,6 +63,7 @@
         </article>
       </div>
 
+      <!-- Modal -->
       <ModalGenerico
         v-if="modalAberto"
         :titulo="modalTitulo"
@@ -66,6 +94,7 @@ import Toast from "@/components/ToastCustomizado.vue";
 const store = useGlobalStore();
 const empresaLogada = store.empresaLogada;
 const idEmpresaLogada = empresaLogada.idEmpresa;
+
 const carregando = ref(false);
 const toastMessage = ref("");
 const toastType = ref("info");
@@ -74,10 +103,19 @@ const servicoSelecionado = ref(null);
 const modalTitulo = ref("");
 const botaoTextoModal = ref("");
 const servicos = ref([]);
+const modoAgendamento = ref("agrupado"); // novo estado
 
 onMounted(async () => {
   await buscarServicosDaEmpresa();
+  const modoSalvo = localStorage.getItem("modoAgendamento");
+  if (modoSalvo) modoAgendamento.value = modoSalvo;
 });
+
+function setarModo(modo) {
+  modoAgendamento.value = modo;
+  localStorage.setItem("modoAgendamento", modo);
+  showToast("Modo de agendamento atualizado!", "success");
+}
 
 function showToast(msg, type = "info") {
   toastMessage.value = msg;
@@ -90,9 +128,7 @@ async function buscarServicosDaEmpresa() {
     const data = await ServicosEmpresaService.buscarServicosEmpresa(
       idEmpresaLogada
     );
-
     if (data) servicos.value = data;
-    // showToast("Horários carregados com sucesso!", "success");
   } catch (error) {
     showToast("Erro ao carregar serviços", "error");
   } finally {
@@ -107,27 +143,8 @@ function abrirModalNovo() {
   modalAberto.value = true;
 }
 
-// async function buscarServicosDaEmpresaComIdEmpresaEIdServico(idServicoParam) {
-//   carregando.value = true;
-//   try {
-//     const data =
-//       await ServicosEmpresaService.buscarServicosEmpresaPorIdEmpresaEIdServico(
-//         idEmpresaLogada,
-//         idServicoParam
-//       );
-
-//     if (data) servicos.value = data;
-//   } catch (error) {
-//     showToast("Erro ao carregar serviços", "error");
-//   } finally {
-//     carregando.value = false;
-//   }
-// }
-
 async function abrirModalEditar(servico) {
   servicoSelecionado.value = { ...servico };
-  // const idServicoSelecionado = servico.idServico;
-  // await buscarServicosDaEmpresaComIdEmpresaEIdServico(idServicoSelecionado);
   modalTitulo.value = "Editar Serviço";
   botaoTextoModal.value = "Salvar";
   modalAberto.value = true;
@@ -157,7 +174,7 @@ async function atualizarServico(dto) {
   carregando.value = true;
   try {
     const data = await ServicosEmpresaService.atualizarServicoEmpresa(dto);
-    if (data.data) showToast("Serviço ataulizado com com sucesso!", "success");
+    if (data.data) showToast("Serviço atualizado com sucesso!", "success");
   } catch (error) {
     showToast("Erro ao atualizar serviços", "error");
   } finally {
@@ -170,7 +187,7 @@ async function excluirServico(dto) {
   try {
     const data = await ServicosEmpresaService.excluirServicoEmpresa(dto);
     if (data.data) {
-      showToast("Serviço excluido com com sucesso!", "success");
+      showToast("Serviço excluído com sucesso!", "success");
       await buscarServicosDaEmpresa();
     }
   } catch (error) {
@@ -184,7 +201,6 @@ async function salvarServico(dados) {
   carregando.value = true;
   try {
     if (servicoSelecionado.value && servicoSelecionado.value.idServico) {
-      // Editar
       const dto = {
         ...dados,
         idServico: servicoSelecionado.value.idServico,
@@ -192,7 +208,6 @@ async function salvarServico(dados) {
       };
       await atualizarServico(dto);
     } else {
-      // Adicionar
       const dto = {
         ...dados,
         idEmpresa: idEmpresaLogada,
@@ -208,8 +223,42 @@ async function salvarServico(dados) {
   }
 }
 </script>
-
 <style scoped>
+.modelo-trabalho {
+  margin-bottom: 2rem;
+}
+
+.titulo-modelo {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.opcoes-modelo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.card-modelo {
+  flex: 1 1 280px;
+  padding: 1rem;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #fff;
+}
+
+.card-modelo:hover {
+  border-color: #28a745;
+}
+
+.card-modelo.ativo {
+  border-color: #28a745;
+  background-color: #eafbe9;
+}
+
 .secao-servicos {
   padding: 1.5rem;
   padding-bottom: 70px;
