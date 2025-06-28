@@ -1,4 +1,10 @@
-import { Clock, Scissors, Building2, GitCompareArrows } from "lucide-vue-next";
+import {
+  Clock,
+  Scissors,
+  Building2,
+  GitCompareArrows,
+  Settings2,
+} from "lucide-vue-next";
 
 export default [
   {
@@ -35,6 +41,15 @@ export default [
     meta: {
       label: "Link de Agendamentos",
       icon: GitCompareArrows,
+    },
+  },
+  {
+    path: "parametros-empresa",
+    name: "ConfigParametrosEmpresa",
+    component: () => import("@/pages/Configuracoes/ParametrosEmpresa.vue"),
+    meta: {
+      label: "Parâmetros da Empresa",
+      icon: Settings2,
     },
   },
 ];

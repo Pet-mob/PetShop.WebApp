@@ -75,6 +75,14 @@ const routes = [
           label: "Link de Agendamentos",
         },
       },
+      {
+        path: "parametros-empresa",
+        name: "ConfigParametrosEmpresa",
+        component: () => import("@/pages/Configuracoes/ParametrosEmpresa.vue"),
+        meta: {
+          label: "Parâmetros da Empresa",
+        },
+      },
     ],
   },
 ];
