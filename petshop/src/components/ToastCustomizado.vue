@@ -1,14 +1,21 @@
 <template>
   <transition name="toast-fade">
-    <div v-if="visible" class="toast" :class="type">
+    <div
+      v-if="visible"
+      class="toast"
+      :class="type"
+      role="alert"
+      aria-live="assertive"
+      tabindex="0"
+    >
       {{ message }}
-      <button @click="close">×</button>
+      <button @click="close" aria-label="Fechar notificação">×</button>
     </div>
   </transition>
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from "vue";
+import { ref, watch, onMounted, nextTick } from "vue";
 
 const props = defineProps({
   message: String,
@@ -32,10 +39,13 @@ function close() {
 
 watch(
   () => props.message,
-  (newMsg) => {
+  async (newMsg) => {
     if (newMsg) {
       visible.value = true;
       clearTimeout(timeoutId);
+      await nextTick();
+      // Foca no toast para leitores de tela
+      document.querySelector('.toast[role="alert"]')?.focus();
       timeoutId = setTimeout(() => {
         visible.value = false;
       }, props.duration);
@@ -43,9 +53,11 @@ watch(
   }
 );
 
-onMounted(() => {
+onMounted(async () => {
   if (props.message) {
     visible.value = true;
+    await nextTick();
+    document.querySelector('.toast[role="alert"]')?.focus();
     timeoutId = setTimeout(() => {
       visible.value = false;
     }, props.duration);

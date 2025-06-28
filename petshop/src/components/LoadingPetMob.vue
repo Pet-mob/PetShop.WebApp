@@ -1,10 +1,15 @@
 <template>
-  <div class="loading-container">
+  <div class="loading-container" role="status" aria-live="polite" tabindex="0">
     <div class="logo-wrapper">
-      <img src="../assets/LogoSemEscrita.png" alt="Pet.ON" class="logo" />
-      <div class="spinner"></div>
+      <img
+        src="../assets/LogoSemEscrita.png"
+        alt="Logotipo Pet.ON"
+        class="logo"
+      />
+      <div class="spinner" aria-hidden="true"></div>
     </div>
     <p class="loading-text">Carregando...</p>
+    <span class="sr-only">Aguarde, conteúdo está sendo carregado.</span>
   </div>
 </template>
 
@@ -54,6 +59,17 @@
   font-size: 1.2rem;
   color: #333;
   font-weight: 500;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
 }
 
 @keyframes spin {

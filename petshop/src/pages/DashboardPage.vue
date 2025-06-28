@@ -6,25 +6,25 @@
     <!-- Oculta o card de login durante o loading -->
     <div v-else>
       <div class="cartoes">
-        <section class="cartao">
+        <section class="cartao" aria-label="Pets agendados hoje">
           <h2>Pets agendados hoje</h2>
           <p>{{ petsAgendadosHoje }}</p>
         </section>
-        <section class="cartao">
+        <section class="cartao" aria-label="Serviços concluídos">
           <h2>Serviços concluídos</h2>
           <p>{{ servicosConcluidos }}</p>
         </section>
-        <section class="cartao">
+        <section class="cartao" aria-label="Agendamentos para amanhã">
           <h2>Agendamentos para amanhã</h2>
           <p>{{ agendamentosAmanha }}</p>
         </section>
-        <section class="cartao">
+        <section class="cartao" aria-label="Próximo horário">
           <h2>Próximo horário</h2>
           <p>{{ proximoHorario }}</p>
         </section>
       </div>
 
-      <div class="grafico">
+      <div class="grafico" aria-label="Gráfico de serviços na última semana">
         <h3>Serviços na última semana</h3>
         <GraficoServicos :dadosSemana="dadosSemana" />
       </div>
@@ -94,7 +94,7 @@ const buscarDashboard = async (idEmpresaParam) => {
     const dataAtual = new Date();
     return await dashboardService.buscarDashboard(dataAtual, idEmpresaParam);
   } catch (error) {
-    console.error("Erro ao buscar dashboard:", error);
+    showToast("Erro ao buscar dashboard.", "error");
     return null;
   }
 };

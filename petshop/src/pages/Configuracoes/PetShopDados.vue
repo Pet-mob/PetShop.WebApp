@@ -14,13 +14,17 @@
             tabindex="0"
             role="button"
             aria-label="Alterar logo da empresa"
+            @keydown.enter.prevent="() => $refs.inputLogo.click()"
+            @keydown.space.prevent="() => $refs.inputLogo.click()"
           >
             <img :src="perfilUrl" alt="Logo da empresa" />
             <input
+              ref="inputLogo"
               type="file"
               @change="onFotoPerfilChange"
               hidden
               accept="image/*"
+              aria-label="Selecionar arquivo de logo"
             />
           </label>
           <div class="foto-legenda">Logo da empresa</div>
@@ -32,13 +36,17 @@
             tabindex="0"
             role="button"
             aria-label="Alterar foto de capa da empresa"
+            @keydown.enter.prevent="() => $refs.inputCapa.click()"
+            @keydown.space.prevent="() => $refs.inputCapa.click()"
           >
             <img :src="capaUrl" alt="Foto de capa" />
             <input
+              ref="inputCapa"
               type="file"
               @change="onFotoCapaChange"
               hidden
               accept="image/*"
+              aria-label="Selecionar arquivo de capa"
             />
           </label>
           <div class="foto-legenda">Foto de capa</div>
@@ -60,6 +68,7 @@
               required
               autocomplete="organization"
               placeholder="Digite o nome da empresa"
+              aria-label="Nome da empresa"
             />
           </div>
           <div class="campo">
@@ -71,6 +80,7 @@
               disabled
               aria-disabled="true"
               required
+              aria-label="CNPJ da empresa"
             />
           </div>
         </div>
@@ -85,6 +95,7 @@
               required
               autocomplete="email"
               placeholder="exemplo@empresa.com"
+              aria-label="E-mail da empresa"
             />
           </div>
           <div class="campo">
@@ -96,12 +107,20 @@
               @input="onTelefoneInput"
               required
               placeholder="(XX) XXXXX-XXXX"
+              aria-label="Telefone da empresa"
             />
           </div>
         </div>
 
         <div class="botoes">
-          <button type="submit" class="btn" aria-live="polite">Salvar</button>
+          <button
+            type="submit"
+            class="btn"
+            aria-live="polite"
+            aria-label="Salvar dados da empresa"
+          >
+            Salvar
+          </button>
         </div>
       </form>
     </div>
@@ -154,7 +173,7 @@ const carregarLogoEmpresa = async () => {
     const logo = await empresaService.buscarLogoEmpresa(idEmpresaLogado);
     if (logo.length > 0) perfilUrl.value = logo[0].url;
   } catch (error) {
-    // showToast("Erro ao carregar logo da empresa", "error");
+    showToast("Erro ao carregar logo da empresa", "error");
   } finally {
     carregando.value = false;
   }
@@ -166,7 +185,7 @@ const carregarCapaEmpresa = async () => {
     const logo = await empresaService.buscarCapaEmpresa(idEmpresaLogado);
     if (logo.length > 0) capaUrl.value = logo[0].url;
   } catch (error) {
-    // showToast("Erro ao carregar capa da empresa", "error");
+    showToast("Erro ao carregar capa da empresa", "error");
   } finally {
     carregando.value = false;
   }
@@ -190,10 +209,27 @@ async function buscarDadosDaEmpresa() {
 function formatarCnpj(valor) {
   const apenasNumeros = (valor || "").replace(/\D/g, "").slice(0, 14);
   let valorFormatado = apenasNumeros;
-  valorFormatado = valorFormatado.replace(/^(\d{2})(\d)/, "$1.$2");
-  valorFormatado = valorFormatado.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
-  valorFormatado = valorFormatado.replace(/\.(\d{3})(\d)/, ".$1/$2");
-  valorFormatado = valorFormatado.replace(/(\d{4})(\d)/, "$1-$2");
+  if (apenasNumeros.length > 2) {
+    valorFormatado = apenasNumeros.replace(/(\d{2})(\d)/, "$1.$2");
+    if (apenasNumeros.length > 5) {
+      valorFormatado = valorFormatado.replace(
+        /(\d{2})\.(\d{3})(\d)/,
+        "$1.$2.$3"
+      );
+      if (apenasNumeros.length > 8) {
+        valorFormatado = valorFormatado.replace(
+          /(\d{2})\.(\d{3})\.(\d{3})(\d)/,
+          "$1.$2.$3/$4"
+        );
+        if (apenasNumeros.length > 12) {
+          valorFormatado = valorFormatado.replace(
+            /(\d{2})\.(\d{3})\.(\d{3})\/(\d{4})(\d{0,2})/,
+            "$1.$2.$3/$4-$5"
+          );
+        }
+      }
+    }
+  }
   return valorFormatado;
 }
 
@@ -234,7 +270,7 @@ const onFotoPerfilChange = (e) => {
     try {
       perfilUrl.value = URL.createObjectURL(file);
       empresaService.enviarLogoEmpresaPorIdEmpresa(file, idEmpresaLogado);
-      showToast("Logo atualizada com com sucesso!", "success");
+      showToast("Logo atualizada com sucesso!", "success");
     } catch (error) {
       showToast("Erro ao enviar logo da empresa", "error");
     }
@@ -247,7 +283,7 @@ const onFotoCapaChange = (e) => {
     try {
       capaUrl.value = URL.createObjectURL(file);
       empresaService.enviarCapaEmpresaPorIdEmpresa(file, idEmpresaLogado);
-      showToast("Capa atualizada com com sucesso!", "success");
+      showToast("Capa atualizada com sucesso!", "success");
     } catch (error) {
       showToast("Erro ao enviar capa da empresa", "error");
     }
@@ -259,12 +295,32 @@ function showToast(msg, type = "info") {
   toastType.value = type;
 }
 
+function validarCampos() {
+  if (
+    !empresa.value.descricaoNomeFisica ||
+    empresa.value.descricaoNomeFisica.length < 3
+  ) {
+    showToast("Nome da empresa é obrigatório.", "error");
+    return false;
+  }
+  if (!empresa.value.email || !/^\S+@\S+\.\S+$/.test(empresa.value.email)) {
+    showToast("E-mail inválido.", "error");
+    return false;
+  }
+  if (!empresa.value.telefone || empresa.value.telefone.length < 10) {
+    showToast("Telefone inválido.", "error");
+    return false;
+  }
+  return true;
+}
+
 async function salvar() {
+  if (!validarCampos()) return;
   carregando.value = true;
   try {
     const data = await empresaService.atualizarDadosEmpresa(empresa.value);
     if (data) {
-      showToast("Dados da empresa atualizada com com sucesso!", "success");
+      showToast("Dados da empresa atualizados com sucesso!", "success");
     }
   } catch (error) {
     showToast("Erro ao atualizar dados da empresa", "error");

@@ -9,7 +9,7 @@
       <h3>Bem-vindo</h3>
       <p>Faça login com seu CNPJ e senha cadastrados.</p>
 
-      <form @submit.prevent="realizarLogin">
+      <form @submit.prevent="realizarLogin" autocomplete="on">
         <label for="cnpj">CNPJ</label>
         <input
           id="cnpj"
@@ -19,6 +19,7 @@
           placeholder="00.000.000/0000-00"
           required
           maxlength="18"
+          aria-label="CNPJ do usuário"
         />
 
         <label for="senha">Senha</label>
@@ -28,15 +29,18 @@
           type="password"
           placeholder="Digite sua senha"
           required
+          aria-label="Senha do usuário"
         />
 
-        <button type="submit">Entrar</button>
+        <button
+          type="submit"
+          :disabled="carregando"
+          aria-label="Entrar no sistema"
+        >
+          Entrar
+        </button>
 
         <Toast :message="toastMessage" :type="toastType" />
-
-        <!-- <router-link to="/recuperar-senha" class="link">
-          Esqueceu a senha?
-        </router-link> -->
       </form>
     </div>
   </div>
@@ -75,22 +79,25 @@ onMounted(() => {
   }
 });
 
+function validarCampos() {
+  if (!cnpj.value || cnpj.value.length < 14) {
+    showToast("CNPJ inválido.", "error");
+    return false;
+  }
+  if (!senha.value || senha.value.length < 4) {
+    showToast("Senha obrigatória.", "error");
+    return false;
+  }
+  return true;
+}
+
 const realizarLogin = async () => {
+  if (!validarCampos()) return;
   carregando.value = true;
 
   try {
     await loginService.validarLogin(cnpjSemFormatacao.value, senha.value);
-
-    // Supondo que a API retorna { token: '...' }
-    // localStorage.setItem("token", resultado.token);
     localStorage.setItem("cnpj", cnpjSemFormatacao.value);
-
-    // if (lembrar.value) {
-    //   localStorage.setItem("cnpj", cnpj.value);
-    // } else {
-    //   localStorage.removeItem("cnpj");
-    // }
-
     store.definirCnpjLogado(cnpjSemFormatacao.value);
     showToast("Login realizado com sucesso!", "success");
     router.push("/inicio");

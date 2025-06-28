@@ -10,19 +10,30 @@
         aria-label="Link de agendamento"
       />
       <div class="botoes-container">
-        <button type="button" class="botao" @click="copiarLink">Copiar</button>
+        <button
+          type="button"
+          class="botao"
+          @click="copiarLink"
+          aria-label="Copiar link de agendamento"
+        >
+          Copiar
+        </button>
         <button
           type="button"
           class="botao"
           v-if="podeCompartilhar"
           @click="compartilharLink"
+          aria-label="Compartilhar link de agendamento"
         >
           Compartilhar
         </button>
       </div>
     </div>
 
-    <p v-if="copiado" class="mensagem-sucesso">Link copiado com sucesso!</p>
+    <p v-if="copiado" class="mensagem-sucesso" role="status" aria-live="polite">
+      Link copiado com sucesso!
+    </p>
+    <p v-if="erro" class="mensagem-erro" role="alert">{{ erro }}</p>
   </div>
 </template>
 
@@ -38,24 +49,34 @@ const baseUrl = "https://peton.app/redirect";
 // Computado e estados
 const linkGerado = computed(() => `${baseUrl}?empresa=${idEmpresa}`);
 const copiado = ref(false);
+const erro = ref("");
 const podeCompartilhar = computed(() => !!navigator.share);
 
 // Ações
 function copiarLink() {
-  navigator.clipboard.writeText(linkGerado.value).then(() => {
-    copiado.value = true;
-    setTimeout(() => (copiado.value = false), 2000);
-  });
+  erro.value = "";
+  navigator.clipboard
+    .writeText(linkGerado.value)
+    .then(() => {
+      copiado.value = true;
+      setTimeout(() => (copiado.value = false), 2000);
+    })
+    .catch(() => {
+      erro.value = "Não foi possível copiar o link. Tente manualmente.";
+    });
 }
 
 function compartilharLink() {
+  erro.value = "";
   navigator
     .share({
       title: "Agende com a Pet.ON",
       text: "Clique no link para agendar o serviço do seu pet:",
       url: linkGerado.value,
     })
-    .catch((err) => console.error("Erro ao compartilhar:", err));
+    .catch(() => {
+      erro.value = "Não foi possível compartilhar o link neste dispositivo.";
+    });
 }
 </script>
 
@@ -117,6 +138,13 @@ function compartilharLink() {
 .mensagem-sucesso {
   font-size: 16px;
   color: green;
+  margin-top: 12px;
+  text-align: left;
+}
+
+.mensagem-erro {
+  font-size: 16px;
+  color: #d32f2f;
   margin-top: 12px;
   text-align: left;
 }

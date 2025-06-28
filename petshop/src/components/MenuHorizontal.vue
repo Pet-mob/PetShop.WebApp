@@ -1,12 +1,22 @@
 <template>
-  <nav class="top-menu">
+  <nav class="top-menu" aria-label="Menu principal de navegação">
     <div class="menu-left">
-      <router-link to="/inicio" class="nav-button" active-class="active-button">
+      <router-link
+        to="/inicio"
+        class="nav-button"
+        active-class="active-button"
+        aria-label="Ir para Início"
+      >
         <Home class="icon" />
         <span class="nav-label">Início</span>
       </router-link>
 
-      <router-link to="/agenda" class="nav-button" active-class="active-button">
+      <router-link
+        to="/agenda"
+        class="nav-button"
+        active-class="active-button"
+        aria-label="Ir para Agenda"
+      >
         <Calendar class="icon" />
         <span class="nav-label">Agenda</span>
       </router-link>
@@ -17,6 +27,7 @@
         to="/configuracoes"
         class="nav-button"
         active-class="active-button"
+        aria-label="Ir para Configurações"
       >
         <Settings class="icon" />
         <span class="nav-label">Configurações</span>
@@ -67,6 +78,12 @@ import { Home, Calendar, Settings } from "lucide-vue-next";
   color: #ffffff;
   box-shadow: 0 0 10px #73aff090;
   transform: translateY(-2px);
+}
+
+.nav-button:focus {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+  z-index: 2;
 }
 
 .active-button {

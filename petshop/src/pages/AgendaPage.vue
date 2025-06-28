@@ -1,10 +1,14 @@
 <template>
   <div class="agenda-container p-4 bg-gray-50 min-h-screen">
     <!-- Tabs -->
-    <div class="tabs mb-4">
+    <div class="tabs mb-4" role="tablist" aria-label="Visualização da agenda">
       <button
         :class="['tab-btn', { active: visualizacao === 'semanal' }]"
         @click="visualizacao = 'semanal'"
+        role="tab"
+        :aria-selected="visualizacao === 'semanal'"
+        tabindex="0"
+        aria-label="Visualização semanal"
       >
         Semanal
       </button>
@@ -18,9 +22,12 @@
         type="date"
         class="input-date-hidden"
         @change="aplicarFiltro"
+        aria-label="Selecionar data para filtrar agenda"
       />
       <div class="navegacao-central">
-        <button @click="voltarPeriodo" aria-label="Voltar período">&lt;</button>
+        <button @click="voltarPeriodo" aria-label="Voltar período" tabindex="0">
+          &lt;
+        </button>
         <label
           class="label-data"
           @click="abrirCalendario"
@@ -28,23 +35,45 @@
           tabindex="0"
           @keydown.enter.prevent="abrirCalendario"
           @keydown.space.prevent="abrirCalendario"
+          aria-label="Selecionar data da semana"
         >
           {{ intervaloSemana }}
         </label>
-        <button @click="avancarPeriodo" aria-label="Avançar período">
+        <button
+          @click="avancarPeriodo"
+          aria-label="Avançar período"
+          tabindex="0"
+        >
           &gt;
         </button>
       </div>
     </div>
 
+    <!-- Feedback de erro -->
+    <div v-if="erroBusca" class="text-center text-red-600 py-2" role="alert">
+      {{ erroBusca }}
+    </div>
+
     <!--Conteudo-->
-    <!--TODO: isolar em um componente, fazer um componente pra isso-->
-    <div v-if="carregando" class="text-center text-gray-400 py-6">
+    <div
+      v-if="carregando"
+      class="text-center text-gray-400 py-6"
+      role="status"
+      aria-live="polite"
+    >
       <span class="animate-pulse">Carregando agendamentos...</span>
     </div>
     <div v-else class="agenda-semanal">
       <div class="cards-dias">
-        <div v-for="dia in diasSemana" :key="dia.data" class="card-dia">
+        <div
+          v-for="dia in diasSemana"
+          :key="dia.data.format('YYYY-MM-DD')"
+          class="card-dia"
+          role="region"
+          :aria-label="
+            'Agendamentos de ' + dia.nome + ' ' + dia.data.format('DD/MM')
+          "
+        >
           <div class="header-dia">
             <span class="nome-dia"
               >{{ dia.nome }} - {{ dia.data.format("DD/MM") }}</span
@@ -55,6 +84,8 @@
             <div
               v-if="agendamentosDoDia(dia.data).length === 0"
               class="sem-agendamentos"
+              aria-label="Nenhum agendamento para este dia"
+              role="status"
             >
               Nenhum agendamento
             </div>
@@ -62,6 +93,15 @@
               v-for="ag in agendamentosDoDia(dia.data)"
               :key="ag.idAgendamento"
               class="agendamento-item"
+              role="listitem"
+              :aria-label="
+                'Agendamento de ' +
+                ag.nomeAnimal +
+                ', serviço: ' +
+                ag.descricaoServico +
+                ', horário: ' +
+                ag.horarioInicial
+              "
             >
               <strong>{{ ag.nomeAnimal }}</strong> <br />
               <small>{{ ag.horarioInicial }} - {{ ag.descricaoServico }}</small>
@@ -88,6 +128,7 @@ const dataFiltro = ref(dayjs().format("YYYY-MM-DD"));
 const inputData = ref(null);
 const carregando = ref(false);
 const agendamentos = ref([]);
+const erroBusca = ref("");
 const empresaLogada = store.empresaLogada;
 const idEmpresaLogada = empresaLogada.idEmpresa;
 
@@ -143,6 +184,7 @@ function agendamentosDoDia(dia) {
 
 async function buscarAgendamentos() {
   carregando.value = true;
+  erroBusca.value = "";
   const dataInicio = dayjs(dataFiltro.value)
     .startOf("week")
     .add(1, "day")
@@ -159,7 +201,8 @@ async function buscarAgendamentos() {
     );
     agendamentos.value = dados;
   } catch (error) {
-    console.error("Erro ao buscar agendamentos:", error);
+    erroBusca.value =
+      "Erro ao buscar agendamentos. Tente novamente mais tarde.";
     agendamentos.value = [];
   } finally {
     carregando.value = false;

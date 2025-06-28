@@ -1,22 +1,37 @@
 <template>
-  <div v-if="agendamentosPendentes.length > 0" class="notificacoes-laterais">
+  <div
+    v-if="agendamentosPendentes.length > 0"
+    class="notificacoes-laterais"
+    aria-label="Notificações de agendamentos pendentes"
+    role="region"
+    aria-live="polite"
+  >
     <TransitionGroup name="fade" tag="div">
       <div
         v-for="agendamento in agendamentosPendentes"
         :key="agendamento.id"
         class="card"
+        role="alertdialog"
+        :aria-label="
+          'Agendamento pendente de ' +
+          agendamento.cliente +
+          ', serviço: ' +
+          agendamento.servico
+        "
       >
         <p><strong>Cliente:</strong> {{ agendamento.cliente }}</p>
         <p><strong>Serviço:</strong> {{ agendamento.servico }}</p>
         <button
           :disabled="isLoading(agendamento.id)"
           @click="aceitar(agendamento.id)"
+          aria-label="Aceitar agendamento de {{ agendamento.cliente }}"
         >
           ✅ Aceitar
         </button>
         <button
           :disabled="isLoading(agendamento.id)"
           @click="recusar(agendamento.id)"
+          aria-label="Recusar agendamento de {{ agendamento.cliente }}"
         >
           ❌ Recusar
         </button>
@@ -76,11 +91,9 @@ async function aceitar(id) {
       showToast("✅ Agendamento aceito!", "success");
     } else {
       const erro = await res.text();
-      console.error("❌ Falha ao aceitar:", erro);
       showToast("Erro ao aceitar: " + erro, "error");
     }
   } catch (err) {
-    console.error("❌ Erro de rede:", err);
     showToast("Erro de rede ao aceitar", "error");
   } finally {
     loadingIds.value = loadingIds.value.filter((i) => i !== id);
@@ -101,11 +114,9 @@ async function recusar(id) {
       showToast("❌ Agendamento recusado!", "warning");
     } else {
       const erro = await res.text();
-      console.error("❌ Falha ao recusar:", erro);
       showToast("Erro ao recusar: " + erro, "error");
     }
   } catch (err) {
-    console.error("❌ Erro de rede:", err);
     showToast("Erro de rede ao recusar", "error");
   } finally {
     loadingIds.value = loadingIds.value.filter((i) => i !== id);
@@ -149,6 +160,12 @@ button[disabled] {
 .fade-leave-to {
   opacity: 0;
   transform: translateX(20px);
+}
+
+.card button:focus {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+  z-index: 2;
 }
 </style>
 

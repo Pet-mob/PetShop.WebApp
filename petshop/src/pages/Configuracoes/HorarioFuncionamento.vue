@@ -11,13 +11,21 @@
         <div v-for="dia in diasDaSemana" :key="dia.value" class="dia-card">
           <div class="switch-container">
             <span class="dia-texto">{{ dia.label }}</span>
-            <input type="checkbox" v-model="horarios[dia.value].ativo" />
+            <input
+              type="checkbox"
+              v-model="horarios[dia.value].ativo"
+              :aria-label="`Ativar/desativar ${dia.label}`"
+            />
           </div>
 
           <div v-if="horarios[dia.value]?.ativo" class="horario-container">
             <div class="picker-container">
-              <label>Abertura</label>
-              <select v-model="horarios[dia.value].abertura">
+              <label :for="`abertura-${dia.value}`">Abertura</label>
+              <select
+                v-model="horarios[dia.value].abertura"
+                :id="`abertura-${dia.value}`"
+                :aria-label="`Horário de abertura de ${dia.label}`"
+              >
                 <option
                   v-for="opcao in opcoesDeHorario"
                   :key="opcao.value"
@@ -29,8 +37,12 @@
             </div>
 
             <div class="picker-container">
-              <label>Fechamento</label>
-              <select v-model="horarios[dia.value].fechamento">
+              <label :for="`fechamento-${dia.value}`">Fechamento</label>
+              <select
+                v-model="horarios[dia.value].fechamento"
+                :id="`fechamento-${dia.value}`"
+                :aria-label="`Horário de fechamento de ${dia.label}`"
+              >
                 <option
                   v-for="opcao in opcoesDeHorario"
                   :key="opcao.value"
@@ -44,7 +56,11 @@
         </div>
       </div>
 
-      <button class="botao-salvar" @click="salvarHorarios">
+      <button
+        class="botao-salvar"
+        @click="salvarHorarios"
+        aria-label="Salvar horários de funcionamento"
+      >
         Salvar Horários
       </button>
     </div>
@@ -146,7 +162,19 @@ function mapearNomeDiaParaChave(nomeDia) {
   return mapa[nomeDia];
 }
 
+function validarHorarios() {
+  for (const dia of diasDaSemana) {
+    const valor = horarios[dia.value];
+    if (valor.ativo && (!valor.abertura || !valor.fechamento)) {
+      showToast(`Preencha abertura e fechamento para ${dia.label}.`, "error");
+      return false;
+    }
+  }
+  return true;
+}
+
 async function salvarHorarios() {
+  if (!validarHorarios()) return;
   carregando.value = true;
 
   const configuracoes = [];

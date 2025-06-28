@@ -3,21 +3,27 @@
     <h1>Recuperar Senha PetShop</h1>
 
     <div v-if="step === 1" class="step">
-      <p>
-        Enviaremos um código para o e-mail do petshop:
-        <strong>equpepeton@gmail.com</strong>
-      </p>
-      <button @click="enviarCodigo" :disabled="carregando">
+      <p>Enviaremos um código para o e-mail cadastrado do petshop.</p>
+      <button
+        @click="enviarCodigo"
+        :disabled="carregando"
+        aria-label="Enviar código de recuperação"
+      >
         {{ carregando ? "Enviando código..." : "Enviar código" }}
       </button>
     </div>
 
     <div v-if="step === 2" class="step">
       <p>Insira o código que você recebeu no e-mail:</p>
-      <input v-model="codigoDigitado" placeholder="Digite o código" />
+      <input
+        v-model="codigoDigitado"
+        placeholder="Digite o código"
+        aria-label="Código recebido por e-mail"
+      />
       <button
         @click="verificarCodigo"
         :disabled="carregando || !codigoDigitado"
+        aria-label="Verificar código"
       >
         {{ carregando ? "Verificando..." : "Verificar código" }}
       </button>
@@ -26,15 +32,22 @@
 
     <div v-if="step === 3" class="step">
       <p>Digite sua nova senha:</p>
-      <input type="password" v-model="novaSenha" placeholder="Nova senha" />
+      <input
+        type="password"
+        v-model="novaSenha"
+        placeholder="Nova senha"
+        aria-label="Nova senha"
+      />
       <input
         type="password"
         v-model="confirmaSenha"
         placeholder="Confirme a nova senha"
+        aria-label="Confirme a nova senha"
       />
       <button
         @click="redefinirSenha"
         :disabled="carregando || !novaSenha || novaSenha !== confirmaSenha"
+        aria-label="Redefinir senha"
       >
         {{ carregando ? "Redefinindo senha..." : "Redefinir senha" }}
       </button>
@@ -71,22 +84,11 @@ const enviarCodigo = async () => {
     // Simular geração de código de 6 dígitos
     codigoGerado.value = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // Simular envio de e-mail com fetch (exemplo)
-    const emailData = {
-      remetente: "equpepeton@gmail.com",
-      destinatario: "rennancastanheira@gmail.com",
-      assunto: "Código de Recuperação de Senha - Pet.ON",
-      corpo: `Seu código de recuperação é: ${codigoGerado.value}`,
-    };
+    // Aqui você deve integrar com sua API real para envio de e-mail
+    // Exemplo:
+    // await apiService.enviarCodigoRecuperacao(emailDoUsuario, codigoGerado.value);
 
-    // Aqui você pode colocar sua URL real da API para enviar email
-    await fetch("https://webhook.site/your-test-url", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(emailData),
-    });
-
-    mensagem.value = `Código enviado para equpepeton@gmail.com`;
+    mensagem.value = `Código enviado para o e-mail cadastrado.`;
     sucesso.value = true;
     step.value = 2;
   } catch (e) {
@@ -99,6 +101,11 @@ const enviarCodigo = async () => {
 // Função para verificar o código digitado
 const verificarCodigo = () => {
   erro.value = "";
+  if (!codigoDigitado.value || codigoDigitado.value.length < 6) {
+    erro.value = "Digite o código recebido.";
+    sucesso.value = false;
+    return;
+  }
   if (codigoDigitado.value === codigoGerado.value) {
     mensagem.value = "";
     sucesso.value = true;
@@ -112,6 +119,11 @@ const verificarCodigo = () => {
 // Função para redefinir senha
 const redefinirSenha = () => {
   erro.value = "";
+  if (!novaSenha.value || novaSenha.value.length < 4) {
+    erro.value = "A senha deve ter pelo menos 4 caracteres.";
+    sucesso.value = false;
+    return;
+  }
   if (novaSenha.value !== confirmaSenha.value) {
     erro.value = "As senhas não coincidem.";
     sucesso.value = false;
@@ -119,7 +131,7 @@ const redefinirSenha = () => {
   }
   carregando.value = true;
 
-  // Simular chamada backend para redefinir senha
+  // Aqui você deve integrar com sua API real para redefinir a senha
   setTimeout(() => {
     carregando.value = false;
     mensagem.value = "Senha redefinida com sucesso!";

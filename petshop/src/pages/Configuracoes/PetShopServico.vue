@@ -14,6 +14,11 @@
             class="card-modelo"
             :class="{ ativo: modoAgendamento === 'agrupado' }"
             @click="setarModo('agrupado')"
+            role="button"
+            tabindex="0"
+            aria-label="Selecionar modo agrupado"
+            @keydown.enter.prevent="setarModo('agrupado')"
+            @keydown.space.prevent="setarModo('agrupado')"
           >
             <h3>Serviços Agrupados</h3>
             <p>O cliente escolhe apenas 1 serviço por agendamento.</p>
@@ -23,6 +28,11 @@
             class="card-modelo"
             :class="{ ativo: modoAgendamento === 'separado' }"
             @click="setarModo('separado')"
+            role="button"
+            tabindex="0"
+            aria-label="Selecionar modo separado"
+            @keydown.enter.prevent="setarModo('separado')"
+            @keydown.space.prevent="setarModo('separado')"
           >
             <h3>Serviços Separados</h3>
             <p>O cliente pode marcar vários serviços em uma só vez.</p>
@@ -33,7 +43,11 @@
       <!-- Cabeçalho da Seção -->
       <header class="cabecalho-secao">
         <h1 class="titulo">Serviços</h1>
-        <button class="botao-adicionar" @click="abrirModalNovo">
+        <button
+          class="botao-adicionar"
+          @click="abrirModalNovo"
+          aria-label="Adicionar novo serviço"
+        >
           Adicionar Serviço
         </button>
       </header>
@@ -53,10 +67,18 @@
             </p>
           </div>
           <div class="card_botoes">
-            <button class="botao-editar" @click="abrirModalEditar(servico)">
+            <button
+              class="botao-editar"
+              @click="abrirModalEditar(servico)"
+              aria-label="Editar serviço {{ servico.descricao }}"
+            >
               Editar
             </button>
-            <button class="botao-excluir" @click="excluirServico(servico)">
+            <button
+              class="botao-excluir"
+              @click="excluirServico(servico)"
+              aria-label="Excluir serviço {{ servico.descricao }}"
+            >
               Excluir
             </button>
           </div>
@@ -108,7 +130,10 @@ const modoAgendamento = ref("agrupado"); // novo estado
 
 onMounted(async () => {
   await buscarServicosDaEmpresa();
-  console.log("parametros: ", parametros);
+  // Carrega o modo de agendamento salvo no localStorage
+  // Se não houver, usa o modo padrão "agrupado"
+  parametros.modoAgendamento = modoAgendamento.value;
+  // console.log("parametros: ", parametros); // Removido para produção
   const modoSalvo = localStorage.getItem("modoAgendamento");
   if (modoSalvo) modoAgendamento.value = modoSalvo;
 });
@@ -158,6 +183,11 @@ async function fecharModal() {
 }
 
 async function adicionarServico(dto) {
+  // Exemplo de reforço de validação (pode ser expandido conforme regras de negócio)
+  if (!dto.descricao || dto.valor === undefined || dto.valor < 0) {
+    showToast("Preencha todos os campos obrigatórios corretamente.", "error");
+    return;
+  }
   if (dto.duracao === undefined || dto.duracao === null) {
     dto.duracao = 0;
   }
@@ -173,6 +203,10 @@ async function adicionarServico(dto) {
 }
 
 async function atualizarServico(dto) {
+  if (!dto.descricao || dto.valor === undefined || dto.valor < 0) {
+    showToast("Preencha todos os campos obrigatórios corretamente.", "error");
+    return;
+  }
   carregando.value = true;
   try {
     const data = await ServicosEmpresaService.atualizarServicoEmpresa(dto);
@@ -217,7 +251,7 @@ async function salvarServico(dados) {
       await adicionarServico(dto);
     }
     showToast("Serviço salvo com sucesso!", "success");
-    fecharModal();
+    await fecharModal();
   } catch (error) {
     showToast("Erro ao salvar serviço", "error");
   } finally {

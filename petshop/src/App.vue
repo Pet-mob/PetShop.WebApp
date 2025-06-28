@@ -1,14 +1,11 @@
 <template>
   <div id="app">
     <MenuHorizontal v-if="$route.meta.menu" />
-    <!-- <NotificacaoAgendamento v-if="$route.meta.menu" /> -->
-    <!-- <- fica sempre ativo -->
-    <router-view />
+    <router-view role="main" />
   </div>
 </template>
 <script setup>
 import MenuHorizontal from "@/components/MenuHorizontal.vue";
-// import NotificacaoAgendamento from "@/components/NotificacaoAgendamento.vue";
 </script>
 <style>
 html,

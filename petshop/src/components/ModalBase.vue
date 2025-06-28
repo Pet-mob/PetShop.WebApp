@@ -1,8 +1,17 @@
 <template>
-  <div class="sobreposicao-modal" @click.self="fecharModal">
+  <div
+    class="sobreposicao-modal"
+    @click.self="fecharModal"
+    role="dialog"
+    aria-modal="true"
+    :aria-labelledby="'titulo-modal'"
+    tabindex="-1"
+    ref="modalRef"
+    @keydown.esc="fecharModal"
+  >
     <div class="container-modal">
       <header class="cabecalho-modal">
-        <h2 class="titulo-modal">{{ props.titulo }}</h2>
+        <h2 class="titulo-modal" :id="'titulo-modal'">{{ props.titulo }}</h2>
         <button
           class="botao-fechar-modal"
           @click="fecharModal"
@@ -22,7 +31,7 @@
 </template>
 
 <script setup>
-import { defineEmits, defineProps } from "vue";
+import { defineEmits, defineProps, ref, onMounted, nextTick } from "vue";
 
 const props = defineProps({
   titulo: {
@@ -32,10 +41,18 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["fechar"]);
+const modalRef = ref(null);
 
 function fecharModal() {
   emit("fechar");
 }
+
+onMounted(async () => {
+  await nextTick();
+  if (modalRef.value) {
+    modalRef.value.focus();
+  }
+});
 </script>
 
 <style scoped>

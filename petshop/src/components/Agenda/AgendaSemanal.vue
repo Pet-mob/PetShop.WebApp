@@ -2,18 +2,38 @@
   <div class="agenda-semanal-container">
     <!-- Cards Semanais -->
     <div class="cards-grid">
-      <div v-for="(dia, i) in semana" :key="i" class="card">
+      <div
+        v-for="(dia, i) in semana"
+        :key="i"
+        class="card"
+        role="region"
+        :aria-label="
+          'Agendamentos de ' + dia.diaSemana + ', ' + dia.dataFormatada
+        "
+      >
         <header>
           <h3>{{ dia.diaSemana }}</h3>
           <span>{{ dia.dataFormatada }}</span>
         </header>
         <section>
           <p class="section-title">Horários</p>
-          <ul>
+          <ul role="list" aria-label="Lista de horários">
+            <li
+              v-if="!dia.horarios || dia.horarios.length === 0"
+              class="sem-horarios"
+              role="status"
+              aria-label="Nenhum horário para este dia"
+            >
+              Nenhum horário
+            </li>
             <li
               v-for="(item, idx) in dia.horarios"
               :key="idx"
               title="Horário - Usuário"
+              role="listitem"
+              :aria-label="
+                'Horário: ' + item.hora + ', Usuário: ' + item.usuario
+              "
             >
               {{ item.hora }} - {{ item.usuario }}
             </li>
@@ -21,6 +41,7 @@
         </section>
       </div>
     </div>
+    <p v-if="erro" class="mensagem-erro" role="alert">{{ erro }}</p>
   </div>
 </template>
 
@@ -43,8 +64,10 @@ const props = defineProps({
 });
 
 const semana = ref([]);
+const erro = ref("");
 
 const carregarAgenda = async () => {
+  erro.value = "";
   try {
     const resposta = await AgendaService.buscarAgenda(
       props.dataFiltro,
@@ -53,7 +76,7 @@ const carregarAgenda = async () => {
     semana.value = resposta;
     return resposta;
   } catch (error) {
-    console.error("Erro ao buscar agenda:", error);
+    erro.value = "Erro ao buscar agenda. Tente novamente mais tarde.";
     semana.value = [];
     return [];
   }
@@ -150,5 +173,17 @@ watch(
   font-family: monospace;
   color: #6b7280;
   cursor: default;
+}
+
+.mensagem-erro {
+  color: #d32f2f;
+  font-size: 1rem;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.sem-horarios {
+  color: #999;
+  font-style: italic;
 }
 </style>

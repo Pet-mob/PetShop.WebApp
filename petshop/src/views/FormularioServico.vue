@@ -1,5 +1,11 @@
 <template>
-  <form class="formulario-container" @submit.prevent="enviarFormulario">
+  <form
+    class="formulario-container"
+    @submit.prevent="enviarFormulario"
+    novalidate
+    role="form"
+    aria-label="Formulário de serviço"
+  >
     <div class="linha-formulario">
       <div class="campo-formulario flex2">
         <label for="nome" class="label-formulario">Nome do Serviço</label>
@@ -10,7 +16,12 @@
           class="campo-texto"
           placeholder="Ex: Banho e Tosa"
           required
+          aria-label="Nome do serviço"
+          :aria-invalid="erros.descricao ? 'true' : 'false'"
         />
+        <span v-if="erros.descricao" class="mensagem-erro" role="alert">{{
+          erros.descricao
+        }}</span>
       </div>
       <div class="campo-formulario flex1">
         <label for="preco" class="label-formulario">Preço (R$)</label>
@@ -23,16 +34,28 @@
           min="0"
           step="0.01"
           required
+          aria-label="Preço do serviço"
+          :aria-invalid="erros.valor ? 'true' : 'false'"
         />
+        <span v-if="erros.valor" class="mensagem-erro" role="alert">{{
+          erros.valor
+        }}</span>
       </div>
       <div class="campo-formulario flex1">
         <label for="duracao" class="label-formulario">Duração (min)</label>
         <input
           id="duracao"
-          v-model="dados.duracao"
+          v-model.number="dados.duracao"
           type="number"
           class="campo-texto"
+          min="1"
+          required
+          aria-label="Duração do serviço em minutos"
+          :aria-invalid="erros.duracao ? 'true' : 'false'"
         />
+        <span v-if="erros.duracao" class="mensagem-erro" role="alert">{{
+          erros.duracao
+        }}</span>
       </div>
     </div>
 
@@ -45,6 +68,7 @@
           v-model="dados.observacao"
           rows="2"
           class="campo-texto"
+          aria-label="Observação do serviço"
         ></textarea>
       </div>
     </div>
@@ -52,8 +76,12 @@
     <!-- Linha: Possui Oferta | Valor da Oferta -->
     <div class="linha-formulario">
       <div class="campo-formulario">
-        <label class="checkbox-container">
-          <input type="checkbox" v-model="dados.possuiMensal" />
+        <label class="checkbox-container" aria-label="Possui mensalidade?">
+          <input
+            type="checkbox"
+            v-model="dados.possuiMensal"
+            aria-checked="dados.possuiMensal ? 'true' : 'false'"
+          />
           <span class="checkmark"></span>
           Possui mensal
         </label>
@@ -65,15 +93,17 @@
         >
         <input
           id="valorOferta"
-          v-model="dados.precoMensal"
+          v-model.number="dados.precoMensal"
           type="number"
           step="0.01"
           class="campo-texto"
+          min="0"
+          aria-label="Valor do mensal"
         />
       </div>
     </div>
 
-    <button type="submit" class="botao-principal">
+    <button type="submit" class="botao-principal" aria-label="Salvar serviço">
       {{ botaoTexto }}
     </button>
   </form>
@@ -103,6 +133,7 @@ const props = defineProps({
 const emit = defineEmits(["salvar"]);
 
 const dados = ref({ ...props.dadosIniciais });
+const erros = ref({ descricao: "", valor: "", duracao: "" });
 
 watch(
   () => props.dadosIniciais,
@@ -111,8 +142,37 @@ watch(
   }
 );
 
+function validarCampos() {
+  erros.value = { descricao: "", valor: "", duracao: "" };
+  let valido = true;
+  if (!dados.value.descricao || dados.value.descricao.trim().length < 3) {
+    erros.value.descricao = "Informe um nome válido para o serviço.";
+    valido = false;
+  }
+  if (
+    dados.value.valor === null ||
+    dados.value.valor === undefined ||
+    isNaN(dados.value.valor) ||
+    dados.value.valor < 0
+  ) {
+    erros.value.valor = "Informe um valor válido (maior ou igual a zero).";
+    valido = false;
+  }
+  if (
+    !dados.value.duracao ||
+    isNaN(dados.value.duracao) ||
+    dados.value.duracao < 1
+  ) {
+    erros.value.duracao = "Informe a duração em minutos (mínimo 1).";
+    valido = false;
+  }
+  return valido;
+}
+
 function enviarFormulario() {
-  emit("salvar", { ...dados.value });
+  if (validarCampos()) {
+    emit("salvar", { ...dados.value });
+  }
 }
 </script>
 
@@ -249,5 +309,12 @@ function enviarFormulario() {
 /* Exibe quando marcado */
 .checkbox-container input:checked ~ .checkmark::after {
   display: block;
+}
+
+.mensagem-erro {
+  color: #d32f2f;
+  font-size: 0.95rem;
+  margin-top: 0.2rem;
+  margin-bottom: 0.2rem;
 }
 </style>
