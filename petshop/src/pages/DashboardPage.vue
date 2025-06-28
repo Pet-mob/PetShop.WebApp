@@ -1,7 +1,7 @@
 <template>
   <div class="container-dashboard">
     <!-- Exibe o loading se estiver carregando -->
-    <LoadingPetON v-if="carregando" />
+    <LoadingPetMob v-if="carregando" />
 
     <!-- Oculta o card de login durante o loading -->
     <div v-else>
@@ -41,7 +41,7 @@ import { useGlobalStore } from "@/store/useGlobalStore";
 import empresaService from "@/services/empresaService";
 import dashboardService from "@/services/dashboardService";
 import Toast from "@/components/ToastCustomizado.vue";
-import LoadingPetON from "@/components/LoadingPetMob.vue";
+import LoadingPetMob from "@/components/LoadingPetMob.vue";
 
 const store = useGlobalStore();
 

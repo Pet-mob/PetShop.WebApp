@@ -1,6 +1,6 @@
 <template>
   <div class="horario-funcionamento">
-    <LoadingPetON v-if="carregando" />
+    <LoadingPetMob v-if="carregando" />
 
     <div v-else>
       <div class="cabecalho">
@@ -57,7 +57,7 @@
 import { onMounted, reactive, ref } from "vue";
 import empresaService from "@/services/empresaService";
 import { useGlobalStore } from "@/store/useGlobalStore";
-import LoadingPetON from "@/components/LoadingPetMob.vue";
+import LoadingPetMob from "@/components/LoadingPetMob.vue";
 import Toast from "@/components/ToastCustomizado.vue";
 
 const store = useGlobalStore();

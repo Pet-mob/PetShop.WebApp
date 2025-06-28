@@ -1,7 +1,7 @@
 <template>
   <div class="empresa-container">
     <!-- Exibe o loading se estiver carregando -->
-    <LoadingPetON v-if="carregando" />
+    <LoadingPetMob v-if="carregando" />
 
     <!-- Conteúdo principal -->
     <div v-else>
@@ -115,7 +115,7 @@ import { ref, onMounted, watch } from "vue";
 import perfilPadrao from "@/assets/perfil.png";
 import fotoCapaPadrao from "@/assets/LogoEscritaPetMob.png";
 import empresaService from "@/services/empresaService";
-import LoadingPetON from "@/components/LoadingPetMob.vue";
+import LoadingPetMob from "@/components/LoadingPetMob.vue";
 import Toast from "@/components/ToastCustomizado.vue";
 import { useGlobalStore } from "@/store/useGlobalStore";
 

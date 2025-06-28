@@ -1,7 +1,7 @@
 <template>
   <section class="secao-servicos">
     <!-- Exibe o loading se estiver carregando -->
-    <LoadingPetON v-if="carregando" />
+    <LoadingPetMob v-if="carregando" />
 
     <!-- Conteúdo principal -->
     <div v-else>
@@ -88,10 +88,11 @@ import ModalGenerico from "@/components/ModalBase.vue";
 import FormularioServico from "@/views/FormularioServico.vue";
 import ServicosEmpresaService from "@/services/ServicosEmpresaService";
 import { useGlobalStore } from "@/store/useGlobalStore";
-import LoadingPetON from "@/components/LoadingPetMob.vue";
+import LoadingPetMob from "@/components/LoadingPetMob.vue";
 import Toast from "@/components/ToastCustomizado.vue";
 
 const store = useGlobalStore();
+const parametros = store.retornoObjParametro();
 const empresaLogada = store.empresaLogada;
 const idEmpresaLogada = empresaLogada.idEmpresa;
 
@@ -107,6 +108,7 @@ const modoAgendamento = ref("agrupado"); // novo estado
 
 onMounted(async () => {
   await buscarServicosDaEmpresa();
+  console.log("parametros: ", parametros);
   const modoSalvo = localStorage.getItem("modoAgendamento");
   if (modoSalvo) modoAgendamento.value = modoSalvo;
 });

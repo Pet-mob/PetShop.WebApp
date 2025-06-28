@@ -1,7 +1,7 @@
 <template>
   <div class="container-login">
     <!-- Exibe o loading se estiver carregando -->
-    <LoadingPetON v-if="carregando" />
+    <LoadingPetMob v-if="carregando" />
 
     <!-- Oculta o card de login durante o loading -->
     <div class="card-login" v-else>
@@ -48,7 +48,7 @@ import { useRouter } from "vue-router";
 import logo from "@/assets/LogoLadoCentralizado.png";
 import loginService from "@/services/loginService";
 import Toast from "@/components/ToastCustomizado.vue";
-import LoadingPetON from "@/components/LoadingPetMob.vue";
+import LoadingPetMob from "@/components/LoadingPetMob.vue";
 import useCnpjFormatado from "@/composables/useCnpjFormatado";
 import { useGlobalStore } from "@/store/useGlobalStore";
 
