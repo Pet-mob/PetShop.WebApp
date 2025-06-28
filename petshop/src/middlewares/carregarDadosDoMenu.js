@@ -1,5 +1,6 @@
 import { useGlobalStore } from "@/store/useGlobalStore";
 import empresaService from "@/services/empresaService";
+import parametroService from "@/services/parametroService";
 
 export default async function carregarDadosDoMenu(to, from, next) {
   const store = useGlobalStore();
@@ -16,16 +17,19 @@ export default async function carregarDadosDoMenu(to, from, next) {
 
     // Chama a API e espera o retorno
     const empresa = await empresaService.buscarEmpresa(cnpj);
-
     // Se não veio empresa, redireciona para erro
     if (!empresa) {
       console.warn("Empresa não encontrada para o CNPJ:", cnpj);
       return next("/erro");
     }
 
+    const parametro = await parametroService.buscarParametro(
+      empresa[0].idEmpresa
+    );
+
     // Salva a empresa na store global
     store.definirObjetoEmpresaLogada(empresa[0]);
-
+    store.atualizarObjParametro(parametro);
     // Continua para a rota
     return next();
   } catch (erro) {
