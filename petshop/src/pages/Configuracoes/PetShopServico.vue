@@ -130,13 +130,18 @@ const modoAgendamento = ref("agrupado"); // novo estado
 
 onMounted(async () => {
   await buscarServicosDaEmpresa();
-  // Carrega o modo de agendamento salvo no localStorage
-  // Se não houver, usa o modo padrão "agrupado"
-  parametros.modoAgendamento = modoAgendamento.value;
-  // console.log("parametros: ", parametros); // Removido para produção
+  modeloTrabalho();
+});
+
+function modeloTrabalho() {
+  if (parametros.idModeloTrabalho == 1) {
+    modoAgendamento.value = "agrupado";
+  } else {
+    modoAgendamento.value = "separado";
+  }
   const modoSalvo = localStorage.getItem("modoAgendamento");
   if (modoSalvo) modoAgendamento.value = modoSalvo;
-});
+}
 
 function setarModo(modo) {
   modoAgendamento.value = modo;

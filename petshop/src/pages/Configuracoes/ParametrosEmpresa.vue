@@ -7,12 +7,12 @@
       aria-label="Formulário de parâmetros da empresa"
     >
       <div class="campo-formulario">
-        <label for="qtde" class="label-formulario"
-          >Qtde. Atendimento Simultâneo por Horário</label
-        >
+        <label for="qtde" class="label-formulario">
+          Qtde. Atendimento Simultâneo por Horário
+        </label>
         <input
           id="qtde"
-          v-model.number="parametros.qtde_atendimento_simultaneo_horario"
+          v-model.number="parametros.qtdeAtendimentoSimultaneoHorario"
           type="number"
           min="1"
           required
@@ -21,12 +21,12 @@
         />
       </div>
       <div class="campo-formulario">
-        <label for="modelo" class="label-formulario"
-          >Modelo de Serviço/Trabalho</label
-        >
+        <label for="modelo" class="label-formulario">
+          Modelo de Serviço/Trabalho
+        </label>
         <select
           id="modelo"
-          v-model.number="parametros.id_modelo_servico_trabalho"
+          v-model.number="parametros.idModeloTrabalho"
           required
           class="campo-texto"
           aria-label="Modelo de serviço/trabalho"
@@ -49,38 +49,50 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import parametrosService from "@/services/parametrosService";
+import parametrosService from "@/services/parametroService";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import Toast from "@/components/ToastCustomizado.vue";
 
+// Estado e store
 const store = useGlobalStore();
 const idEmpresa = store.empresaLogada.idEmpresa;
 const parametros = ref({
-  id_empresa: idEmpresa,
-  qtde_atendimento_simultaneo_horario: 1,
-  id_modelo_servico_trabalho: 1,
+  idEmpresa: idEmpresa,
+  qtdeAtendimentoSimultaneoHorario: 1,
+  idModeloTrabalho: 1,
 });
 const toastMessage = ref("");
 const toastType = ref("info");
 
+// Toast helper
+function showToast(msg, type = "info") {
+  toastMessage.value = msg;
+  toastType.value = type;
+}
+
+// Carregar parâmetros existentes
 async function carregarParametros() {
   try {
-    const data = await parametrosService.buscarParametros(idEmpresa);
+    const data = await parametrosService.buscarParametro(idEmpresa);
     if (data) Object.assign(parametros.value, data);
   } catch (error) {
-    toastMessage.value = "Erro ao carregar parâmetros.";
-    toastType.value = "error";
+    showToast("Erro ao carregar parâmetros.", "error");
   }
 }
 
+// Salvar parâmetros
 async function salvar() {
   try {
-    await parametrosService.salvarParametros(parametros.value);
-    toastMessage.value = "Parâmetros salvos com sucesso!";
-    toastType.value = "success";
+    const resultado = await parametrosService.ataulizarParametros(
+      parametros.value
+    );
+    if (!resultado) {
+      showToast("Erro ao salvar parâmetros.", "error");
+      return;
+    }
+    showToast("Parâmetros salvos com sucesso!", "success");
   } catch (error) {
-    toastMessage.value = "Erro ao salvar parâmetros.";
-    toastType.value = "error";
+    showToast("Erro ao salvar parâmetros.", "error");
   }
 }
 

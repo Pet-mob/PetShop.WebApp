@@ -9,6 +9,16 @@ const buscarParametro = (idEmpresaParam) => {
   });
 };
 
+const ataulizarParametros = (dto) => {
+  return new Promise((resolve, reject) => {
+    apiClient
+      .put("Parametros", dto)
+      .then((response) => resolve(response.data))
+      .catch((error) => reject(error));
+  });
+};
+
 export default {
   buscarParametro,
+  ataulizarParametros,
 };
