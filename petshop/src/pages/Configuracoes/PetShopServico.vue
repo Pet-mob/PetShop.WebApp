@@ -12,13 +12,21 @@
         <div class="opcoes-modelo">
           <div
             class="card-modelo"
-            :class="{ ativo: modoAgendamento === 'agrupado' }"
-            @click="setarModo('agrupado')"
+            :class="{
+              ativo: modoAgendamento === 'agrupado',
+              desabilitado: parametros.idModeloTrabalho !== 1,
+            }"
+            @click="parametros.idModeloTrabalho === 1 && setarModo('agrupado')"
             role="button"
             tabindex="0"
             aria-label="Selecionar modo agrupado"
-            @keydown.enter.prevent="setarModo('agrupado')"
-            @keydown.space.prevent="setarModo('agrupado')"
+            @keydown.enter.prevent="
+              parametros.idModeloTrabalho === 1 && setarModo('agrupado')
+            "
+            @keydown.space.prevent="
+              parametros.idModeloTrabalho === 1 && setarModo('agrupado')
+            "
+            :aria-disabled="parametros.idModeloTrabalho !== 1"
           >
             <h3>Serviços Agrupados</h3>
             <p>O cliente escolhe apenas 1 serviço por agendamento.</p>
@@ -26,13 +34,21 @@
 
           <div
             class="card-modelo"
-            :class="{ ativo: modoAgendamento === 'separado' }"
-            @click="setarModo('separado')"
+            :class="{
+              ativo: modoAgendamento === 'separado',
+              desabilitado: parametros.idModeloTrabalho !== 2,
+            }"
+            @click="parametros.idModeloTrabalho === 2 && setarModo('separado')"
             role="button"
             tabindex="0"
             aria-label="Selecionar modo separado"
-            @keydown.enter.prevent="setarModo('separado')"
-            @keydown.space.prevent="setarModo('separado')"
+            @keydown.enter.prevent="
+              parametros.idModeloTrabalho === 2 && setarModo('separado')
+            "
+            @keydown.space.prevent="
+              parametros.idModeloTrabalho === 2 && setarModo('separado')
+            "
+            :aria-disabled="parametros.idModeloTrabalho !== 2"
           >
             <h3>Serviços Separados</h3>
             <p>O cliente pode marcar vários serviços em uma só vez.</p>
@@ -53,7 +69,8 @@
       </header>
 
       <!-- Lista de Serviços -->
-      <div class="lista-grid">
+      <div v-if="parametros.idModeloTrabalho == 1" class="lista-grid">
+        <!-- Modo agrupado: exibe serviços detalhados -->
         <article
           v-for="servico in servicos"
           :key="servico.idServico"
@@ -84,6 +101,41 @@
           </div>
         </article>
       </div>
+      <div v-else class="lista-grid">
+        <!-- Modo separado: permite múltiplos serviços únicos -->
+        <article
+          v-for="servico in servicos"
+          :key="servico.idServico"
+          class="item-grid"
+        >
+          <div class="info-servico">
+            <h2 class="nome-servico">{{ servico.descricao }}</h2>
+            <p class="detalhe-servico">{{ servico.observacao }}</p>
+            <p class="detalhe-servico">
+              <strong>Preço:</strong> R$ {{ (servico.valor ?? 0).toFixed(2) }}
+            </p>
+            <p class="detalhe-servico">
+              <strong>Tipo:</strong> Serviço único/separado
+            </p>
+          </div>
+          <div class="card_botoes">
+            <button
+              class="botao-editar"
+              @click="abrirModalEditar(servico)"
+              aria-label="Editar serviço {{ servico.descricao }}"
+            >
+              Editar
+            </button>
+            <button
+              class="botao-excluir"
+              @click="excluirServico(servico)"
+              aria-label="Excluir serviço {{ servico.descricao }}"
+            >
+              Excluir
+            </button>
+          </div>
+        </article>
+      </div>
 
       <!-- Modal -->
       <ModalGenerico
@@ -94,6 +146,8 @@
         <FormularioServico
           :dadosIniciais="servicoSelecionado"
           :botaoTexto="botaoTextoModal"
+          :modeloTrabalho="parametros.idModeloTrabalho"
+          :categorias="categorias"
           @salvar="salvarServico"
         />
       </ModalGenerico>
@@ -127,6 +181,12 @@ const modalTitulo = ref("");
 const botaoTextoModal = ref("");
 const servicos = ref([]);
 const modoAgendamento = ref("agrupado"); // novo estado
+const categorias = ref([
+  { id: 1, nome: "Banho" },
+  { id: 2, nome: "Tosa" },
+  { id: 3, nome: "Vacina" },
+  // Adicione mais categorias conforme necessário
+]);
 
 onMounted(async () => {
   await buscarServicosDaEmpresa();
@@ -298,6 +358,12 @@ async function salvarServico(dados) {
 .card-modelo.ativo {
   border-color: #28a745;
   background-color: #eafbe9;
+}
+
+.card-modelo.desabilitado {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
 }
 
 .secao-servicos {
