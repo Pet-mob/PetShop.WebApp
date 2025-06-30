@@ -28,7 +28,7 @@
         <label for="porte" class="label-formulario">Porte do Animal</label>
         <select
           id="porte"
-          v-model="dados.idPorte"
+          v-model.number="dados.idPorte"
           class="campo-texto"
           placeholder="Selecione o porte"
           required
@@ -145,7 +145,7 @@ const props = defineProps({
       observacao: "",
       possuiMensal: false,
       precoMensal: 0,
-      idPorte: "",
+      idPorte: 0,
     }),
   },
   botaoTexto: {
