@@ -6,6 +6,7 @@
     role="form"
     aria-label="Formulário de serviço"
   >
+    <!-- Linha: Nome, Porte, Duração -->
     <div class="linha-formulario">
       <div class="campo-formulario flex2">
         <label for="nome" class="label-formulario">Nome do Serviço</label>
@@ -24,21 +25,22 @@
         }}</span>
       </div>
       <div class="campo-formulario flex1">
-        <label for="preco" class="label-formulario">Preço (R$)</label>
-        <input
-          id="preco"
-          v-model.number="dados.valor"
-          type="number"
+        <label for="porte" class="label-formulario">Porte do Animal</label>
+        <select
+          id="porte"
+          v-model="dados.idPorte"
           class="campo-texto"
-          placeholder="Ex: 120.00"
-          min="0"
-          step="0.01"
+          placeholder="Selecione o porte"
           required
-          aria-label="Preço do serviço"
-          :aria-invalid="erros.valor ? 'true' : 'false'"
-        />
-        <span v-if="erros.valor" class="mensagem-erro" role="alert">{{
-          erros.valor
+          aria-label="Porte do animal"
+          :aria-invalid="erros.idPorte ? 'true' : 'false'"
+        >
+          <option value="1">Pequeno</option>
+          <option value="2">Médio</option>
+          <option value="3">Grande</option>
+        </select>
+        <span v-if="erros.idPorte" class="mensagem-erro" role="alert">{{
+          erros.idPorte
         }}</span>
       </div>
       <div class="campo-formulario flex1">
@@ -59,6 +61,57 @@
       </div>
     </div>
 
+    <!-- Linha: Preço, Mensalidade -->
+    <div class="linha-formulario">
+      <div class="campo-formulario flex1">
+        <label for="preco" class="label-formulario">Preço (R$)</label>
+        <input
+          id="preco"
+          v-model.number="dados.valor"
+          type="number"
+          class="campo-texto"
+          placeholder="Ex: 120.00"
+          min="0"
+          step="0.01"
+          required
+          aria-label="Preço do serviço"
+          :aria-invalid="erros.valor ? 'true' : 'false'"
+        />
+        <span v-if="erros.valor" class="mensagem-erro" role="alert">{{
+          erros.valor
+        }}</span>
+      </div>
+      <div class="campo-formulario flex2 mensalidade-group">
+        <div class="mensalidade-flex">
+          <label class="checkbox-container" aria-label="Possui mensalidade?">
+            <input
+              type="checkbox"
+              v-model="dados.possuiMensal"
+              aria-checked="dados.possuiMensal ? 'true' : 'false'"
+            />
+            <span class="checkmark"></span>
+            Possui mensal
+          </label>
+          <transition name="fade">
+            <div v-if="dados.possuiMensal" class="mensalidade-valor">
+              <label for="valorOferta" class="label-formulario"
+                >Valor do mensal</label
+              >
+              <input
+                id="valorOferta"
+                v-model.number="dados.precoMensal"
+                type="number"
+                step="0.01"
+                class="campo-texto"
+                min="0"
+                aria-label="Valor do mensal"
+              />
+            </div>
+          </transition>
+        </div>
+      </div>
+    </div>
+
     <!-- Linha: Observação -->
     <div class="linha-formulario">
       <div class="campo-formulario flex2">
@@ -70,36 +123,6 @@
           class="campo-texto"
           aria-label="Observação do serviço"
         ></textarea>
-      </div>
-    </div>
-
-    <!-- Linha: Possui Oferta | Valor da Oferta -->
-    <div class="linha-formulario">
-      <div class="campo-formulario">
-        <label class="checkbox-container" aria-label="Possui mensalidade?">
-          <input
-            type="checkbox"
-            v-model="dados.possuiMensal"
-            aria-checked="dados.possuiMensal ? 'true' : 'false'"
-          />
-          <span class="checkmark"></span>
-          Possui mensal
-        </label>
-      </div>
-
-      <div class="campo-formulario" v-if="dados.possuiMensal">
-        <label for="valorOferta" class="label-formulario"
-          >Valor do mensal</label
-        >
-        <input
-          id="valorOferta"
-          v-model.number="dados.precoMensal"
-          type="number"
-          step="0.01"
-          class="campo-texto"
-          min="0"
-          aria-label="Valor do mensal"
-        />
       </div>
     </div>
 
@@ -122,6 +145,7 @@ const props = defineProps({
       observacao: "",
       possuiMensal: false,
       precoMensal: 0,
+      idPorte: "",
     }),
   },
   botaoTexto: {
@@ -133,7 +157,7 @@ const props = defineProps({
 const emit = defineEmits(["salvar"]);
 
 const dados = ref({ ...props.dadosIniciais });
-const erros = ref({ descricao: "", valor: "", duracao: "" });
+const erros = ref({ descricao: "", valor: "", duracao: "", idPorte: "" });
 
 watch(
   () => props.dadosIniciais,
@@ -143,7 +167,7 @@ watch(
 );
 
 function validarCampos() {
-  erros.value = { descricao: "", valor: "", duracao: "" };
+  erros.value = { descricao: "", valor: "", duracao: "", porte: "" };
   let valido = true;
   if (!dados.value.descricao || dados.value.descricao.trim().length < 3) {
     erros.value.descricao = "Informe um nome válido para o serviço.";
@@ -166,6 +190,10 @@ function validarCampos() {
     erros.value.duracao = "Informe a duração em minutos (mínimo 1).";
     valido = false;
   }
+  if (!dados.value.idPorte) {
+    erros.value.idPorte = "Selecione o porte do animal.";
+    valido = false;
+  }
   return valido;
 }
 
@@ -180,34 +208,42 @@ function enviarFormulario() {
 .formulario-container {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(40, 167, 69, 0.08);
+  padding: 2rem 1.5rem;
+  max-width: 700px;
+  margin: 0 auto;
 }
 
 .linha-formulario {
   display: flex;
   text-align: left;
-  gap: 1rem;
+  gap: 1.2rem;
   flex-wrap: wrap;
 }
 
 .campo-formulario {
   display: flex;
   flex-direction: column;
+  margin-bottom: 0.2rem;
 }
 
 .flex2 {
   flex: 2;
-  min-width: 200px;
+  min-width: 220px;
 }
 
 .flex1 {
   flex: 1;
-  min-width: 120px;
+  min-width: 140px;
 }
 
 .label-formulario {
   font-weight: 600;
   margin-bottom: 0.3rem;
+  color: #222;
 }
 
 .campo-texto {
@@ -216,6 +252,7 @@ function enviarFormulario() {
   padding: 0.5rem 0.75rem;
   background-color: #f9f9f9;
   font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .campo-texto:focus {
@@ -223,6 +260,15 @@ function enviarFormulario() {
   border-color: #28a745;
   box-shadow: 0 0 3px #28a745;
   background-color: white;
+}
+
+select.campo-texto {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%2328a745" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1.2em;
 }
 
 .grupo-checkbox {
@@ -245,7 +291,10 @@ function enviarFormulario() {
   font-weight: 700;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  align-self: flex-start;
+  align-self: flex-end;
+  font-size: 1.1rem;
+  margin-top: 0.5rem;
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.08);
 }
 
 .botao-principal:hover {
@@ -263,7 +312,6 @@ function enviarFormulario() {
   user-select: none;
 }
 
-/* Oculta o checkbox original */
 .checkbox-container input {
   position: absolute;
   opacity: 0;
@@ -272,7 +320,6 @@ function enviarFormulario() {
   width: 0;
 }
 
-/* Caixa customizada */
 .checkmark {
   position: absolute;
   left: 0;
@@ -286,13 +333,11 @@ function enviarFormulario() {
   transition: 0.2s ease;
 }
 
-/* Quando selecionado */
 .checkbox-container input:checked ~ .checkmark {
   background-color: #28a745;
   border-color: #28a745;
 }
 
-/* Check branco */
 .checkmark::after {
   content: "";
   position: absolute;
@@ -306,7 +351,6 @@ function enviarFormulario() {
   transform: rotate(45deg);
 }
 
-/* Exibe quando marcado */
 .checkbox-container input:checked ~ .checkmark::after {
   display: block;
 }
@@ -316,5 +360,57 @@ function enviarFormulario() {
   font-size: 0.95rem;
   margin-top: 0.2rem;
   margin-bottom: 0.2rem;
+}
+
+.mensalidade-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.mensalidade-flex {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.2rem;
+}
+
+.mensalidade-valor {
+  display: flex;
+  flex-direction: column;
+  min-width: 140px;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+@media (max-width: 700px) {
+  .formulario-container {
+    padding: 1rem 0.5rem;
+    max-width: 100%;
+  }
+  .linha-formulario {
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+  .botao-principal {
+    width: 100%;
+    align-self: stretch;
+  }
+  .mensalidade-flex {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .mensalidade-valor {
+    width: 100%;
+    min-width: 0;
+  }
 }
 </style>
