@@ -84,7 +84,7 @@ function validarCampos() {
     showToast("CNPJ inválido.", "error");
     return false;
   }
-  if (!senha.value || senha.value.length < 4) {
+  if (!senha.value) {
     showToast("Senha obrigatória.", "error");
     return false;
   }
