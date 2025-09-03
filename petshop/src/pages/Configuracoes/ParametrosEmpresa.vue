@@ -31,8 +31,8 @@
           class="campo-texto"
           aria-label="Modelo de serviço/trabalho"
         >
-          <option :value="1">Agrupado</option>
-          <option :value="2">Separado</option>
+          <option :value="1">Banho e Tosa Higiênica</option>
+          <option :value="2">Banho + Tosa + Produtos Anti-alérgicos</option>
         </select>
       </div>
       <button
