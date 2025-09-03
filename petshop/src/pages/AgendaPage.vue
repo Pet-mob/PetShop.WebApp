@@ -1,30 +1,24 @@
+/* Remover scroll vertical indesejado */ html, body { overflow-y: auto
+!important; height: 100%; } .agenda-container { min-height: 100vh; overflow-y:
+unset; } /* Centralização da navegação */ .navegacao-central-centralizada {
+display: flex; align-items: center; justify-content: center; gap: 0.7rem;
+margin-bottom: 1.2rem; } /* Card clicável */ .agendamento-clicavel { cursor:
+pointer; transition: box-shadow 0.2s, border-color 0.2s, background 0.2s; }
+.agendamento-clicavel:hover, .agendamento-clicavel:focus { background: #e8f0fe;
+box-shadow: 0 4px 16px rgba(0,0,0,0.12); border-color: #2563eb; outline: none; }
 <template>
   <div class="agenda-container p-4 bg-gray-50 min-h-screen">
     <!-- Tabs -->
     <div class="tabs mb-4" role="tablist" aria-label="Visualização da agenda">
-      <button
-        :class="['tab-btn', { active: visualizacao === 'semanal' }]"
-        @click="visualizacao = 'semanal'"
-        role="tab"
-        :aria-selected="visualizacao === 'semanal'"
-        tabindex="0"
-        aria-label="Visualização semanal"
-      >
-        Semanal
-      </button>
-    </div>
-
-    <!-- Navegação -->
-    <div class="filtro-navegacao mb-4">
-      <input
-        ref="inputData"
-        v-model="dataFiltro"
-        type="date"
-        class="input-date-hidden"
-        @change="aplicarFiltro"
-        aria-label="Selecionar data para filtrar agenda"
-      />
-      <div class="navegacao-central">
+      <div class="navegacao-central-centralizada">
+        <input
+          v-model="dataFiltro"
+          type="date"
+          class="input-date-hidden"
+          ref="inputData"
+          @change="aplicarFiltro"
+          aria-label="Selecionar data para filtrar agenda"
+        />
         <button @click="voltarPeriodo" aria-label="Voltar período" tabindex="0">
           &lt;
         </button>
@@ -48,13 +42,6 @@
         </button>
       </div>
     </div>
-
-    <!-- Feedback de erro -->
-    <div v-if="erroBusca" class="text-center text-red-600 py-2" role="alert">
-      {{ erroBusca }}
-    </div>
-
-    <!--Conteudo-->
     <div
       v-if="carregando"
       class="text-center text-gray-400 py-6"
@@ -92,29 +79,209 @@
             <div
               v-for="ag in agendamentosDoDia(dia.data)"
               :key="ag.idAgendamento"
-              class="agendamento-item"
+              class="agendamento-item agendamento-clicavel"
               role="listitem"
               :aria-label="
                 'Agendamento de ' +
                 ag.nomeAnimal +
                 ', serviço: ' +
-                ag.descricaoServico +
+                ag.descricaoServicos +
                 ', horário: ' +
                 ag.horarioInicial
               "
+              @click="abrirModalServicos(ag)"
+              tabindex="0"
+              @keydown.enter.prevent="abrirModalServicos(ag)"
+              @keydown.space.prevent="abrirModalServicos(ag)"
             >
               <strong>{{ ag.nomeAnimal }}</strong> <br />
-              <small>{{ ag.horarioInicial }} - {{ ag.descricaoServico }}</small>
+              <small>{{ ag.horarioInicial }}</small>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+  <!-- Modal de serviços agendados -->
+  <ModalBase
+    v-if="modalServicosAberto"
+    :titulo="
+      'Serviços agendados para ' + (agendamentoSelecionado?.nomeAnimal || '')
+    "
+    @fechar="fecharModalServicos"
+  >
+    <template #default>
+      <div style="margin-bottom: 1rem">
+        <template
+          v-if="
+            agendamentoSelecionado?.servicos &&
+            agendamentoSelecionado.servicos.length > 0
+          "
+        >
+        </template>
+        <template v-else>
+          <div
+            style="
+              text-align: center;
+              color: #999;
+              font-style: italic;
+              margin-bottom: 0.5rem;
+            "
+          >
+            Nenhum serviço detalhado para este agendamento.
+          </div>
+          <div
+            v-if="agendamentoSelecionado?.descricaoServicos"
+            style="display: flex; align-items: center; justify-content: center"
+          >
+            <span style="color: #2563eb; font-size: 1.2em; margin-right: 0.5em"
+              >🔹</span
+            >
+            <span>{{ agendamentoSelecionado?.descricaoServicos }}</span>
+          </div>
+        </template>
+        <div class="modal-agendamento-detalhes">
+          <div class="modal-agendamento-header">
+            <img
+              v-if="agendamentoSelecionado?.UrlFotoAnimal"
+              :src="agendamentoSelecionado.UrlFotoAnimal"
+              alt="Foto do animal"
+              class="modal-agendamento-foto"
+            />
+            <div class="modal-agendamento-nomes">
+              <div class="modal-agendamento-animal">
+                🐾 <strong>{{ agendamentoSelecionado?.NomeAnimal }}</strong>
+              </div>
+              <div class="modal-agendamento-usuario">
+                👤 <strong>{{ agendamentoSelecionado?.NomeUsuario }}</strong>
+              </div>
+            </div>
+          </div>
+          <div class="modal-agendamento-servicos">
+            <span style="font-weight: 600; color: #2563eb">Serviços:</span>
+            <div v-if="agendamentoSelecionado?.DescricaoServicos">
+              <span
+                v-for="(
+                  servico, idx
+                ) in agendamentoSelecionado.DescricaoServicos.split(',')"
+                :key="idx"
+                class="modal-agendamento-servico-item"
+              >
+                <span style="color: #2563eb; margin-right: 0.3em">🔹</span
+                >{{ servico.trim() }}
+              </span>
+            </div>
+            <div v-else style="color: #999; font-style: italic">
+              Nenhum serviço detalhado.
+            </div>
+          </div>
+          <div class="modal-agendamento-info">
+            <div>
+              <strong>Horário:</strong>
+              {{ agendamentoSelecionado?.HorarioInicial }} -
+              {{ agendamentoSelecionado?.HorarioFinal }}
+            </div>
+            <div>
+              <strong>Status:</strong>
+              <span
+                :style="{
+                  color:
+                    agendamentoSelecionado?.Status === 'Confirmado'
+                      ? '#22c55e'
+                      : agendamentoSelecionado?.Status === 'Cancelado'
+                      ? '#ef4444'
+                      : '#2563eb',
+                  fontWeight: 'bold',
+                }"
+              >
+                {{ agendamentoSelecionado?.Status }}
+              </span>
+            </div>
+            <div v-if="agendamentoSelecionado?.PacoteMensal">
+              <strong>Pacote:</strong>
+              <span style="color: #2563eb">Mensal</span>
+            </div>
+            <div>
+              <strong>Empresa:</strong>
+              {{ agendamentoSelecionado?.NomeEmpresa }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-agendamento-dados">
+        <div class="modal-agendamento-header">
+          <img
+            v-if="agendamentoSelecionado?.urlFotoAnimal"
+            :src="agendamentoSelecionado.urlFotoAnimal"
+            alt="Foto do animal"
+            class="modal-foto-animal"
+          />
+          <div class="modal-nomes">
+            <div class="modal-nome-animal">
+              🐾 {{ agendamentoSelecionado?.nomeAnimal }}
+            </div>
+            <div class="modal-nome-usuario">
+              👤 {{ agendamentoSelecionado?.nomeUsuario }}
+            </div>
+          </div>
+        </div>
+        <div class="modal-agendamento-info">
+          <div class="modal-servicos">
+            <div class="modal-servicos-label">Serviços:</div>
+            <template v-if="agendamentoSelecionado?.descricaoServicos">
+              <div
+                v-for="servico in agendamentoSelecionado.descricaoServicos.split(
+                  ','
+                )"
+                :key="servico"
+                class="modal-servico-item"
+              >
+                <span class="modal-servico-icon">🛁</span>
+                <span>{{ servico.trim() }}</span>
+              </div>
+            </template>
+            <template v-else>
+              <div
+                class="modal-servico-item"
+                style="color: #999; font-style: italic"
+              >
+                Nenhum serviço detalhado.
+              </div>
+            </template>
+          </div>
+          <div class="modal-horario">
+            <span class="modal-horario-label">Horário:</span>
+            <span
+              >{{ agendamentoSelecionado?.horarioInicial }} -
+              {{ agendamentoSelecionado?.horarioFinal }}</span
+            >
+          </div>
+          <div class="modal-status">
+            <span class="modal-status-label">Status:</span>
+            <span
+              :class="[
+                'modal-status-badge',
+                agendamentoSelecionado?.status?.toLowerCase(),
+              ]"
+              >{{ agendamentoSelecionado?.status }}</span
+            >
+          </div>
+          <div v-if="agendamentoSelecionado?.pacoteMensal" class="modal-pacote">
+            <span class="modal-pacote-badge">Pacote Mensal</span>
+          </div>
+          <div class="modal-empresa">
+            <span class="modal-empresa-label">Empresa:</span>
+            <span>{{ agendamentoSelecionado?.nomeEmpresa }}</span>
+          </div>
+        </div>
+      </div>
+    </template>
+  </ModalBase>
 </template>
 
 <script setup>
 import { ref, computed, watch } from "vue";
+import ModalBase from "@/components/ModalBase.vue";
 import dayjs from "dayjs";
 import "dayjs/locale/pt-br";
 import AgendaService from "@/services/agendaService";
@@ -123,11 +290,23 @@ import { useGlobalStore } from "@/store/useGlobalStore";
 dayjs.locale("pt-br");
 
 const store = useGlobalStore();
-const visualizacao = ref("semanal");
+// Removido: visualizacao não utilizada
 const dataFiltro = ref(dayjs().format("YYYY-MM-DD"));
 const inputData = ref(null);
 const carregando = ref(false);
 const agendamentos = ref([]);
+const modalServicosAberto = ref(false);
+const agendamentoSelecionado = ref(null);
+
+function abrirModalServicos(agendamento) {
+  agendamentoSelecionado.value = agendamento;
+  modalServicosAberto.value = true;
+}
+
+function fecharModalServicos() {
+  modalServicosAberto.value = false;
+  agendamentoSelecionado.value = null;
+}
 const erroBusca = ref("");
 const empresaLogada = store.empresaLogada;
 const idEmpresaLogada = empresaLogada.idEmpresa;
@@ -159,9 +338,7 @@ function avancarPeriodo() {
   dataFiltro.value = dayjs(dataFiltro.value).add(7, "day").format("YYYY-MM-DD");
 }
 
-function aplicarFiltro() {
-  dataFiltro.value = inputData.value.value;
-}
+// Removido: aplicarFiltro não utilizada
 
 const diasSemana = computed(() => {
   return [...Array(7).keys()].map((i) => {
@@ -227,11 +404,10 @@ watch(
 
 /* Tabs */
 .tabs {
-  display: flex;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  display: block;
+  width: 100%;
   margin-bottom: 1rem;
-  gap: 0.5rem;
+  overflow: visible;
 }
 .tab-btn {
   flex-shrink: 0;
@@ -257,7 +433,13 @@ watch(
   flex-direction: column;
   gap: 0.75rem;
   align-items: center;
-  margin-bottom: 1rem;
+}
+.navegacao-central-centralizada {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  margin-bottom: 1.2rem;
 }
 .navegacao-central {
   display: flex;
@@ -265,22 +447,38 @@ watch(
   align-items: center;
   justify-content: center;
 }
-.navegacao-central button {
-  background: white;
-  border: 2px solid #757575;
-  border-radius: 8px;
-  padding: 0.4rem 0.8rem;
-  font-weight: 600;
-  font-size: 1rem;
-  color: #757575;
+
+.navegacao-central-centralizada button {
+  background: #fff;
+  border: 2px solid #2563eb;
+  border-radius: 12px;
+  padding: 0.5rem 1.2rem;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: #2563eb;
   cursor: pointer;
-  height: 40px;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  height: 44px;
+  min-width: 44px;
+  outline: none;
 }
-.navegacao-central button:hover {
-  background-color: #757575;
-  color: white;
+.navegacao-central-centralizada button:hover,
+.navegacao-central-centralizada button:focus {
+  background: #e8f0fe;
+  color: #1746a2;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.15);
+  border-color: #1746a2;
 }
 .label-data {
+  background: #f8fafc;
+  border-radius: 16px;
+  padding: 0.7rem 2.2rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #222;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.06);
+  border: none;
   cursor: pointer;
   padding: 0.5rem 1rem;
   border-radius: 8px;
@@ -304,15 +502,18 @@ watch(
 /* Agenda */
 .agenda-semanal {
   overflow-x: auto;
+  overflow-y: hidden;
 }
 .cards-dias {
   display: flex;
   flex-direction: row;
-  gap: 0.75rem;
+  gap: 2rem;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: 1rem;
+  padding-bottom: 2rem;
+  justify-content: center;
+  align-items: flex-start;
 }
 
 .card-dia {
@@ -349,11 +550,38 @@ watch(
   overflow-y: auto;
 }
 .agendamento-item {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
+  padding: 1rem 1.2rem;
+  margin-bottom: 0.7rem;
+  border: 1.5px solid #e5e7eb;
+  transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.agendamento-clicavel {
+  cursor: pointer;
+}
+.agendamento-clicavel:hover,
+.agendamento-clicavel:focus {
   background: #e8f0fe;
-  border-radius: 4px;
-  padding: 0.4rem 0.6rem;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.15);
+  border-color: #2563eb;
+  outline: none;
+}
+.agendamento-item strong {
+  font-size: 1.15rem;
+  color: #2563eb;
+  margin-bottom: 0.2rem;
+  font-weight: 700;
+}
+.agendamento-item small {
+  color: #374151;
   margin-bottom: 0.4rem;
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 .sem-agendamentos {
   text-align: center;
