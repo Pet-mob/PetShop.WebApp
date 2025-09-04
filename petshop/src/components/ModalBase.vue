@@ -103,7 +103,7 @@ onMounted(async () => {
 
 .corpo-modal {
   padding: 1rem;
-  overflow-y: auto;
+  /* overflow-y: auto; */
   flex-grow: 1;
 }
 .rodape-modal {
