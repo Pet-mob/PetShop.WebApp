@@ -9,7 +9,7 @@
     ref="modalRef"
     @keydown.esc="fecharModal"
   >
-    <div class="container-modal">
+    <div class="container-modal" :style="{ maxWidth: props.maxWidth }">
       <header class="cabecalho-modal">
         <h2 class="titulo-modal" :id="'titulo-modal'">{{ props.titulo }}</h2>
         <button
@@ -34,10 +34,9 @@
 import { defineEmits, defineProps, ref, onMounted, nextTick } from "vue";
 
 const props = defineProps({
-  titulo: {
-    type: String,
-    default: "Título do Modal",
-  },
+  titulo: { type: String, default: "Título do Modal" },
+  // 👇 novo: permite controlar a largura do modal
+  maxWidth: { type: String, default: "500px" },
 });
 
 const emit = defineEmits(["fechar"]);
@@ -49,19 +48,14 @@ function fecharModal() {
 
 onMounted(async () => {
   await nextTick();
-  if (modalRef.value) {
-    modalRef.value.focus();
-  }
+  if (modalRef.value) modalRef.value.focus();
 });
 </script>
 
 <style scoped>
 .sobreposicao-modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
@@ -74,7 +68,6 @@ onMounted(async () => {
   background: white;
   border-radius: 8px;
   width: 100%;
-  max-width: 500px;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
@@ -104,7 +97,6 @@ onMounted(async () => {
   cursor: pointer;
   color: #333;
 }
-
 .botao-fechar-modal:hover {
   color: #d00;
 }
@@ -114,7 +106,6 @@ onMounted(async () => {
   overflow-y: auto;
   flex-grow: 1;
 }
-
 .rodape-modal {
   padding: 1rem;
   border-top: 1px solid #ddd;
@@ -122,21 +113,15 @@ onMounted(async () => {
   background-color: #f9f9f9;
 }
 
-/* Responsivo */
 @media (max-width: 600px) {
   .container-modal {
     max-width: 95%;
     max-height: 95vh;
   }
-
   .titulo-modal {
     font-size: 1.1rem;
   }
-
-  .corpo-modal {
-    padding: 0.75rem;
-  }
-
+  .corpo-modal,
   .rodape-modal {
     padding: 0.75rem;
   }
