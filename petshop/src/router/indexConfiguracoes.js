@@ -4,6 +4,7 @@ import {
   Building2,
   GitCompareArrows,
   Settings2,
+  Info
 } from "lucide-vue-next";
 
 export default [
@@ -50,6 +51,15 @@ export default [
     meta: {
       label: "Parâmetros da Empresa",
       icon: Settings2,
+    },
+  },
+    {
+    path: "FaleConosco",
+    name: "ConfigFaleConosco",
+    component: () => import("@/pages/Configuracoes/FaleConosco.vue"),
+    meta: {
+      label: "Fale Conosco",
+      icon: Info,
     },
   },
 ];

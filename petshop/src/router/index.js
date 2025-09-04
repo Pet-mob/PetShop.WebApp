@@ -83,6 +83,14 @@ const routes = [
           label: "Parâmetros da Empresa",
         },
       },
+      {
+        path: "FaleConosco",
+        name: "ConfigFaleConosco",
+        component: () => import("@/pages/Configuracoes/FaleConosco.vue"),
+        meta: {
+          label: "Fale Conosco",
+        },
+      },
     ],
   },
 ];
