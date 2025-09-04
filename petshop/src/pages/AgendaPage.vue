@@ -273,12 +273,15 @@ function avancarPeriodo() {
 }
 
 const diasSemana = computed(() => {
-  return [...Array(7).keys()].map((i) => ({
-    nome: dayjs().day(i).locale("pt-br").format("ddd"),
-    data: dayjs(dataFiltro.value)
-      .startOf("week")
-      .add(1 + i, "day"),
-  }));
+  // start from Monday of the selected week and derive name from the actual date
+  const inicioSemana = dayjs(dataFiltro.value).startOf("week").add(1, "day");
+  return [...Array(7).keys()].map((i) => {
+    const data = inicioSemana.add(i, "day");
+    return {
+      nome: data.locale("pt-br").format("ddd"),
+      data,
+    };
+  });
 });
 
 function agendamentosDoDia(dia) {
