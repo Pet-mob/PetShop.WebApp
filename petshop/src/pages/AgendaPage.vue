@@ -97,91 +97,21 @@
       </div>
     </div>
 
-    <!-- Modal outside of the list -->
-    <ModalBase
-      v-if="modalServicosAberto"
+    <!-- Modal outside of the list (migrated to separate component) -->
+    <FormularioAgendaVisualizacao
+      :visible="modalServicosAberto"
+      :agendamento="agendamentoSelecionado"
       :titulo="
         'Serviços agendados para ' + (agendamentoSelecionado?.nomeAnimal || '')
       "
       @fechar="fecharModalServicos"
-    >
-      <template #default>
-        <div class="modal-agendamento-detalhes">
-          <div class="modal-agendamento-header">
-            <img
-              v-if="agendamentoSelecionado?.urlFotoAnimal"
-              :src="agendamentoSelecionado.urlFotoAnimal"
-              alt="Foto do animal"
-              class="modal-agendamento-foto"
-            />
-            <div class="modal-agendamento-nomes">
-              <div class="modal-agendamento-animal">
-                🐾 <strong>{{ agendamentoSelecionado?.nomeAnimal }}</strong>
-              </div>
-              <div class="modal-agendamento-usuario">
-                👤 <strong>{{ agendamentoSelecionado?.nomeUsuario }}</strong>
-              </div>
-            </div>
-          </div>
-
-          <div class="modal-agendamento-servicos" style="margin-top: 0.75rem">
-            <span style="font-weight: 600; color: #2563eb">Serviços:</span>
-            <div v-if="agendamentoSelecionado?.descricaoServicos">
-              <div
-                v-for="(
-                  servico, idx
-                ) in agendamentoSelecionado.descricaoServicos.split(',')"
-                :key="idx"
-                class="modal-agendamento-servico-item"
-              >
-                <span style="color: #2563eb; margin-right: 0.3em">•</span>
-                {{ servico.trim() }}
-              </div>
-            </div>
-            <div v-else style="color: #999; font-style: italic">
-              Nenhum serviço detalhado.
-            </div>
-          </div>
-
-          <div class="modal-agendamento-info" style="margin-top: 0.75rem">
-            <div>
-              <strong>Horário:</strong>
-              {{ agendamentoSelecionado?.horarioInicial }} -
-              {{ agendamentoSelecionado?.horarioFinal }}
-            </div>
-            <div>
-              <strong>Status:</strong>
-              <span
-                :style="{
-                  color:
-                    agendamentoSelecionado?.status === 'Confirmado'
-                      ? '#22c55e'
-                      : agendamentoSelecionado?.status === 'Cancelado'
-                      ? '#ef4444'
-                      : '#2563eb',
-                  fontWeight: 'bold',
-                }"
-                >{{ agendamentoSelecionado?.status }}</span
-              >
-            </div>
-            <div v-if="agendamentoSelecionado?.pacoteMensal">
-              <strong>Pacote:</strong>
-              <span style="color: #2563eb">Mensal</span>
-            </div>
-            <div>
-              <strong>Empresa:</strong>
-              {{ agendamentoSelecionado?.nomeEmpresa }}
-            </div>
-          </div>
-        </div>
-      </template>
-    </ModalBase>
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch } from "vue";
-import ModalBase from "@/components/ModalBase.vue";
+import FormularioAgendaVisualizacao from "@/views/FormularioAgendaVisualizacao.vue";
 import dayjs from "dayjs";
 import "dayjs/locale/pt-br";
 import AgendaService from "@/services/agendaService";
