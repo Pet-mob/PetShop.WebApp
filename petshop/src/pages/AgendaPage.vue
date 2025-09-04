@@ -507,7 +507,7 @@ watch(
 .cards-dias {
   display: flex;
   flex-direction: row;
-  gap: 2rem;
+  gap: 1rem;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
@@ -557,7 +557,6 @@ watch(
   margin-bottom: 0.7rem;
   border: 1.5px solid #e5e7eb;
   transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
-  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
