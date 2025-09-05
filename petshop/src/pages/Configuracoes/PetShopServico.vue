@@ -28,7 +28,7 @@
             "
             :aria-disabled="parametros.idModeloTrabalho !== 1"
           >
-            <h3>Serviços Agrupados (Banho e Tosa Higiênica)</h3>
+            <h3>Serviços Agrupados</h3>
             <p>O cliente escolhe apenas 1 serviço por agendamento.</p>
           </div>
 
@@ -50,7 +50,7 @@
             "
             :aria-disabled="parametros.idModeloTrabalho !== 2"
           >
-            <h3>Serviços Separados (Banho + Tosa + Produtos Anti-alérgicos)</h3>
+            <h3>Serviços Separados</h3>
             <p>O cliente pode marcar vários serviços em uma só vez.</p>
           </div>
         </div>
