@@ -9,4 +9,10 @@ const app = createApp(App);
 app.use(createPinia());
 app.use(router);
 
+// Limpa o localStorage (logoff) ao fechar a aba/janela
+window.addEventListener("unload", () => {
+  localStorage.removeItem("cnpj");
+  // Adicione aqui outros dados de autenticação se necessário
+});
+
 app.mount("#app");
