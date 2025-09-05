@@ -66,10 +66,22 @@ function showToast(msg, type = "info") {
 const buscarEmpresaLogadaPorCnpj = async () => {
   try {
     carregando.value = true;
-    const empresa = await empresaService.buscarEmpresa(store.cnpjLogado.value);
+    let empresa = null;
+    if (!store.empresaLogada) {
+      var empresaRetornadoPorLista = await empresaService.buscarEmpresa(
+        store.cnpjLogado
+      );
+      if (!empresaRetornadoPorLista) {
+        return;
+      }
+      empresa = empresaRetornadoPorLista[0];
+    } else {
+      empresa = store.empresaLogada;
+    }
+
     if (empresa) {
-      store.definirObjetoEmpresaLogada(empresa[0]);
-      const dashboard = await buscarDashboard(empresa[0].idEmpresa);
+      store.definirObjetoEmpresaLogada(empresa);
+      const dashboard = await buscarDashboard(empresa.idEmpresa);
 
       if (dashboard) {
         petsAgendadosHoje.value = dashboard.petsAgendadosHoje || 0;

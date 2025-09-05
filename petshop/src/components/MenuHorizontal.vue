@@ -32,12 +32,44 @@
         <Settings class="icon" />
         <span class="nav-label">Configurações</span>
       </router-link>
+      <button
+        class="nav-button logoff-button"
+        @click="logoff"
+        aria-label="Sair do sistema"
+      >
+        <svg
+          class="icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke="#000"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6A2.25 2.25 0 0 0 5.25 5.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M18 15l3-3m0 0-3-3m3 3H9"
+          />
+        </svg>
+        <span class="nav-label">Sair</span>
+      </button>
     </div>
   </nav>
 </template>
 
 <script setup>
 import { Home, Calendar, Settings } from "lucide-vue-next";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
+function logoff() {
+  localStorage.removeItem("cnpj");
+  // Se houver outros dados de autenticação, limpe aqui também
+  router.push("/login");
+}
 </script>
 
 <style scoped>
@@ -57,6 +89,24 @@ import { Home, Calendar, Settings } from "lucide-vue-next";
   display: flex;
   align-items: center;
   gap: 1.5rem;
+}
+
+.logoff-button {
+  background: #fff;
+  border: 1px solid #d32f2f;
+  color: #d32f2f;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.logoff-button:hover {
+  background: #d32f2f;
+  color: #fff;
 }
 
 .nav-button {
