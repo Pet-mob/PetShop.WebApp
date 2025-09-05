@@ -77,7 +77,9 @@
           class="item-grid"
         >
           <div class="info-servico">
-            <h2 class="nome-servico">{{ servico.descricao }}</h2>
+            <h2 class="nome-servico">
+              {{ servico.descricao }} ({{ porteTexto(servico.idPorte) }})
+            </h2>
             <p class="detalhe-servico">{{ servico.observacao }}</p>
             <p class="detalhe-servico">
               <strong>Preço:</strong> R$ {{ (servico.valor ?? 0).toFixed(2) }}
@@ -322,6 +324,15 @@ async function salvarServico(dados) {
   } finally {
     carregando.value = false;
   }
+}
+
+// Função utilitária para exibir o porte do animal
+function porteTexto(idPorte) {
+  if (idPorte === 0) return "Todos";
+  if (idPorte === 1) return "Pequeno";
+  if (idPorte === 2) return "Médio";
+  if (idPorte === 3) return "Grande";
+  return "Todos";
 }
 </script>
 <style scoped>

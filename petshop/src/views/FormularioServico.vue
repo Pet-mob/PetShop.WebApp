@@ -35,6 +35,7 @@
           aria-label="Porte do animal"
           :aria-invalid="erros.idPorte ? 'true' : 'false'"
         >
+          <option value="0">Todos</option>
           <option value="1">Pequeno</option>
           <option value="2">Médio</option>
           <option value="3">Grande</option>
@@ -190,7 +191,8 @@ function validarCampos() {
     erros.value.duracao = "Informe a duração em minutos (mínimo 1).";
     valido = false;
   }
-  if (!dados.value.idPorte) {
+  // Corrigido: aceita 0 como válido, só acusa erro se for null ou undefined
+  if (dados.value.idPorte === null || dados.value.idPorte === undefined) {
     erros.value.idPorte = "Selecione o porte do animal.";
     valido = false;
   }
