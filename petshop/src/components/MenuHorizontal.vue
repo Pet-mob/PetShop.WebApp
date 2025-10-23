@@ -20,6 +20,16 @@
         <Calendar class="icon" />
         <span class="nav-label">Agenda</span>
       </router-link>
+
+      <router-link
+        to="/confirmacao-agendamento"
+        class="nav-button"
+        active-class="active-button"
+        aria-label="Ir para Confirmação de Agendamento"
+      >
+        <CheckCircle class="icon" />
+        <span class="nav-label">Confirmação de Agendamento</span>
+      </router-link>
     </div>
 
     <div class="menu-right">
@@ -60,7 +70,7 @@
 </template>
 
 <script setup>
-import { Home, Calendar, Settings } from "lucide-vue-next";
+import { Home, Calendar, Settings, CheckCircle } from "lucide-vue-next";
 import { useRouter } from "vue-router";
 
 const router = useRouter();

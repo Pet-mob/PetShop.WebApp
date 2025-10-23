@@ -30,6 +30,11 @@ const routes = [
     meta: { menu: true },
   },
   {
+    path: "/confirmacao-agendamento",
+    name: "ConfirmacaoAgendamento",
+    component: () => import("@/pages/ConfirmacaoAgendamentoPage.vue"),
+  },
+  {
     path: "/recuperar-senha",
     name: "RecuperarSenha",
     component: () => import("@/pages/RecuperarSenhaPage.vue"),

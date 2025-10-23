@@ -14,6 +14,35 @@ const buscarAgenda = (dataInicioParam, dataFimParam, idEmpresaParam) => {
   });
 };
 
+const atualizarStatusAgendamento = (
+  idAgendamento,
+  status,
+  justificativa = null
+) => {
+  const atualizacaoDto = {
+    idAgendamento,
+    status,
+    justificativa,
+  };
+  return new Promise((resolve, reject) => {
+    apiClient
+      .put("Agendamento/AtualizarStatus", atualizacaoDto)
+      .then((response) => resolve(response.data))
+      .catch((error) => reject(error));
+  });
+};
+
+const buscarAgendamentoPorId = (idAgendamento) => {
+  return new Promise((resolve, reject) => {
+    apiClient
+      .get(`Agendamento/${idAgendamento}`)
+      .then((response) => resolve(response.data))
+      .catch((error) => reject(error));
+  });
+};
+
 export default {
   buscarAgenda,
+  atualizarStatusAgendamento,
+  buscarAgendamentoPorId,
 };
