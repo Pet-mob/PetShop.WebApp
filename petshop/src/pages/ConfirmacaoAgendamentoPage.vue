@@ -1,267 +1,211 @@
 <template>
-  <div class="confirmacao-page">
-    <div class="card-agendamento" v-if="agendamento">
-      <h2 class="titulo">Confirmação de Agendamento</h2>
+  <div class="confirmacao-agendamento">
+    <h2>Confirmação de Agendamentos</h2>
 
-      <div class="status-badge" :class="agendamento.status.toLowerCase()">
-        {{ statusFormatado }}
-      </div>
-
-      <div class="detalhes-agendamento">
-        <div class="info-grupo">
-          <label>Data:</label>
-          <span>{{ formatarData(agendamento.data) }}</span>
-        </div>
-        <div class="info-grupo">
-          <label>Horário:</label>
-          <span>{{ formatarHora(agendamento.hora) }}</span>
-        </div>
-        <div class="info-grupo">
-          <label>Serviço:</label>
-          <span>{{ agendamento.servico }}</span>
-        </div>
-        <div class="info-grupo">
-          <label>Pet:</label>
-          <span>{{ agendamento.nomePet }}</span>
-        </div>
-      </div>
-
+    <div class="cards-container" v-if="agendamentos.length > 0">
       <div
-        v-if="agendamento.status === 'PENDENTE' && isAdmin"
-        class="acoes-admin"
+        class="card"
+        v-for="agendamento in agendamentos"
+        :key="agendamento.id"
       >
-        <button class="btn-confirmar" @click="confirmarAgendamento">
-          Confirmar Agendamento
-        </button>
-        <button class="btn-negar" @click="mostrarModalNegacao">
-          Negar Agendamento
-        </button>
-      </div>
+        <div class="card-header">
+          <h3>Agendamento #{{ agendamento.id }}</h3>
+          <span class="data">{{
+            formatarData(agendamento.dataAgendamento)
+          }}</span>
+        </div>
 
-      <div v-if="agendamento.status === 'CANCELADO'" class="justificativa">
-        <h3>Motivo do Cancelamento:</h3>
-        <p>{{ agendamento.justificativa }}</p>
+        <div class="card-body">
+          <div class="info-row">
+            <span class="label">Cliente:</span>
+            <span class="value">{{ agendamento.nomeCliente }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Pet:</span>
+            <span class="value">{{ agendamento.nomePet }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Serviço:</span>
+            <span class="value">{{ agendamento.servico }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Horário:</span>
+            <span class="value">{{
+              formatarHora(agendamento.dataAgendamento)
+            }}</span>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button
+            class="btn-confirmar"
+            @click="confirmarAgendamento(agendamento.id)"
+            :disabled="loading"
+          >
+            Confirmar
+          </button>
+          <button
+            class="btn-negar"
+            @click="negarAgendamento(agendamento.id)"
+            :disabled="loading"
+          >
+            Negar
+          </button>
+        </div>
       </div>
     </div>
 
-    <!-- Modal de Negação -->
-    <ModalBase v-if="showModal" @fechar="showModal = false">
-      <template #titulo> Justificativa de Negação </template>
-      <template #conteudo>
-        <div class="form-justificativa">
-          <label>Por favor, informe o motivo da negação do agendamento:</label>
-          <textarea
-            v-model="justificativa"
-            rows="4"
-            placeholder="Digite o motivo..."
-            required
-          ></textarea>
-        </div>
-      </template>
-      <template #acoes>
-        <button
-          class="btn-confirmar"
-          @click="confirmarNegacao"
-          :disabled="!justificativa.trim()"
-        >
-          Confirmar
-        </button>
-        <button class="btn-cancelar" @click="showModal = false">
-          Cancelar
-        </button>
-      </template>
-    </ModalBase>
+    <div class="empty-state" v-else>
+      <p>Não há agendamentos pendentes de confirmação.</p>
+    </div>
+
+    <Toast :message="toastMessage" :type="toastType" />
   </div>
 </template>
 
-<script>
-import { ref, onMounted, computed } from "vue";
-import { useRoute } from "vue-router";
-import agendaService from "@/services/agendaService";
-import ModalBase from "@/components/ModalBase.vue";
-import { useGlobalStore } from "@/store/useGlobalStore";
+<script setup>
+import { ref, onMounted } from "vue";
+import { agendaService } from "../services/agendaService";
+import Toast from "../components/ToastCustomizado.vue";
 
-export default {
-  name: "ConfirmacaoAgendamentoPage",
-  components: {
-    ModalBase,
-  },
-  setup() {
-    const route = useRoute();
-    const globalStore = useGlobalStore();
-    const agendamento = ref(null);
-    const showModal = ref(false);
-    const justificativa = ref("");
-    const isAdmin = ref(false); // Deve ser configurado com base nas permissões do usuário
+const agendamentos = ref([]);
+const loading = ref(false);
+const toastMessage = ref("");
+const toastType = ref("info");
 
-    const statusFormatado = computed(() => {
-      const status = agendamento.value?.status;
-      switch (status) {
-        case "PENDENTE":
-          return "Pendente";
-        case "CONFIRMADO":
-          return "Confirmado";
-        case "CANCELADO":
-          return "Cancelado";
-        default:
-          return "";
-      }
-    });
+onMounted(async () => {
+  await carregarAgendamentos();
+});
 
-    const formatarData = (data) => {
-      return new Date(data).toLocaleDateString("pt-BR");
-    };
-
-    const formatarHora = (hora) => {
-      return hora.substring(0, 5);
-    };
-
-    const carregarAgendamento = async () => {
-      try {
-        const idAgendamento = route.params.id;
-        const response = await agendaService.buscarAgendamentoPorId(
-          idAgendamento
-        );
-        agendamento.value = response;
-      } catch (error) {
-        console.error("Erro ao carregar agendamento:", error);
-        globalStore.showToast("Erro ao carregar dados do agendamento", "error");
-      }
-    };
-
-    const confirmarAgendamento = async () => {
-      try {
-        await agendaService.atualizarStatusAgendamento(
-          agendamento.value.id,
-          "CONFIRMADO"
-        );
-        agendamento.value.status = "CONFIRMADO";
-        globalStore.showToast("Agendamento confirmado com sucesso!", "success");
-      } catch (error) {
-        console.error("Erro ao confirmar agendamento:", error);
-        globalStore.showToast("Erro ao confirmar agendamento", "error");
-      }
-    };
-
-    const mostrarModalNegacao = () => {
-      showModal.value = true;
-    };
-
-    const confirmarNegacao = async () => {
-      if (!justificativa.value.trim()) {
-        globalStore.showToast("A justificativa é obrigatória", "error");
-        return;
-      }
-
-      try {
-        await agendaService.atualizarStatusAgendamento(
-          agendamento.value.id,
-          "CANCELADO",
-          justificativa.value
-        );
-        agendamento.value.status = "CANCELADO";
-        agendamento.value.justificativa = justificativa.value;
-        showModal.value = false;
-        justificativa.value = "";
-        globalStore.showToast("Agendamento cancelado", "success");
-      } catch (error) {
-        console.error("Erro ao negar agendamento:", error);
-        globalStore.showToast("Erro ao negar agendamento", "error");
-      }
-    };
-
-    onMounted(() => {
-      carregarAgendamento();
-    });
-
-    return {
-      agendamento,
-      showModal,
-      justificativa,
-      isAdmin,
-      statusFormatado,
-      formatarData,
-      formatarHora,
-      confirmarAgendamento,
-      mostrarModalNegacao,
-      confirmarNegacao,
-    };
-  },
+const carregarAgendamentos = async () => {
+  try {
+    loading.value = true;
+    const response = await agendaService.buscarAgendamentosPendentes();
+    agendamentos.value = response.data;
+  } catch (error) {
+    showToast("Erro ao carregar agendamentos", "error");
+    console.error(error);
+  } finally {
+    loading.value = false;
+  }
 };
+
+const confirmarAgendamento = async (id) => {
+  try {
+    loading.value = true;
+    await agendaService.confirmarAgendamento(id);
+    await carregarAgendamentos();
+    showToast("Agendamento confirmado com sucesso!", "success");
+  } catch (error) {
+    showToast("Erro ao confirmar agendamento", "error");
+    console.error(error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+const negarAgendamento = async (id) => {
+  try {
+    loading.value = true;
+    await agendaService.negarAgendamento(id);
+    await carregarAgendamentos();
+    showToast("Agendamento negado com sucesso!", "success");
+  } catch (error) {
+    showToast("Erro ao negar agendamento", "error");
+    console.error(error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+const formatarData = (data) => {
+  return new Date(data).toLocaleDateString("pt-BR");
+};
+
+const formatarHora = (data) => {
+  return new Date(data).toLocaleTimeString("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+function showToast(msg, type = "info") {
+  toastMessage.value = msg;
+  toastType.value = type;
+}
 </script>
 
 <style scoped>
-.confirmacao-page {
-  padding: 2rem;
+.confirmacao-agendamento {
+  padding: 20px;
 }
 
-.card-agendamento {
+h2 {
+  color: var(--cor-primaria);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.card {
   background: white;
   border-radius: 8px;
-  padding: 2rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  max-width: 600px;
-  margin: 0 auto;
+  padding: 16px;
 }
 
-.titulo {
-  text-align: center;
-  margin-bottom: 2rem;
+.card-header {
+  border-bottom: 1px solid #eee;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+}
+
+.card-header h3 {
   color: var(--cor-primaria);
+  margin: 0;
+  font-size: 1.1em;
 }
 
-.status-badge {
-  display: inline-block;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-weight: bold;
-  margin-bottom: 1.5rem;
+.data {
+  color: #666;
+  font-size: 0.9em;
 }
 
-.status-badge.pendente {
-  background-color: #fff3cd;
-  color: #856404;
-}
-
-.status-badge.confirmado {
-  background-color: #d4edda;
-  color: #155724;
-}
-
-.status-badge.cancelado {
-  background-color: #f8d7da;
-  color: #721c24;
-}
-
-.detalhes-agendamento {
-  margin-bottom: 2rem;
-}
-
-.info-grupo {
-  margin-bottom: 1rem;
+.info-row {
   display: flex;
-  gap: 1rem;
+  margin-bottom: 8px;
 }
 
-.info-grupo label {
+.label {
   font-weight: bold;
-  min-width: 100px;
+  width: 80px;
+  color: #555;
 }
 
-.acoes-admin {
+.value {
+  flex: 1;
+}
+
+.card-actions {
   display: flex;
-  gap: 1rem;
-  margin-top: 2rem;
+  gap: 10px;
+  margin-top: 16px;
+  justify-content: flex-end;
 }
 
 .btn-confirmar,
-.btn-negar,
-.btn-cancelar {
-  padding: 0.75rem 1.5rem;
-  border-radius: 4px;
+.btn-negar {
+  padding: 8px 16px;
   border: none;
-  font-weight: bold;
+  border-radius: 4px;
   cursor: pointer;
+  font-weight: bold;
   transition: opacity 0.2s;
 }
 
@@ -275,40 +219,20 @@ export default {
   color: white;
 }
 
-.btn-cancelar {
-  background-color: #6c757d;
-  color: white;
-}
-
 .btn-confirmar:hover,
-.btn-negar:hover,
-.btn-cancelar:hover {
+.btn-negar:hover {
   opacity: 0.9;
 }
 
-.justificativa {
-  margin-top: 2rem;
-  padding: 1rem;
-  background-color: #f8f9fa;
-  border-radius: 4px;
-}
-
-.form-justificativa {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.form-justificativa textarea {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
-  resize: vertical;
-}
-
-button:disabled {
-  opacity: 0.5;
+.btn-confirmar:disabled,
+.btn-negar:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
+}
+
+.empty-state {
+  text-align: center;
+  color: #666;
+  padding: 40px;
 }
 </style>

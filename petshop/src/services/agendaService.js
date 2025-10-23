@@ -41,8 +41,28 @@ const buscarAgendamentoPorId = (idAgendamento) => {
   });
 };
 
-export default {
+const buscarAgendamentosPendentes = () => {
+  return new Promise((resolve, reject) => {
+    apiClient
+      .get("Agendamento/Pendentes")
+      .then((response) => resolve(response))
+      .catch((error) => reject(error));
+  });
+};
+
+const confirmarAgendamento = (idAgendamento) => {
+  return atualizarStatusAgendamento(idAgendamento, 1); // 1 = Confirmado
+};
+
+const negarAgendamento = (idAgendamento) => {
+  return atualizarStatusAgendamento(idAgendamento, 2); // 2 = Negado
+};
+
+export const agendaService = {
   buscarAgenda,
   atualizarStatusAgendamento,
   buscarAgendamentoPorId,
+  buscarAgendamentosPendentes,
+  confirmarAgendamento,
+  negarAgendamento,
 };
