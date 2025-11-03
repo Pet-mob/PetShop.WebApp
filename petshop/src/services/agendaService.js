@@ -41,10 +41,10 @@ const buscarAgendamentoPorId = (idAgendamento) => {
   });
 };
 
-const buscarAgendamentosPendentes = () => {
+const buscarAgendamentosPendentes = (idEmpresa) => {
   return new Promise((resolve, reject) => {
     apiClient
-      .get("Agendamento/Pendentes")
+      .get(`Agendamento/AgendamentosPendentes?idEmpresa=${idEmpresa}`)
       .then((response) => resolve(response))
       .catch((error) => reject(error));
   });

@@ -3,52 +3,40 @@
     <h2>Confirmação de Agendamentos</h2>
 
     <div class="cards-container" v-if="agendamentos.length > 0">
-      <div
-        class="card"
-        v-for="agendamento in agendamentos"
-        :key="agendamento.id"
-      >
+      <div class="card" v-for="agendamento in agendamentos" :key="agendamento.id">
         <div class="card-header">
-          <h3>Agendamento #{{ agendamento.id }}</h3>
+          <h3>Agendamento #{{ agendamento.idAgendamento }}</h3>
           <span class="data">{{
-            formatarData(agendamento.dataAgendamento)
+            formatarData(agendamento.data)
           }}</span>
         </div>
 
         <div class="card-body">
           <div class="info-row">
             <span class="label">Cliente:</span>
-            <span class="value">{{ agendamento.nomeCliente }}</span>
+            <span class="value">{{ agendamento.nomeUsuario }}</span>
           </div>
           <div class="info-row">
             <span class="label">Pet:</span>
-            <span class="value">{{ agendamento.nomePet }}</span>
+            <span class="value">{{ agendamento.nomeAnimal }}</span>
           </div>
-          <div class="info-row">
+          <!-- <div class="info-row">
             <span class="label">Serviço:</span>
             <span class="value">{{ agendamento.servico }}</span>
-          </div>
+          </div> -->
           <div class="info-row">
             <span class="label">Horário:</span>
             <span class="value">{{
-              formatarHora(agendamento.dataAgendamento)
+              formatarHora(agendamento.horarioInicial)
             }}</span>
           </div>
         </div>
 
         <div class="card-actions">
-          <button
-            class="btn-confirmar"
-            @click="confirmarAgendamento(agendamento.id)"
-            :disabled="loading"
-          >
+          <button class="btn-confirmar" @click="confirmarAgendamento(agendamento.idAgendamento)" :disabled="loading">
             Confirmar
           </button>
-          <button
-            class="btn-negar"
-            @click="negarAgendamento(agendamento.id)"
-            :disabled="loading"
-          >
+          <button class="btn-negar" @click="negarAgendamento(agendamento.idAgendamento)" :disabled="loading">
             Negar
           </button>
         </div>
@@ -67,7 +55,10 @@
 import { ref, onMounted } from "vue";
 import { agendaService } from "../services/agendaService";
 import Toast from "../components/ToastCustomizado.vue";
+import { useGlobalStore } from "@/store/useGlobalStore";
 
+const store = useGlobalStore();
+const idEmpresaLogada = store.empresaLogada.idEmpresa;
 const agendamentos = ref([]);
 const loading = ref(false);
 const toastMessage = ref("");
@@ -80,7 +71,7 @@ onMounted(async () => {
 const carregarAgendamentos = async () => {
   try {
     loading.value = true;
-    const response = await agendaService.buscarAgendamentosPendentes();
+    const response = await agendaService.buscarAgendamentosPendentes(idEmpresaLogada);
     agendamentos.value = response.data;
   } catch (error) {
     showToast("Erro ao carregar agendamentos", "error");
@@ -122,11 +113,33 @@ const formatarData = (data) => {
   return new Date(data).toLocaleDateString("pt-BR");
 };
 
-const formatarHora = (data) => {
-  return new Date(data).toLocaleTimeString("pt-BR", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+const formatarHora = (horarioInicial) => {
+  // Return empty string for null/undefined
+  if (!horarioInicial && horarioInicial !== 0) return "";
+
+  // If it's a string in format HH:MM:SS or HH:MM, extract hours and minutes
+  if (typeof horarioInicial === "string") {
+    const m = horarioInicial.match(/^(\d{2}):(\d{2})(?::\d{2})?$/);
+    if (m) return `${m[1]}:${m[2]}`;
+
+    // Try to parse as a date string fallback
+    const parsed = new Date(horarioInicial);
+    if (!isNaN(parsed)) {
+      return parsed.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    }
+
+    // Fallback: return original string
+    return horarioInicial;
+  }
+
+  // If it's already a Date instance or numeric timestamp
+  const date = horarioInicial instanceof Date ? horarioInicial : new Date(horarioInicial);
+  if (!isNaN(date)) {
+    return date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  }
+
+  // Last-resort fallback
+  return String(horarioInicial);
 };
 
 function showToast(msg, type = "info") {
@@ -210,8 +223,8 @@ h2 {
 }
 
 .btn-confirmar {
-  background-color: var(--cor-primaria);
-  color: white;
+  background-color: rgb(45, 145, 36);
+  color: rgb(255, 255, 255);
 }
 
 .btn-negar {
