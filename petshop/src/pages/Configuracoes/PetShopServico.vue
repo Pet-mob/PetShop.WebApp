@@ -10,48 +10,32 @@
         <h2 class="titulo-modelo">Como você deseja oferecer seus serviços?</h2>
 
         <div class="opcoes-modelo">
-          <div
-            class="card-modelo"
-            :class="{
-              ativo: modoAgendamento === 'agrupado',
-              desabilitado: parametros.idModeloTrabalho !== 1,
-            }"
-            @click="parametros.idModeloTrabalho === 1 && setarModo('agrupado')"
-            role="button"
-            tabindex="0"
-            aria-label="Selecionar modo agrupado"
-            @keydown.enter.prevent="
+          <div class="card-modelo" :class="{
+            ativo: modoAgendamento === 'agrupado',
+            desabilitado: parametros.idModeloTrabalho !== 1,
+          }" @click="parametros.idModeloTrabalho === 1 && setarModo('agrupado')" role="button" tabindex="0"
+            aria-label="Selecionar modo agrupado" @keydown.enter.prevent="
               parametros.idModeloTrabalho === 1 && setarModo('agrupado')
-            "
-            @keydown.space.prevent="
-              parametros.idModeloTrabalho === 1 && setarModo('agrupado')
-            "
-            :aria-disabled="parametros.idModeloTrabalho !== 1"
-          >
-            <h3>Serviços Agrupados</h3>
-            <p>O cliente escolhe apenas 1 serviço por agendamento.</p>
+              " @keydown.space.prevent="
+    parametros.idModeloTrabalho === 1 && setarModo('agrupado')
+    " :aria-disabled="parametros.idModeloTrabalho !== 1">
+            <h3>Seleção única de serviço</h3>
+            <p>O cliente escolhe apenas 1 serviço por agendamento ("Banho e Tosa Completa" ou "Banho e Tosa Higiênica").
+            </p>
           </div>
 
-          <div
-            class="card-modelo"
-            :class="{
-              ativo: modoAgendamento === 'separado',
-              desabilitado: parametros.idModeloTrabalho !== 2,
-            }"
-            @click="parametros.idModeloTrabalho === 2 && setarModo('separado')"
-            role="button"
-            tabindex="0"
-            aria-label="Selecionar modo separado"
-            @keydown.enter.prevent="
+          <div class="card-modelo" :class="{
+            ativo: modoAgendamento === 'separado',
+            desabilitado: parametros.idModeloTrabalho !== 2,
+          }" @click="parametros.idModeloTrabalho === 2 && setarModo('separado')" role="button" tabindex="0"
+            aria-label="Selecionar modo separado" @keydown.enter.prevent="
               parametros.idModeloTrabalho === 2 && setarModo('separado')
-            "
-            @keydown.space.prevent="
-              parametros.idModeloTrabalho === 2 && setarModo('separado')
-            "
-            :aria-disabled="parametros.idModeloTrabalho !== 2"
-          >
-            <h3>Serviços Separados</h3>
-            <p>O cliente pode marcar vários serviços em uma só vez.</p>
+              " @keydown.space.prevent="
+    parametros.idModeloTrabalho === 2 && setarModo('separado')
+    " :aria-disabled="parametros.idModeloTrabalho !== 2">
+            <h3>Seleção simultânea de itens</h3>
+            <p>O cliente pode marcar vários serviços em uma só vez ("Banho + Bandana" ou "Banho + Tosa + Produtos
+              Anti-alérgicos").</p>
           </div>
         </div>
       </div>
@@ -59,11 +43,7 @@
       <!-- Cabeçalho da Seção -->
       <header class="cabecalho-secao">
         <h1 class="titulo">Serviços</h1>
-        <button
-          class="botao-adicionar"
-          @click="abrirModalNovo"
-          aria-label="Adicionar novo serviço"
-        >
+        <button class="botao-adicionar" @click="abrirModalNovo" aria-label="Adicionar novo serviço">
           Adicionar Serviço
         </button>
       </header>
@@ -71,11 +51,7 @@
       <!-- Lista de Serviços -->
       <div v-if="parametros.idModeloTrabalho == 1" class="lista-grid">
         <!-- Modo agrupado: exibe serviços detalhados -->
-        <article
-          v-for="servico in servicos"
-          :key="servico.idServico"
-          class="item-grid"
-        >
+        <article v-for="servico in servicos" :key="servico.idServico" class="item-grid">
           <div class="info-servico">
             <h2 class="nome-servico">
               {{ servico.descricao }} ({{ porteTexto(servico.idPorte) }})
@@ -86,18 +62,12 @@
             </p>
           </div>
           <div class="card_botoes">
-            <button
-              class="botao-editar"
-              @click="abrirModalEditar(servico)"
-              aria-label="Editar serviço {{ servico.descricao }}"
-            >
+            <button class="botao-editar" @click="abrirModalEditar(servico)"
+              aria-label="Editar serviço {{ servico.descricao }}">
               Editar
             </button>
-            <button
-              class="botao-excluir"
-              @click="excluirServico(servico)"
-              aria-label="Excluir serviço {{ servico.descricao }}"
-            >
+            <button class="botao-excluir" @click="excluirServico(servico)"
+              aria-label="Excluir serviço {{ servico.descricao }}">
               Excluir
             </button>
           </div>
@@ -105,11 +75,7 @@
       </div>
       <div v-else class="lista-grid">
         <!-- Modo separado: permite múltiplos serviços únicos -->
-        <article
-          v-for="servico in servicos"
-          :key="servico.idServico"
-          class="item-grid"
-        >
+        <article v-for="servico in servicos" :key="servico.idServico" class="item-grid">
           <div class="info-servico">
             <h2 class="nome-servico">{{ servico.descricao }}</h2>
             <p class="detalhe-servico">{{ servico.observacao }}</p>
@@ -121,18 +87,12 @@
             </p>
           </div>
           <div class="card_botoes">
-            <button
-              class="botao-editar"
-              @click="abrirModalEditar(servico)"
-              aria-label="Editar serviço {{ servico.descricao }}"
-            >
+            <button class="botao-editar" @click="abrirModalEditar(servico)"
+              aria-label="Editar serviço {{ servico.descricao }}">
               Editar
             </button>
-            <button
-              class="botao-excluir"
-              @click="excluirServico(servico)"
-              aria-label="Excluir serviço {{ servico.descricao }}"
-            >
+            <button class="botao-excluir" @click="excluirServico(servico)"
+              aria-label="Excluir serviço {{ servico.descricao }}">
               Excluir
             </button>
           </div>
@@ -140,18 +100,9 @@
       </div>
 
       <!-- Modal -->
-      <ModalGenerico
-        v-if="modalAberto"
-        :titulo="modalTitulo"
-        @fechar="fecharModal"
-      >
-        <FormularioServico
-          :dadosIniciais="servicoSelecionado"
-          :botaoTexto="botaoTextoModal"
-          :modeloTrabalho="parametros.idModeloTrabalho"
-          :categorias="categorias"
-          @salvar="salvarServico"
-        />
+      <ModalGenerico v-if="modalAberto" :titulo="modalTitulo" @fechar="fecharModal">
+        <FormularioServico :dadosIniciais="servicoSelecionado" :botaoTexto="botaoTextoModal"
+          :modeloTrabalho="parametros.idModeloTrabalho" :categorias="categorias" @salvar="salvarServico" />
       </ModalGenerico>
     </div>
   </section>
