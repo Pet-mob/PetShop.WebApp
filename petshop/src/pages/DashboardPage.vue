@@ -11,7 +11,7 @@
           <p>{{ petsAgendadosHoje }}</p>
         </section>
         <section class="cartao" aria-label="Serviços concluídos">
-          <h2>Serviços concluídos</h2>
+          <h2>Serviços concluídos hoje</h2>
           <p>{{ servicosConcluidos }}</p>
         </section>
         <section class="cartao" aria-label="Agendamentos para amanhã">
