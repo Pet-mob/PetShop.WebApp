@@ -17,16 +17,10 @@ const buscarAgenda = (dataInicioParam, dataFimParam, idEmpresaParam) => {
 const atualizarStatusAgendamento = (
   idAgendamento,
   status,
-  justificativa = null
 ) => {
-  const atualizacaoDto = {
-    idAgendamento,
-    status,
-    justificativa,
-  };
   return new Promise((resolve, reject) => {
     apiClient
-      .put("Agendamento/AtualizarStatus", atualizacaoDto)
+      .put("Agendamento/AtualizarStatus?idAgendamento=" + idAgendamento + "&status=" + status)
       .then((response) => resolve(response.data))
       .catch((error) => reject(error));
   });
