@@ -239,6 +239,15 @@ async function atualizarServico(dto) {
 async function excluirServico(dto) {
   carregando.value = true;
   try {
+    const possoExcluir = await ServicosEmpresaService.possoExcluirServico(dto);
+    if (!possoExcluir) {
+      showToast(
+        "Não é possível excluir este serviço, pois ele está vinculado a agendamentos existentes.",
+        "error"
+      );
+      carregando.value = false;
+      return;
+    }
     const data = await ServicosEmpresaService.excluirServicoEmpresa(dto);
     if (data.data) {
       showToast("Serviço excluído com sucesso!", "success");

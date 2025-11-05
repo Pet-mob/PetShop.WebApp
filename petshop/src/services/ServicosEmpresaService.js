@@ -53,10 +53,21 @@ const excluirServicoEmpresa = (dto) => {
   });
 };
 
+const possoExcluirServico = (dto) => {
+  const { idEmpresa, idServico } = dto;
+  return new Promise((resolve, reject) => {
+    apiClient
+      .delete(`Servicos/PossoExcluirServico?idEmpresa=${idEmpresa}&idServico=${idServico}`)
+      .then((response) => resolve(response))
+      .catch((error) => reject(error));
+  });
+};
+
 export default {
   buscarServicosEmpresa,
   buscarServicosEmpresaPorIdEmpresaEIdServico,
   atualizarServicoEmpresa,
   adicionarServicoEmpresa,
   excluirServicoEmpresa,
+  possoExcluirServico,
 };
