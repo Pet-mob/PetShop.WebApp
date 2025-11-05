@@ -14,10 +14,7 @@ const buscarAgenda = (dataInicioParam, dataFimParam, idEmpresaParam) => {
   });
 };
 
-const atualizarStatusAgendamento = (
-  idAgendamento,
-  status,
-) => {
+const atualizarStatusAgendamento = (idAgendamento, status) => {
   return new Promise((resolve, reject) => {
     apiClient
       .put("Agendamento/AtualizarStatus?idAgendamento=" + idAgendamento + "&status=" + status)
@@ -52,7 +49,7 @@ const negarAgendamento = (idAgendamento) => {
   return atualizarStatusAgendamento(idAgendamento, 2); // 2 = Negado
 };
 
-export const agendaService = {
+export default {
   buscarAgenda,
   atualizarStatusAgendamento,
   buscarAgendamentoPorId,
