@@ -1,21 +1,12 @@
 <template>
-  <ModalBase
-    v-if="visible"
-    :titulo="titulo"
-    :maxWidth="'720px'"
-    @fechar="onFechar"
-  >
+  <ModalBase v-if="visible" :titulo="titulo" :maxWidth="'720px'" @fechar="onFechar">
     <template #default>
       <div class="ag-layout">
         <!-- Coluna esquerda: avatar + nomes + serviços -->
         <div class="ag-left">
           <div class="ag-header">
-            <img
-              v-if="agendamento?.urlFotoAnimal"
-              :src="agendamento.urlFotoAnimal"
-              alt="Foto do animal"
-              class="ag-avatar"
-            />
+            <img v-if="agendamento?.urlFotoAnimal" :src="agendamento.urlFotoAnimal" alt="Foto do animal"
+              class="ag-avatar" />
             <div class="ag-names">
               <div class="ag-animal">🐾 {{ agendamento?.nomeAnimal }}</div>
               <div class="ag-user">👤 {{ agendamento?.nomeUsuario }}</div>
@@ -113,16 +104,16 @@ const formatarData = (data) => {
 const listaServicos = computed(() =>
   props.agendamento?.descricaoServicos
     ? props.agendamento.descricaoServicos
-        .split(",")
-        .map((s) => s.trim())
-        .filter((s) => s.length > 0)
+      .split(",")
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0)
     : []
 );
 
 const statusClass = computed(() => {
   const s = props.agendamento?.status;
-  if (s === "Confirmado" || s === "Agendado") return "ag-badge--ok";
-  if (s === "Pendente") return "ag-badge--warn";
+  if (s === "Concluido") return "ag-badge--ok";
+  if (s === "Agendado") return "ag-badge--warn";
   if (s === "Cancelado") return "ag-badge--err";
   return "ag-badge--muted";
 });
@@ -164,10 +155,12 @@ const statusClass = computed(() => {
   flex-direction: column;
   gap: 2px;
 }
+
 .ag-animal {
   font-weight: 700;
   color: #111827;
 }
+
 .ag-user {
   color: #6b7280;
 }
@@ -177,16 +170,19 @@ const statusClass = computed(() => {
   flex-direction: column;
   gap: 8px;
 }
+
 .ag-section-title {
   font-weight: 800;
   color: #1f2937;
   font-size: 1.05rem;
 }
+
 .ag-services {
   margin: 0;
   padding-left: 1.05rem;
   list-style: disc;
 }
+
 .ag-services li {
   margin: 6px 0;
 }
@@ -197,6 +193,7 @@ const statusClass = computed(() => {
   flex-direction: column;
   gap: 6px;
 }
+
 .ag-card {
   padding: 12px;
   border-radius: 8px;
@@ -211,16 +208,19 @@ const statusClass = computed(() => {
   gap: 10px;
   margin: 0;
 }
+
 .ag-row {
   display: flex;
   gap: 12px;
   align-items: flex-start;
 }
+
 .ag-row dt {
   width: 85px;
   font-weight: 700;
   color: #374151;
 }
+
 .ag-row dd {
   margin: 0;
   color: #111827;
@@ -234,18 +234,22 @@ const statusClass = computed(() => {
   font-size: 13px;
   font-weight: 700;
 }
+
 .ag-badge--ok {
   background: #dcfce7;
   color: #166534;
 }
+
 .ag-badge--warn {
   background: #fef3c7;
   color: #92400e;
 }
+
 .ag-badge--err {
   background: #fee2e2;
   color: #991b1b;
 }
+
 .ag-badge--muted {
   background: #f3f4f6;
   color: #374151;
@@ -267,10 +271,12 @@ const statusClass = computed(() => {
     flex-direction: column;
     gap: 2px;
   }
+
   .ag-row dt {
     width: auto;
     font-size: 0.9rem;
   }
+
   .ag-row dd {
     font-size: 0.95rem;
   }
@@ -307,5 +313,4 @@ const statusClass = computed(() => {
 
 .ag-services-table tr:last-child td {
   border-bottom: none;
-}
-</style>
+}</style>
