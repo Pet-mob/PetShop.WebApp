@@ -53,7 +53,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { agendaService } from "../services/agendaService";
+import agendaService from "../services/agendaService";
 import Toast from "../components/ToastCustomizado.vue";
 import { useGlobalStore } from "@/store/useGlobalStore";
 
