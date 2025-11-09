@@ -58,7 +58,7 @@ const possoExcluirServico = (dto) => {
   return new Promise((resolve, reject) => {
     apiClient
       .delete(`Servicos/PossoExcluirServico?idEmpresa=${idEmpresa}&idServico=${idServico}`)
-      .then((response) => resolve(response))
+      .then((response) => resolve(response.data))
       .catch((error) => reject(error));
   });
 };
