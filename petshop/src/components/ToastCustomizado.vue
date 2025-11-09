@@ -1,13 +1,6 @@
 <template>
   <transition name="toast-fade">
-    <div
-      v-if="visible"
-      class="toast"
-      :class="type"
-      role="alert"
-      aria-live="assertive"
-      tabindex="0"
-    >
+    <div v-if="visible" class="toast" :class="type" role="alert" aria-live="assertive" tabindex="0">
       {{ message }}
       <button @click="close" aria-label="Fechar notificação">×</button>
     </div>
@@ -40,6 +33,7 @@ function close() {
 watch(
   () => props.message,
   async (newMsg) => {
+
     if (newMsg) {
       visible.value = true;
       clearTimeout(timeoutId);
@@ -49,11 +43,15 @@ watch(
       timeoutId = setTimeout(() => {
         visible.value = false;
       }, props.duration);
+    } else {
+      // Se a mensagem foi limpa, esconder imediatamente
+      visible.value = false;
     }
   }
 );
 
 onMounted(async () => {
+
   if (props.message) {
     visible.value = true;
     await nextTick();
@@ -79,7 +77,10 @@ onMounted(async () => {
   align-items: center;
   gap: 10px;
   min-width: 200px;
+  z-index: 10001;
+  /* acima de modais (modal usa 9999) */
 }
+
 .toast button {
   background: transparent;
   border: none;
@@ -109,6 +110,7 @@ onMounted(async () => {
 .toast-fade-leave-active {
   transition: opacity 0.3s;
 }
+
 .toast-fade-enter-from,
 .toast-fade-leave-to {
   opacity: 0;
