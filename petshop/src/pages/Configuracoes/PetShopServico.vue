@@ -112,7 +112,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch, nextTick } from "vue";
 import ModalGenerico from "@/components/ModalBase.vue";
 import FormularioServico from "@/views/FormularioServico.vue";
 import ServicosEmpresaService from "@/services/ServicosEmpresaService";
@@ -120,11 +120,20 @@ import { useGlobalStore } from "@/store/useGlobalStore";
 import LoadingPetMob from "@/components/LoadingPetMob.vue";
 import Toast from "@/components/ToastCustomizado.vue";
 
+// Constantes e chaves
+const MODO_KEY = "modoAgendamento";
+const MODO = {
+  AGRUPADO: "agrupado",
+  SEPARADO: "separado",
+};
+
+// Store / contexto
 const store = useGlobalStore();
 const parametros = store.retornoObjParametro();
 const empresaLogada = store.empresaLogada;
-const idEmpresaLogada = empresaLogada.idEmpresa;
+const idEmpresaLogada = empresaLogada?.idEmpresa;
 
+// Estado local
 const carregando = ref(false);
 const toastMessage = ref("");
 const toastType = ref("info");
@@ -133,48 +142,101 @@ const servicoSelecionado = ref(null);
 const modalTitulo = ref("");
 const botaoTextoModal = ref("");
 const servicos = ref([]);
-const modoAgendamento = ref("agrupado"); // novo estado
+const modoAgendamento = ref(MODO.AGRUPADO);
+
 const categorias = ref([
   { id: 1, nome: "Banho" },
   { id: 2, nome: "Tosa" },
   { id: 3, nome: "Vacina" },
-  // Adicione mais categorias conforme necessário
 ]);
 
+// -----------------------------
+// Inicialização
+// -----------------------------
 onMounted(async () => {
   await buscarServicosDaEmpresa();
-  modeloTrabalho();
+  inicializarModo();
 });
 
-function modeloTrabalho() {
-  if (parametros.idModeloTrabalho == 1) {
-    modoAgendamento.value = "agrupado";
-  } else {
-    modoAgendamento.value = "separado";
+// Se os parametros mudarem em runtime, respeitamos a nova configuração
+watch(
+  () => parametros?.idModeloTrabalho,
+  (novo) => {
+    if (novo === 1) setModoPadrao(MODO.AGRUPADO);
+    else if (novo === 2) setModoPadrao(MODO.SEPARADO);
   }
-  const modoSalvo = localStorage.getItem("modoAgendamento");
-  if (modoSalvo) modoAgendamento.value = modoSalvo;
+);
+
+function inicializarModo() {
+  // Preferência local salvo no navegador tem precedência
+  const modoSalvo = localStorage.getItem(MODO_KEY);
+  if (modoSalvo === MODO.AGRUPADO || modoSalvo === MODO.SEPARADO) {
+    modoAgendamento.value = modoSalvo;
+    return;
+  }
+
+  // Senão, usar configuração dos parâmetros da empresa
+  if (parametros?.idModeloTrabalho === 1) modoAgendamento.value = MODO.AGRUPADO;
+  else modoAgendamento.value = MODO.SEPARADO;
+}
+
+function setModoPadrao(modo) {
+  modoAgendamento.value = modo;
+  localStorage.setItem(MODO_KEY, modo);
 }
 
 function setarModo(modo) {
+  // Checa se modo permitido pela configuração do servidor
   modoAgendamento.value = modo;
-  localStorage.setItem("modoAgendamento", modo);
+  localStorage.setItem(MODO_KEY, modo);
   showToast("Modo de agendamento atualizado!", "success");
 }
 
-function showToast(msg, type = "info") {
-  toastMessage.value = msg;
+// Handler único para clique/teclado nas opções de modo
+// function handleModoSelect(modo, requiredId) {
+//   if (parametros?.idModeloTrabalho !== requiredId) return;
+//   setarModo(modo);
+// }
+
+// -----------------------------
+// UI helpers
+// -----------------------------
+async function showToast(msg, type = "info") {
+  // Forçar mudança no valor para que o componente <Toast> detecte
+  // mesmo quando a mensagem for igual à anterior.
   toastType.value = type;
+  toastMessage.value = "";
+  await nextTick();
+  toastMessage.value = msg;
 }
 
+function porteTexto(idPorte) {
+  switch (idPorte) {
+    case 0:
+      return "Todos";
+    case 1:
+      return "Pequeno";
+    case 2:
+      return "Médio";
+    case 3:
+      return "Grande";
+    default:
+      return "Todos";
+  }
+}
+
+// -----------------------------
+// CRUD: serviços
+// -----------------------------
 async function buscarServicosDaEmpresa() {
   carregando.value = true;
   try {
-    const data = await ServicosEmpresaService.buscarServicosEmpresa(
-      idEmpresaLogada
-    );
+    if (!idEmpresaLogada) return;
+    const data = await ServicosEmpresaService.buscarServicosEmpresa(idEmpresaLogada);
     if (data) servicos.value = data;
   } catch (error) {
+    // Log mínimo para debugging
+    // console.error('buscarServicosDaEmpresa', error);
     showToast("Erro ao carregar serviços", "error");
   } finally {
     carregando.value = false;
@@ -188,7 +250,7 @@ function abrirModalNovo() {
   modalAberto.value = true;
 }
 
-async function abrirModalEditar(servico) {
+function abrirModalEditar(servico) {
   servicoSelecionado.value = { ...servico };
   modalTitulo.value = "Editar Serviço";
   botaoTextoModal.value = "Salvar";
@@ -201,18 +263,12 @@ async function fecharModal() {
 }
 
 async function adicionarServico(dto) {
-  // Exemplo de reforço de validação (pode ser expandido conforme regras de negócio)
-  if (!dto.descricao || dto.valor === undefined || dto.valor < 0) {
-    showToast("Preencha todos os campos obrigatórios corretamente.", "error");
-    return;
-  }
-  if (dto.duracao === undefined || dto.duracao === null) {
-    dto.duracao = 0;
-  }
+  if (!validarDtoBasico(dto)) return;
+  dto.duracao = dto.duracao ?? 0;
   carregando.value = true;
   try {
     const data = await ServicosEmpresaService.adicionarServicoEmpresa(dto);
-    if (data.data) showToast("Serviço adicionado com sucesso!", "success");
+    if (data?.data) showToast("Serviço adicionado com sucesso!", "success");
   } catch (error) {
     showToast("Erro ao adicionar serviços", "error");
   } finally {
@@ -221,14 +277,11 @@ async function adicionarServico(dto) {
 }
 
 async function atualizarServico(dto) {
-  if (!dto.descricao || dto.valor === undefined || dto.valor < 0) {
-    showToast("Preencha todos os campos obrigatórios corretamente.", "error");
-    return;
-  }
+  if (!validarDtoBasico(dto)) return;
   carregando.value = true;
   try {
     const data = await ServicosEmpresaService.atualizarServicoEmpresa(dto);
-    if (data.data) showToast("Serviço atualizado com sucesso!", "success");
+    if (data?.data) showToast("Serviço atualizado com sucesso!", "success");
   } catch (error) {
     showToast("Erro ao atualizar serviços", "error");
   } finally {
@@ -249,7 +302,7 @@ async function excluirServico(dto) {
       return;
     }
     const data = await ServicosEmpresaService.excluirServicoEmpresa(dto);
-    if (data.data) {
+    if (data?.data) {
       showToast("Serviço excluído com sucesso!", "success");
       await buscarServicosDaEmpresa();
     }
@@ -286,13 +339,12 @@ async function salvarServico(dados) {
   }
 }
 
-// Função utilitária para exibir o porte do animal
-function porteTexto(idPorte) {
-  if (idPorte === 0) return "Todos";
-  if (idPorte === 1) return "Pequeno";
-  if (idPorte === 2) return "Médio";
-  if (idPorte === 3) return "Grande";
-  return "Todos";
+function validarDtoBasico(dto) {
+  if (!dto?.descricao || dto?.valor === undefined || dto?.valor < 0) {
+    showToast("Preencha todos os campos obrigatórios corretamente.", "error");
+    return false;
+  }
+  return true;
 }
 </script>
 <style scoped>
