@@ -1,40 +1,20 @@
 <template>
-  <form
-    class="formulario-container"
-    @submit.prevent="enviarFormulario"
-    novalidate
-    role="form"
-    aria-label="Formulário de serviço"
-  >
+  <form class="formulario-container" @submit.prevent="enviarFormulario" novalidate role="form"
+    aria-label="Formulário de serviço">
     <!-- Linha: Nome, Porte, Duração -->
     <div class="linha-formulario">
       <div class="campo-formulario flex2">
         <label for="nome" class="label-formulario">Nome do Serviço</label>
-        <input
-          id="nome"
-          v-model="dados.descricao"
-          type="text"
-          class="campo-texto"
-          placeholder="Ex: Banho e Tosa"
-          required
-          aria-label="Nome do serviço"
-          :aria-invalid="erros.descricao ? 'true' : 'false'"
-        />
+        <input id="nome" v-model="dados.descricao" type="text" class="campo-texto" placeholder="Ex: Banho e Tosa" required
+          aria-label="Nome do serviço" :aria-invalid="erros.descricao ? 'true' : 'false'" />
         <span v-if="erros.descricao" class="mensagem-erro" role="alert">{{
           erros.descricao
         }}</span>
       </div>
       <div class="campo-formulario flex1">
         <label for="porte" class="label-formulario">Porte do Animal</label>
-        <select
-          id="porte"
-          v-model.number="dados.idPorte"
-          class="campo-texto"
-          placeholder="Selecione o porte"
-          required
-          aria-label="Porte do animal"
-          :aria-invalid="erros.idPorte ? 'true' : 'false'"
-        >
+        <select id="porte" v-model.number="dados.idPorte" class="campo-texto" placeholder="Selecione o porte" required
+          aria-label="Porte do animal" :aria-invalid="erros.idPorte ? 'true' : 'false'">
           <option value="0">Todos</option>
           <option value="1">Pequeno</option>
           <option value="2">Médio</option>
@@ -46,16 +26,8 @@
       </div>
       <div class="campo-formulario flex1">
         <label for="duracao" class="label-formulario">Duração (min)</label>
-        <input
-          id="duracao"
-          v-model.number="dados.duracao"
-          type="number"
-          class="campo-texto"
-          min="1"
-          required
-          aria-label="Duração do serviço em minutos"
-          :aria-invalid="erros.duracao ? 'true' : 'false'"
-        />
+        <input id="duracao" v-model.number="dados.duracao" type="number" class="campo-texto" min="1" required
+          aria-label="Duração do serviço em minutos" :aria-invalid="erros.duracao ? 'true' : 'false'" />
         <span v-if="erros.duracao" class="mensagem-erro" role="alert">{{
           erros.duracao
         }}</span>
@@ -66,23 +38,13 @@
     <div class="linha-formulario">
       <div class="campo-formulario flex1">
         <label for="preco" class="label-formulario">Preço (R$)</label>
-        <input
-          id="preco"
-          v-model.number="dados.valor"
-          type="number"
-          class="campo-texto"
-          placeholder="Ex: 120.00"
-          min="0"
-          step="0.01"
-          required
-          aria-label="Preço do serviço"
-          :aria-invalid="erros.valor ? 'true' : 'false'"
-        />
+        <input id="preco" v-model.number="dados.valor" type="number" class="campo-texto" placeholder="Ex: 120.00" min="0"
+          step="0.01" required aria-label="Preço do serviço" :aria-invalid="erros.valor ? 'true' : 'false'" />
         <span v-if="erros.valor" class="mensagem-erro" role="alert">{{
           erros.valor
         }}</span>
       </div>
-      <div class="campo-formulario flex2 mensalidade-group">
+      <!-- <div class="campo-formulario flex2 mensalidade-group">
         <div class="mensalidade-flex">
           <label class="checkbox-container" aria-label="Possui mensalidade?">
             <input
@@ -110,20 +72,15 @@
             </div>
           </transition>
         </div>
-      </div>
+      </div> -->
     </div>
 
     <!-- Linha: Observação -->
     <div class="linha-formulario">
       <div class="campo-formulario flex2">
         <label for="observacao" class="label-formulario">Observação</label>
-        <textarea
-          id="observacao"
-          v-model="dados.observacao"
-          rows="2"
-          class="campo-texto"
-          aria-label="Observação do serviço"
-        ></textarea>
+        <textarea id="observacao" v-model="dados.observacao" rows="2" class="campo-texto"
+          aria-label="Observação do serviço"></textarea>
       </div>
     </div>
 
@@ -335,7 +292,7 @@ select.campo-texto {
   transition: 0.2s ease;
 }
 
-.checkbox-container input:checked ~ .checkmark {
+.checkbox-container input:checked~.checkmark {
   background-color: #28a745;
   border-color: #28a745;
 }
@@ -353,7 +310,7 @@ select.campo-texto {
   transform: rotate(45deg);
 }
 
-.checkbox-container input:checked ~ .checkmark::after {
+.checkbox-container input:checked~.checkmark::after {
   display: block;
 }
 
@@ -397,19 +354,23 @@ select.campo-texto {
     padding: 1rem 0.5rem;
     max-width: 100%;
   }
+
   .linha-formulario {
     flex-direction: column;
     gap: 0.7rem;
   }
+
   .botao-principal {
     width: 100%;
     align-self: stretch;
   }
+
   .mensalidade-flex {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
+
   .mensalidade-valor {
     width: 100%;
     min-width: 0;
