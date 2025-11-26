@@ -1,17 +1,11 @@
 <template>
-  <div role="region" aria-label="Gráfico de serviços realizados na semana">
+  <div role="region" aria-label="Gráfico de agendamentos na semana">
     <Bar :data="dadosGrafico" :options="opcoesGrafico" />
-    <p
-      v-if="!dadosGrafico.datasets[0].data.length"
-      class="mensagem-erro"
-      role="status"
-    >
+    <p v-if="!dadosGrafico.datasets[0].data.length" class="mensagem-erro" role="status">
       Nenhum dado disponível para exibir o gráfico.
     </p>
-    <span class="sr-only"
-      >Este gráfico mostra a quantidade de serviços realizados em cada dia da
-      semana.</span
-    >
+    <span class="sr-only">Este gráfico mostra a quantidade de agendamentos em cada dia da
+      semana.</span>
   </div>
 </template>
 
@@ -43,7 +37,7 @@ const dadosGrafico = ref({
   labels,
   datasets: [
     {
-      label: "Serviços realizados",
+      label: "Agendamentos",
       backgroundColor: "#6a1b9a",
       data: [],
     },
@@ -96,12 +90,14 @@ div {
   height: 300px;
   width: 100%;
 }
+
 .mensagem-erro {
   color: #d32f2f;
   font-size: 1rem;
   margin-top: 1rem;
   text-align: center;
 }
+
 .sr-only {
   position: absolute;
   width: 1px;
