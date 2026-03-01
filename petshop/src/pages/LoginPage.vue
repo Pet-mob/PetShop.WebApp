@@ -5,7 +5,8 @@
         <div class="side-content">
           <h2>Gerencie seu pet shop de forma inteligente</h2>
           <p>
-            Toda a sua gestão em um só lugar, com dados e ferramentas que impulsionam seu negócio.
+            Toda a sua gestão em um só lugar, com dados e ferramentas que
+            impulsionam seu negócio.
           </p>
           <img :src="logoGrande" alt="Logo PetMob" class="side-img" />
         </div>
@@ -17,7 +18,7 @@
           <div class="logo-container">
             <img :src="logo" alt="Logo Pet.ON" class="logo" />
           </div>
-          <h1>Área do Lojista</h1>
+          <h1>Área de Acesso</h1>
           <form @submit.prevent="realizarLogin" autocomplete="on">
             <label for="cnpj">CNPJ</label>
             <input
@@ -48,7 +49,7 @@
               :disabled="carregando"
               aria-label="Entrar no sistema"
             >
-              {{ carregando ? 'Carregando...' : 'Entrar' }}
+              {{ carregando ? "Carregando..." : "Entrar" }}
             </button>
           </form>
           <div class="links">
@@ -122,7 +123,7 @@ const realizarLogin = async () => {
   } catch (err) {
     showToast(
       err.response?.data?.message || "CNPJ ou senha incorretos.",
-      "error"
+      "error",
     );
   } finally {
     carregando.value = false;
@@ -146,7 +147,7 @@ function onRegister() {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+  font-family: "Segoe UI", "Roboto", "Arial", sans-serif;
   padding: 1.5rem;
   box-sizing: border-box;
 }
@@ -160,7 +161,8 @@ function onRegister() {
   background: transparent;
   border-radius: 2rem;
   overflow: hidden;
-  box-shadow: 0 8px 32px 0 rgba(106,13,173,0.12), 0 1.5px 8px 0 rgba(0,146,63,0.08);
+  box-shadow: 0 8px 32px 0 rgba(106, 13, 173, 0.12),
+    0 1.5px 8px 0 rgba(0, 146, 63, 0.08);
 }
 
 @media (min-width: 900px) {
@@ -173,7 +175,7 @@ function onRegister() {
 .login-side-info {
   display: none;
   position: relative;
-  background: #00923F; /* alterado para fundo verde */
+  background: #00923f; /* alterado para fundo verde */
   min-width: 340px;
   max-width: 500px;
   flex: 1 1 0;
@@ -216,12 +218,18 @@ function onRegister() {
   max-width: 320px;
   border-radius: 2rem;
   margin: 0 auto;
-  box-shadow: 0 6px 32px 0 #6A0DAD22;
+  box-shadow: 0 6px 32px 0 #6a0dad22;
   animation: fade-in 1.2s;
 }
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(30px);}
-  to { opacity: 1; transform: none;}
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* Card do formulário */
@@ -257,7 +265,7 @@ function onRegister() {
   height: 90px;
   border-radius: 50%;
   background: #f6f6f6;
-  box-shadow: 0 2px 12px #6A0DAD22;
+  box-shadow: 0 2px 12px #6a0dad22;
   object-fit: contain;
 }
 h1 {
@@ -299,25 +307,25 @@ input[type="password"] {
 }
 input[type="text"]:focus,
 input[type="password"]:focus {
-  border: 1.5px solid #00923F;
+  border: 1.5px solid #00923f;
   outline: none;
   box-shadow: 0 0 0 2px #00923f33;
 }
 button {
-  background: #6A0DAD;
+  background: #6a0dad;
   color: #fff;
   padding: 0.95rem 0;
   border: none;
   border-radius: 1rem;
   font-size: 1.1rem;
   font-weight: 700;
-  box-shadow: 0 2px 12px #6A0DAD22;
+  box-shadow: 0 2px 12px #6a0dad22;
   cursor: pointer;
   margin-top: 0.5rem;
   transition: background 0.2s, transform 0.15s;
 }
 button:hover:not([disabled]) {
-  background: #00923F;
+  background: #00923f;
   transform: scale(1.03);
 }
 button[disabled] {
@@ -332,7 +340,7 @@ button[disabled] {
   margin-top: 1.2rem;
 }
 .links a {
-  color: #6A0DAD;
+  color: #6a0dad;
   font-size: 0.98rem;
   font-weight: 500;
   text-decoration: none;
@@ -340,11 +348,11 @@ button[disabled] {
   cursor: pointer;
 }
 .links a:hover {
-  color: #00923F;
+  color: #00923f;
   text-decoration: underline;
 }
 .links span {
-  color: #00923F;
+  color: #00923f;
   font-weight: 700;
 }
 </style>
