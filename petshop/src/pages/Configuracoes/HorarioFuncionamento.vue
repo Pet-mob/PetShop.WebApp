@@ -131,7 +131,7 @@ async function buscarHorariosDeFuncionamentoDaEmpresa() {
   carregando.value = true;
   try {
     const data = await empresaService.buscarHorarioFuncionamentoEmpresa(
-      idEmpresaLogada
+      idEmpresaLogada,
     );
 
     for (const entrada of data) {
@@ -185,12 +185,18 @@ async function salvarHorarios() {
       idEmpresa: idEmpresaLogada,
       nomeDiaSemana: dia.label,
       funcionaNesseDia: valor.ativo,
-      horarioAbertura: valor.abertura + ":00",
-      horarioFechamento: valor.fechamento + ":00",
+      horarioAbertura: valor.abertura,
+      horarioFechamento: valor.fechamento,
       intervaloEntreServicos: 0,
     });
   }
-
+  // Limpar horários dos dias desativados
+  for (const dia of diasDaSemana) {
+    if (!horarios[dia.value].ativo) {
+      horarios[dia.value].abertura = "";
+      horarios[dia.value].fechamento = "";
+    }
+  }
   try {
     await empresaService.atualizarHorariosFuncionamentoEmpresa(configuracoes);
     showToast("Horários salvos com sucesso!", "success");

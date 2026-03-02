@@ -12,7 +12,7 @@ const atualizarDadosEmpresa = (dto) => {
 const atualizarHorariosFuncionamentoEmpresa = (dto) => {
   return new Promise((resolve, reject) => {
     apiClient
-      .put("Empresa/HorariosFuncionamento", dto)
+      .put("Empresa/AtualizarHorariosFuncionamento", dto)
       .then((response) => resolve(response.data))
       .catch((error) => reject(error));
   });
