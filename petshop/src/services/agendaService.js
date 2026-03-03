@@ -1,4 +1,5 @@
 import apiClient from "@/services/apiClient"; // Certifique-se de que o caminho está correto
+import { statusAgendamentoEnum } from "@/utils/statusAgendamentoEnum";
 
 const buscarAgenda = (dataInicioParam, dataFimParam, idEmpresaParam) => {
   const dashboardDto = {
@@ -47,11 +48,17 @@ const buscarAgendamentosPendentes = (idEmpresa) => {
 };
 
 const confirmarAgendamento = (idAgendamento) => {
-  return atualizarStatusAgendamento(idAgendamento, 1); // 1 = Concluído
+  return atualizarStatusAgendamento(
+    idAgendamento,
+    statusAgendamentoEnum.CONCLUIDO,
+  );
 };
 
 const negarAgendamento = (idAgendamento) => {
-  return atualizarStatusAgendamento(idAgendamento, 2); // 2 = Cancelado
+  return atualizarStatusAgendamento(
+    idAgendamento,
+    statusAgendamentoEnum.CANCELADO,
+  );
 };
 
 export default {
