@@ -1,12 +1,21 @@
 <template>
-  <ModalBase v-if="visible" :titulo="titulo" :maxWidth="'720px'" @fechar="onFechar">
+  <ModalBase
+    v-if="visible"
+    :titulo="titulo"
+    :maxWidth="'720px'"
+    @fechar="onFechar"
+  >
     <template #default>
       <div class="ag-layout">
         <!-- Coluna esquerda: avatar + nomes + serviços -->
         <div class="ag-left">
           <div class="ag-header">
-            <img v-if="agendamento?.urlFotoAnimal" :src="agendamento.urlFotoAnimal" alt="Foto do animal"
-              class="ag-avatar" />
+            <img
+              v-if="agendamento?.urlFotoAnimal"
+              :src="agendamento.urlFotoAnimal"
+              alt="Foto do animal"
+              class="ag-avatar"
+            />
             <div class="ag-names">
               <div class="ag-animal">🐾 {{ agendamento?.nomeAnimal }}</div>
               <div class="ag-user">👤 {{ agendamento?.nomeUsuario }}</div>
@@ -57,7 +66,13 @@
                 <dt>Status</dt>
                 <dd>
                   <span class="ag-badge" :class="statusClass">{{
-                    agendamento?.status
+                    agendamento?.idStatusAgendamento === 1
+                      ? "Concluído"
+                      : agendamento?.idStatusAgendamento === 3
+                      ? "Agendado"
+                      : agendamento?.idStatusAgendamento === 2
+                      ? "Cancelado"
+                      : "Desconhecido"
                   }}</span>
                 </dd>
               </div>
@@ -104,15 +119,15 @@ const formatarData = (data) => {
 const listaServicos = computed(() =>
   props.agendamento?.descricaoServicos
     ? props.agendamento.descricaoServicos
-      .split(",")
-      .map((s) => s.trim())
-      .filter((s) => s.length > 0)
-    : []
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0)
+    : [],
 );
 
 const statusClass = computed(() => {
-  const s = props.agendamento?.status;
-  if (s === "Concluido") return "ag-badge--ok";
+  const s = props.agendamento?.idStatusAgendamento;
+  if (s === "Concluído") return "ag-badge--ok";
   if (s === "Agendado") return "ag-badge--warn";
   if (s === "Cancelado") return "ag-badge--err";
   return "ag-badge--muted";
@@ -313,4 +328,5 @@ const statusClass = computed(() => {
 
 .ag-services-table tr:last-child td {
   border-bottom: none;
-}</style>
+}
+</style>

@@ -3,49 +3,91 @@
     <!-- Navigation -->
     <div class="tabs mb-4" role="tablist" aria-label="Visualização da agenda">
       <div class="navegacao-central-centralizada">
-        <input v-model="dataFiltro" type="date" class="input-date-hidden" ref="inputData"
-          aria-label="Selecionar data para filtrar agenda" />
+        <input
+          v-model="dataFiltro"
+          type="date"
+          class="input-date-hidden"
+          ref="inputData"
+          aria-label="Selecionar data para filtrar agenda"
+        />
         <button @click="voltarPeriodo" aria-label="Voltar período" tabindex="0">
           &lt;
         </button>
-        <label class="label-data" @click="abrirCalendario" role="button" tabindex="0"
-          @keydown.enter.prevent="abrirCalendario" @keydown.space.prevent="abrirCalendario"
-          aria-label="Selecionar data da semana">
+        <label
+          class="label-data"
+          @click="abrirCalendario"
+          role="button"
+          tabindex="0"
+          @keydown.enter.prevent="abrirCalendario"
+          @keydown.space.prevent="abrirCalendario"
+          aria-label="Selecionar data da semana"
+        >
           {{ intervaloSemana }}
         </label>
-        <button @click="avancarPeriodo" aria-label="Avançar período" tabindex="0">
+        <button
+          @click="avancarPeriodo"
+          aria-label="Avançar período"
+          tabindex="0"
+        >
           &gt;
         </button>
       </div>
     </div>
 
-    <div v-if="carregando" class="text-center text-gray-400 py-6" role="status" aria-live="polite">
+    <div
+      v-if="carregando"
+      class="text-center text-gray-400 py-6"
+      role="status"
+      aria-live="polite"
+    >
       <span class="animate-pulse">Carregando agendamentos...</span>
     </div>
 
     <div v-else class="agenda-semanal">
       <div class="cards-dias">
-        <div v-for="dia in diasSemana" :key="dia.data.format('YYYY-MM-DD')" class="card-dia" role="region" :aria-label="'Agendamentos de ' + dia.nome + ' ' + dia.data.format('DD/MM')
-          ">
+        <div
+          v-for="dia in diasSemana"
+          :key="dia.data.format('YYYY-MM-DD')"
+          class="card-dia"
+          role="region"
+          :aria-label="
+            'Agendamentos de ' + dia.nome + ' ' + dia.data.format('DD/MM')
+          "
+        >
           <div class="header-dia">
-            <span class="nome-dia">{{ dia.nome }} - {{ dia.data.format("DD/MM") }}</span>
+            <span class="nome-dia"
+              >{{ dia.nome }} - {{ dia.data.format("DD/MM") }}</span
+            >
           </div>
 
           <div class="agendamentos-dia">
-            <div v-if="agendamentosDoDia(dia.data).length === 0" class="sem-agendamentos"
-              aria-label="Nenhum agendamento para este dia" role="status">
+            <div
+              v-if="agendamentosDoDia(dia.data).length === 0"
+              class="sem-agendamentos"
+              aria-label="Nenhum agendamento para este dia"
+              role="status"
+            >
               Nenhum agendamento
             </div>
 
-            <div v-for="ag in agendamentosDoDia(dia.data)" :key="ag.idAgendamento"
-              class="agendamento-item agendamento-clicavel" role="listitem" :aria-label="'Agendamento de ' +
+            <div
+              v-for="ag in agendamentosDoDia(dia.data)"
+              :key="ag.idAgendamento"
+              class="agendamento-item agendamento-clicavel"
+              role="listitem"
+              :aria-label="
+                'Agendamento de ' +
                 ag.nomeAnimal +
                 ', serviço: ' +
                 (ag.descricaoServicos || '') +
                 ', horário: ' +
                 (ag.horarioInicial || '')
-                " @click="abrirModalServicos(ag)" tabindex="0" @keydown.enter.prevent="abrirModalServicos(ag)"
-              @keydown.space.prevent="abrirModalServicos(ag)">
+              "
+              @click="abrirModalServicos(ag)"
+              tabindex="0"
+              @keydown.enter.prevent="abrirModalServicos(ag)"
+              @keydown.space.prevent="abrirModalServicos(ag)"
+            >
               <strong>{{ ag.nomeAnimal }}</strong>
               <br />
               <small>{{ ag.horarioInicial }}</small>
@@ -56,8 +98,14 @@
     </div>
 
     <!-- Modal outside of the list (migrated to separate component) -->
-    <FormularioAgendaVisualizacao :visible="modalServicosAberto" :agendamento="agendamentoSelecionado" :titulo="'Serviços agendados para ' + (agendamentoSelecionado?.nomeAnimal || '')
-      " @fechar="fecharModalServicos" />
+    <FormularioAgendaVisualizacao
+      :visible="modalServicosAberto"
+      :agendamento="agendamentoSelecionado"
+      :titulo="
+        'Serviços agendados para ' + (agendamentoSelecionado?.nomeAnimal || '')
+      "
+      @fechar="fecharModalServicos"
+    />
   </div>
 </template>
 
@@ -107,7 +155,8 @@ function abrirModalServicos(agendamento) {
       agendamento.horario ||
       "",
     horarioFinal: agendamento.horarioFinal || agendamento.HorarioFinal || "",
-    status: agendamento.status || agendamento.Status || "",
+    idStatusAgendamento:
+      agendamento.idStatusAgendamento || agendamento.IdStatusAgendamento || "",
     pacoteMensal: agendamento.pacoteMensal || agendamento.PacoteMensal || false,
     nomeEmpresa: agendamento.nomeEmpresa || agendamento.NomeEmpresa || "",
     urlFotoAnimal:
@@ -168,7 +217,7 @@ const diasSemana = computed(() => {
 function agendamentosDoDia(dia) {
   const diaFormatado = dayjs(dia).format("YYYY-MM-DD");
   return agendamentos.value.filter(
-    (ag) => dayjs(ag.data).format("YYYY-MM-DD") === diaFormatado
+    (ag) => dayjs(ag.data).format("YYYY-MM-DD") === diaFormatado,
   );
 }
 
@@ -187,7 +236,7 @@ async function buscarAgendamentos() {
     const dados = await agendaService.buscarAgenda(
       dataInicio,
       dataFim,
-      idEmpresaLogada
+      idEmpresaLogada,
     );
     agendamentos.value = dados || [];
   } catch (error) {

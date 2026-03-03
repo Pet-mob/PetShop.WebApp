@@ -14,10 +14,15 @@ const buscarAgenda = (dataInicioParam, dataFimParam, idEmpresaParam) => {
   });
 };
 
-const atualizarStatusAgendamento = (idAgendamento, status) => {
+const atualizarStatusAgendamento = (idAgendamento, idStatusAgendamento) => {
   return new Promise((resolve, reject) => {
     apiClient
-      .put("Agendamento/AtualizarStatus?idAgendamento=" + idAgendamento + "&status=" + status)
+      .put(
+        "Agendamento/AtualizarStatus?idAgendamento=" +
+          idAgendamento +
+          "&idStatusAgendamento=" +
+          idStatusAgendamento,
+      )
       .then((response) => resolve(response.data))
       .catch((error) => reject(error));
   });
@@ -42,11 +47,11 @@ const buscarAgendamentosPendentes = (idEmpresa) => {
 };
 
 const confirmarAgendamento = (idAgendamento) => {
-  return atualizarStatusAgendamento(idAgendamento, 1); // 1 = Confirmado
+  return atualizarStatusAgendamento(idAgendamento, 1); // 1 = Concluído
 };
 
 const negarAgendamento = (idAgendamento) => {
-  return atualizarStatusAgendamento(idAgendamento, 2); // 2 = Negado
+  return atualizarStatusAgendamento(idAgendamento, 2); // 2 = Cancelado
 };
 
 export default {
