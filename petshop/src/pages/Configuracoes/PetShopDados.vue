@@ -52,7 +52,7 @@
           <div class="foto-legenda">Foto de capa</div>
           <div class="foto-descricao">
             Essa imagem será exibida no aplicativo quando o usuário for agendar
-            um horário com sua empresa.
+            um horário com sua empresa (tamanho recomendado: 500x200px).
           </div>
         </div>
       </div>
@@ -214,17 +214,17 @@ function formatarCnpj(valor) {
     if (apenasNumeros.length > 5) {
       valorFormatado = valorFormatado.replace(
         /(\d{2})\.(\d{3})(\d)/,
-        "$1.$2.$3"
+        "$1.$2.$3",
       );
       if (apenasNumeros.length > 8) {
         valorFormatado = valorFormatado.replace(
           /(\d{2})\.(\d{3})\.(\d{3})(\d)/,
-          "$1.$2.$3/$4"
+          "$1.$2.$3/$4",
         );
         if (apenasNumeros.length > 12) {
           valorFormatado = valorFormatado.replace(
             /(\d{2})\.(\d{3})\.(\d{3})\/(\d{4})(\d{0,2})/,
-            "$1.$2.$3/$4-$5"
+            "$1.$2.$3/$4-$5",
           );
         }
       }
@@ -254,7 +254,7 @@ watch(
   (novo) => {
     telefoneFormatado.value = formatarTelefone(novo);
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 function onTelefoneInput(e) {
@@ -390,9 +390,8 @@ async function salvar() {
 }
 
 .foto-capa img {
-  width: 100%;
-  max-width: 480px;
-  height: 120px;
+  width: 500px;
+  height: 200px;
   border-radius: 8px;
   object-fit: cover;
   border: 2px solid #ccc;
