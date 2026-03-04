@@ -1,108 +1,74 @@
-import apiClient from "@/services/apiClient"; // Certifique-se de que o caminho está correto
+import { CRUDService } from "./baseService";
 
-const atualizarDadosEmpresa = (dto) => {
-  return new Promise((resolve, reject) => {
-    apiClient
-      .put("Empresa", dto)
-      .then((response) => resolve(response.data))
-      .catch((error) => reject(error));
-  });
-};
+class EmpresaService extends CRUDService {
+  constructor() {
+    super("Empresa");
+  }
 
-const atualizarHorariosFuncionamentoEmpresa = (dto) => {
-  return new Promise((resolve, reject) => {
-    apiClient
-      .put("Empresa/AtualizarHorariosFuncionamento", dto)
-      .then((response) => resolve(response.data))
-      .catch((error) => reject(error));
-  });
-};
+  async buscarEmpresa(cnpj) {
+    return this.obter("", { cnpj });
+  }
 
-const buscarLogoEmpresa = (idEmpresaParam) => {
-  return new Promise((resolve, reject) => {
-    apiClient
-      .get("Empresa/BuscarLogosEmpresas", {
-        params: { idEmpresa: idEmpresaParam },
-      })
-      .then((response) => resolve(response.data))
-      .catch((error) => reject(error));
-  });
-};
+  async buscarHorariosFuncionamento(idEmpresa) {
+    return this.obter("HorariosFuncionamento", { IdEmpresa: idEmpresa });
+  }
 
-const buscarCapaEmpresa = (idEmpresaParam) => {
-  return new Promise((resolve, reject) => {
-    apiClient
-      .get("Empresa/BuscarCapasEmpresas", {
-        params: { idEmpresa: idEmpresaParam },
-      })
-      .then((response) => resolve(response.data))
-      .catch((error) => reject(error));
-  });
-};
+  async buscarLogos(idEmpresa) {
+    return this.obter("BuscarLogosEmpresas", { idEmpresa });
+  }
 
-const buscarEmpresa = (cnpjParam) => {
-  return new Promise((resolve, reject) => {
-    apiClient
-      .get("Empresa", {
-        params: { cnpj: cnpjParam },
-      })
-      .then((response) => resolve(response.data))
-      .catch((error) => reject(error));
-  });
-};
+  async buscarCapas(idEmpresa) {
+    return this.obter("BuscarCapasEmpresas", { idEmpresa });
+  }
 
-const buscarHorarioFuncionamentoEmpresa = (idEmpresaParam) => {
-  return new Promise((resolve, reject) => {
-    apiClient
-      .get("Empresa/HorariosFuncionamento", {
-        params: { IdEmpresa: idEmpresaParam },
-      })
-      .then((response) => resolve(response.data))
-      .catch((error) => reject(error));
-  });
-};
-
-const enviarLogoEmpresaPorIdEmpresa = async (imagem, idEmpresaParam) => {
-  return new Promise((resolve, reject) => {
+  async enviarLogo(imagem, idEmpresa) {
     const formData = new FormData();
     formData.append("arquivo", imagem);
-    formData.append("idEmpresa", idEmpresaParam);
+    formData.append("idEmpresa", idEmpresa);
 
-    apiClient
-      .post("Empresa/EnviarLogoEmpresa", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((response) => resolve(response.data))
-      .catch((error) => reject(error));
-  });
-};
+    return this.adicionarComArquivo("EnviarLogoEmpresa", formData);
+  }
 
-const enviarCapaEmpresaPorIdEmpresa = async (imagem, idEmpresaParam) => {
-  return new Promise((resolve, reject) => {
+  async enviarCapa(imagem, idEmpresa) {
     const formData = new FormData();
     formData.append("arquivo", imagem);
-    formData.append("idEmpresa", idEmpresaParam);
+    formData.append("idEmpresa", idEmpresa);
 
-    apiClient
-      .post("Empresa/EnviarCapaEmpresa", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((response) => resolve(response.data))
-      .catch((error) => reject(error));
-  });
-};
+    return this.adicionarComArquivo("EnviarCapaEmpresa", formData);
+  }
 
-export default {
-  buscarEmpresa,
-  buscarHorarioFuncionamentoEmpresa,
-  atualizarHorariosFuncionamentoEmpresa,
-  atualizarDadosEmpresa,
-  buscarCapaEmpresa,
-  buscarLogoEmpresa,
-  enviarLogoEmpresaPorIdEmpresa,
-  enviarCapaEmpresaPorIdEmpresa,
-};
+  async atualizarHorariosFuncionamento(dto) {
+    return this.atualizar("AtualizarHorariosFuncionamento", dto);
+  }
+
+  async atualizarDadosEmpresa(dto) {
+    return this.atualizar("", dto);
+  }
+
+  // ALIASES - Manter compatibilidade com código existente
+  async buscarHorarioFuncionamentoEmpresa(idEmpresa) {
+    return this.buscarHorariosFuncionamento(idEmpresa);
+  }
+
+  async buscarLogoEmpresa(idEmpresa) {
+    return this.buscarLogos(idEmpresa);
+  }
+
+  async buscarCapaEmpresa(idEmpresa) {
+    return this.buscarCapas(idEmpresa);
+  }
+
+  async enviarLogoEmpresaPorIdEmpresa(imagem, idEmpresa) {
+    return this.enviarLogo(imagem, idEmpresa);
+  }
+
+  async enviarCapaEmpresaPorIdEmpresa(imagem, idEmpresa) {
+    return this.enviarCapa(imagem, idEmpresa);
+  }
+
+  async atualizarHorariosFuncionamentoEmpresa(dto) {
+    return this.atualizarHorariosFuncionamento(dto);
+  }
+}
+
+export default new EmpresaService();

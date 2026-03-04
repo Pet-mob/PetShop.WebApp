@@ -1,73 +1,38 @@
-import apiClient from "@/services/apiClient"; // Certifique-se de que o caminho está correto
+import { CRUDService } from "./baseService";
 
-const buscarServicosEmpresa = (idEmpresaParam) => {
-  return new Promise((resolve, reject) => {
-    apiClient
-      .get("Servicos/ListaServicosPetShop", {
-        params: { IdEmpresa: idEmpresaParam },
-      })
-      .then((response) => resolve(response.data))
-      .catch((error) => reject(error));
-  });
-};
+class ServicosEmpresaService extends CRUDService {
+  constructor() {
+    super("Servicos");
+  }
 
-const buscarServicosEmpresaPorIdEmpresaEIdServico = (
-  idEmpresaParam,
-  idServicoParam
-) => {
-  return new Promise((resolve, reject) => {
-    apiClient
-      .get("Servicos/ListaServicosPetShop", {
-        params: { IdEmpresa: idEmpresaParam, IdServico: idServicoParam },
-      })
-      .then((response) => resolve(response.data))
-      .catch((error) => reject(error));
-  });
-};
+  async buscarServicosEmpresa(idEmpresa) {
+    return this.obter("ListaServicosPetShop", { IdEmpresa: idEmpresa });
+  }
 
-const atualizarServicoEmpresa = (dto) => {
-  return new Promise((resolve, reject) => {
-    apiClient
-      .put("Servicos", dto)
-      .then((response) => resolve(response))
-      .catch((error) => reject(error));
-  });
-};
+  async buscarServicosEmpresaPorIdEmpresaEIdServico(idEmpresa, idServico) {
+    return this.obter("ListaServicosPetShop", {
+      IdEmpresa: idEmpresa,
+      IdServico: idServico,
+    });
+  }
 
-const adicionarServicoEmpresa = (dto) => {
-  return new Promise((resolve, reject) => {
-    apiClient
-      .post("Servicos", dto)
-      .then((response) => resolve(response))
-      .catch((error) => reject(error));
-  });
-};
+  async atualizarServicoEmpresa(dto) {
+    return this.atualizar("", dto);
+  }
 
-const excluirServicoEmpresa = (dto) => {
-  const { idEmpresa, idServico } = dto;
-  return new Promise((resolve, reject) => {
-    apiClient
-      .delete(`Servicos?idEmpresa=${idEmpresa}&idServico=${idServico}`)
-      .then((response) => resolve(response))
-      .catch((error) => reject(error));
-  });
-};
+  async adicionarServicoEmpresa(dto) {
+    return this.adicionar("", dto);
+  }
 
-const possoExcluirServico = (dto) => {
-  const { idEmpresa, idServico } = dto;
-  return new Promise((resolve, reject) => {
-    apiClient
-      .delete(`Servicos/PossoExcluirServico?idEmpresa=${idEmpresa}&idServico=${idServico}`)
-      .then((response) => resolve(response.data))
-      .catch((error) => reject(error));
-  });
-};
+  async excluirServicoEmpresa(dto) {
+    const { idEmpresa, idServico } = dto;
+    return this.deletar("", { idEmpresa, idServico });
+  }
 
-export default {
-  buscarServicosEmpresa,
-  buscarServicosEmpresaPorIdEmpresaEIdServico,
-  atualizarServicoEmpresa,
-  adicionarServicoEmpresa,
-  excluirServicoEmpresa,
-  possoExcluirServico,
-};
+  async possoExcluirServico(dto) {
+    const { idEmpresa, idServico } = dto;
+    return this.deletar("PossoExcluirServico", { idEmpresa, idServico });
+  }
+}
+
+export default new ServicosEmpresaService();

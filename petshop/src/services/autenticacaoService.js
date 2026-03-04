@@ -1,24 +1,29 @@
-import apiClient from "./apiClient";
+import { CRUDService } from "./baseService";
 
-export async function fazerLogin(cnpj, senha) {
-  // Validar entrada
-  if (!validarCnpj(cnpj) || !senha || senha.length < 8) {
-    throw new Error("Dados inválidos");
+class AutenticacaoService extends CRUDService {
+  constructor() {
+    super("Autenticacao");
   }
 
-  // Backend deve fazer hash de senha e validar
-  const response = await apiClient.post("Autenticacao/Login", {
-    cnpj,
-    senha,
-  });
+  async fazerLogin(cnpj, senha) {
+    // Validar entrada
+    if (!this._validarCnpj(cnpj) || !senha || senha.length < 8) {
+      throw new Error("Dados inválidos");
+    }
 
-  // Backend retorna JWT em HttpOnly cookie (automático)
-  // Frontend recebe confirmação
-  return response.data;
+    // Backend deve fazer hash de senha e validar
+    return this.adicionar("Login", { cnpj, senha });
+  }
+
+  async fazerLogout() {
+    // Backend revoga token
+    return this.adicionar("Logout", {});
+  }
+
+  _validarCnpj(cnpj) {
+    // Implementar validação de CNPJ conforme necessário
+    return cnpj && cnpj.length > 0;
+  }
 }
 
-export async function fazerLogout() {
-  // Backend revoga token
-  await apiClient.post("Autenticacao/Logout");
-  // Cookie é automaticamente limpo pelo backend
-}
+export default new AutenticacaoService();

@@ -1,24 +1,22 @@
-import apiClient from "@/services/apiClient"; // Certifique-se de que o caminho está correto
+import { CRUDService } from "./baseService";
 
-const buscarParametro = (idEmpresaParam) => {
-  return new Promise((resolve, reject) => {
-    apiClient
-      .get(`Parametros?idEmpresa=${idEmpresaParam}`)
-      .then((response) => resolve(response.data))
-      .catch((error) => reject(error));
-  });
-};
+class ParametroService extends CRUDService {
+  constructor() {
+    super("Parametro");
+  }
 
-const ataulizarParametros = (dto) => {
-  return new Promise((resolve, reject) => {
-    apiClient
-      .put("Parametros", dto)
-      .then((response) => resolve(response.data))
-      .catch((error) => reject(error));
-  });
-};
+  async buscarParametro(idEmpresa) {
+    return this.obter("", { idEmpresa });
+  }
 
-export default {
-  buscarParametro,
-  ataulizarParametros,
-};
+  async atualizarParametros(dto) {
+    return this.atualizar("", dto);
+  }
+
+  // ALIAS - Manter compatibilidade com typo existente no código
+  async ataulizarParametros(dto) {
+    return this.atualizarParametros(dto);
+  }
+}
+
+export default new ParametroService();
