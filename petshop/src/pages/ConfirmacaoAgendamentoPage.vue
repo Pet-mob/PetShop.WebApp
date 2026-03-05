@@ -1,14 +1,14 @@
 <template>
   <div class="confirmacao-agendamento">
-    <h2>Confirmação de Agendamentos</h2>
-
-    <div class="cards-container" v-if="agendamentos.length > 0">
-      <div class="card" v-for="agendamento in agendamentos" :key="agendamento.id">
+    <div class="cards-container" v-if="agendamentos && agendamentos.length > 0">
+      <div
+        class="card"
+        v-for="agendamento in agendamentos"
+        :key="agendamento.id"
+      >
         <div class="card-header">
           <h3>Agendamento #{{ agendamento.idAgendamento }}</h3>
-          <span class="data">{{
-            formatarData(agendamento.data)
-          }}</span>
+          <span class="data">{{ formatarData(agendamento.data) }}</span>
         </div>
 
         <div class="card-body">
@@ -33,10 +33,18 @@
         </div>
 
         <div class="card-actions">
-          <button class="btn-confirmar" @click="confirmarAgendamento(agendamento.idAgendamento)" :disabled="loading">
+          <button
+            class="btn-confirmar"
+            @click="confirmarAgendamento(agendamento.idAgendamento)"
+            :disabled="loading"
+          >
             Confirmar
           </button>
-          <button class="btn-negar" @click="negarAgendamento(agendamento.idAgendamento)" :disabled="loading">
+          <button
+            class="btn-negar"
+            @click="negarAgendamento(agendamento.idAgendamento)"
+            :disabled="loading"
+          >
             Negar
           </button>
         </div>
@@ -71,8 +79,10 @@ onMounted(async () => {
 const carregarAgendamentos = async () => {
   try {
     loading.value = true;
-    const response = await agendaService.buscarAgendamentosPendentes(idEmpresaLogada);
-    agendamentos.value = response.data;
+    const response = await agendaService.buscarAgendamentosPendentes(
+      idEmpresaLogada,
+    );
+    agendamentos.value = response.data || [];
   } catch (error) {
     showToast("Erro ao carregar agendamentos", "error");
     console.error(error);
@@ -125,7 +135,10 @@ const formatarHora = (horarioInicial) => {
     // Try to parse as a date string fallback
     const parsed = new Date(horarioInicial);
     if (!isNaN(parsed)) {
-      return parsed.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+      return parsed.toLocaleTimeString("pt-BR", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     }
 
     // Fallback: return original string
@@ -133,9 +146,13 @@ const formatarHora = (horarioInicial) => {
   }
 
   // If it's already a Date instance or numeric timestamp
-  const date = horarioInicial instanceof Date ? horarioInicial : new Date(horarioInicial);
+  const date =
+    horarioInicial instanceof Date ? horarioInicial : new Date(horarioInicial);
   if (!isNaN(date)) {
-    return date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    return date.toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   }
 
   // Last-resort fallback
