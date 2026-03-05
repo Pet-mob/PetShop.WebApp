@@ -128,7 +128,7 @@ const agendamentoSelecionado = ref(null);
 const erroBusca = ref("");
 
 const empresaLogada = store.empresaLogada || {};
-const idEmpresaLogada = empresaLogada.idEmpresa;
+const idEmpresaLogada = empresaLogada.idEmpresa ?? empresaLogada[0].idEmpresa;
 
 function abrirModalServicos(agendamento) {
   // normalize fields to camelCase used in template

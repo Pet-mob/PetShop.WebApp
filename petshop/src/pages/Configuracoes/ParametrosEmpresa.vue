@@ -1,25 +1,45 @@
 <template>
   <section class="secao-parametros">
     <h1 class="titulo">Parâmetros da Empresa</h1>
-    <form @submit.prevent="salvar" class="form-parametros" aria-label="Formulário de parâmetros da empresa">
+    <form
+      @submit.prevent="salvar"
+      class="form-parametros"
+      aria-label="Formulário de parâmetros da empresa"
+    >
       <div class="campo-formulario">
         <label for="qtde" class="label-formulario">
           Qtde. Atendimento Simultâneo por Horário
         </label>
-        <input id="qtde" v-model.number="parametros.qtdeAtendimentoSimultaneoHorario" type="number" min="1" required
-          class="campo-texto" aria-label="Quantidade de atendimentos simultâneos por horário" />
+        <input
+          id="qtde"
+          v-model.number="parametros.qtdeAtendimentoSimultaneoHorario"
+          type="number"
+          min="1"
+          required
+          class="campo-texto"
+          aria-label="Quantidade de atendimentos simultâneos por horário"
+        />
       </div>
       <div class="campo-formulario">
         <label for="modelo" class="label-formulario">
           Modelo de Serviço/Trabalho
         </label>
-        <select id="modelo" v-model.number="parametros.idModeloTrabalho" required class="campo-texto"
-          aria-label="Modelo de serviço/trabalho">
+        <select
+          id="modelo"
+          v-model.number="parametros.idModeloTrabalho"
+          required
+          class="campo-texto"
+          aria-label="Modelo de serviço/trabalho"
+        >
           <option :value="1">Seleção única de serviço</option>
           <option :value="2">Seleção simultânea de itens</option>
         </select>
       </div>
-      <button type="submit" class="botao-principal" aria-label="Salvar parâmetros">
+      <button
+        type="submit"
+        class="botao-principal"
+        aria-label="Salvar parâmetros"
+      >
         Salvar
       </button>
     </form>
@@ -35,9 +55,11 @@ import Toast from "@/components/ToastCustomizado.vue";
 
 // Estado e store
 const store = useGlobalStore();
-const idEmpresa = store.empresaLogada.idEmpresa;
+const empresaLogada = store.empresaLogada || {};
+const idEmpresaLogada = empresaLogada.idEmpresa ?? empresaLogada[0].idEmpresa;
+
 const parametros = ref({
-  idEmpresa: idEmpresa,
+  idEmpresa: idEmpresaLogada,
   qtdeAtendimentoSimultaneoHorario: 1,
   idModeloTrabalho: 1,
 });
@@ -53,7 +75,7 @@ function showToast(msg, type = "info") {
 // Carregar parâmetros existentes
 async function carregarParametros() {
   try {
-    const data = await parametrosService.buscarParametro(idEmpresa);
+    const data = await parametrosService.buscarParametro(idEmpresaLogada);
     if (data) Object.assign(parametros.value, data);
   } catch (error) {
     showToast("Erro ao carregar parâmetros.", "error");
@@ -64,7 +86,7 @@ async function carregarParametros() {
 async function salvar() {
   try {
     const resultado = await parametrosService.ataulizarParametros(
-      parametros.value
+      parametros.value,
     );
     if (!resultado) {
       showToast("Erro ao salvar parâmetros.", "error");

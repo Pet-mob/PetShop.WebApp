@@ -78,7 +78,7 @@ import Toast from "@/components/ToastCustomizado.vue";
 
 const store = useGlobalStore();
 const empresaLogada = store.empresaLogada;
-const idEmpresaLogada = empresaLogada.idEmpresa;
+const idEmpresaLogada = empresaLogada.idEmpresa ?? empresaLogada[0].idEmpresa;
 
 const carregando = ref(false);
 const toastMessage = ref("");

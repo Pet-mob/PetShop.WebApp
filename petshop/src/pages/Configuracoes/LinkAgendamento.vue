@@ -43,11 +43,13 @@ import { useGlobalStore } from "@/store/useGlobalStore";
 
 // Dados da empresa
 const store = useGlobalStore();
-const idEmpresa = store.empresaLogada?.idEmpresa ?? "";
+const empresaLogada = store.empresaLogada || {};
+const idEmpresaLogada = empresaLogada.idEmpresa ?? empresaLogada[0].idEmpresa;
+
 const baseUrl = "https://peton.app/redirect";
 
 // Computado e estados
-const linkGerado = computed(() => `${baseUrl}?empresa=${idEmpresa}`);
+const linkGerado = computed(() => `${baseUrl}?empresa=${idEmpresaLogada}`);
 const copiado = ref(false);
 const erro = ref("");
 const podeCompartilhar = computed(() => !!navigator.share);
