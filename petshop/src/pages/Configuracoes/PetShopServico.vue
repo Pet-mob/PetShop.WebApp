@@ -174,6 +174,7 @@ import ServicosEmpresaService from "@/services/ServicosEmpresaService";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import LoadingPetMob from "@/components/LoadingPetMob.vue";
 import Toast from "@/components/ToastCustomizado.vue";
+import ParametrosEmpresa from "./ParametrosEmpresa.vue";
 
 // Constantes e chaves
 const MODO_KEY = "modoAgendamento";
@@ -208,6 +209,7 @@ const categorias = ref([
 // Inicialização
 // -----------------------------
 onMounted(async () => {
+  await buscarParametro();
   await buscarServicosDaEmpresa();
   inicializarModo();
 });
@@ -290,6 +292,20 @@ async function buscarServicosDaEmpresa() {
       idEmpresaLogada,
     );
     if (data) servicos.value = data;
+  } catch (error) {
+    // Log mínimo para debugging
+    // console.error('buscarServicosDaEmpresa', error);
+    showToast("Erro ao carregar serviços", "error");
+  } finally {
+    carregando.value = false;
+  }
+}
+async function buscarParametro() {
+  carregando.value = true;
+  try {
+    if (!idEmpresaLogada) return;
+    const data = await ParametrosEmpresa.buscarParametro(idEmpresaLogada);
+    if (data) parametrosEmpresa.value = data;
   } catch (error) {
     // Log mínimo para debugging
     // console.error('buscarServicosDaEmpresa', error);

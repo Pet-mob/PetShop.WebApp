@@ -2,7 +2,7 @@ import { CRUDService } from "./baseService";
 
 class ParametroService extends CRUDService {
   constructor() {
-    super("Parametro");
+    super("Parametros");
   }
 
   async buscarParametro(idEmpresa) {

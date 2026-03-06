@@ -52,7 +52,7 @@ export default async function carregarDadosDoMenu(to, from, next) {
   }
 
   // Se já tem empresa carregada, pular
-  if (store.empresaLogada?.idEmpresa) {
+  if (store.empresaLogada[0]?.idEmpresa) {
     return next();
   }
 

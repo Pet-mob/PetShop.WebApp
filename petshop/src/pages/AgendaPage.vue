@@ -233,11 +233,11 @@ async function buscarAgendamentos() {
     .add(1, "day")
     .format("YYYY-MM-DD");
   try {
-    const dados = await agendaService.buscarAgenda(
-      dataInicio,
-      dataFim,
-      idEmpresaLogada,
-    );
+    const dados = await agendaService.buscarAgenda({
+      dataFiltroInicio: dataInicio,
+      dataFiltroFim: dataFim,
+      idEmpresa: idEmpresaLogada,
+    });
     agendamentos.value = dados || [];
   } catch (error) {
     erroBusca.value =
