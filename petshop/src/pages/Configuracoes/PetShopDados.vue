@@ -150,6 +150,7 @@ import Toast from "@/components/ToastCustomizado.vue";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { useErro } from "@/composables/useErro";
 import { useFormulario } from "@/composables/useFormulario";
+import { useDebounce } from "@/composables/useDebounce";
 import {
   validarNome,
   validarEmail,
@@ -332,7 +333,8 @@ function showToast(msg, type = "info") {
   toastType.value = type;
 }
 
-async function salvar() {
+// Criar função salvar com debounce para evitar múltiplos cliques
+const salvarSemDebounce = async () => {
   if (!formulario.validarFormulario()) {
     showToast(
       Object.values(formulario.erros.value).find((e) => e) ||
@@ -358,7 +360,10 @@ async function salvar() {
   } finally {
     carregando.value = false;
   }
-}
+};
+
+// Proteger com debounce de 500ms
+const salvar = useDebounce(salvarSemDebounce, 500);
 </script>
 
 <style scoped>

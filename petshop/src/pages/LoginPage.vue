@@ -89,6 +89,7 @@ import useCnpjFormatado from "@/composables/useCnpjFormatado";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { useErro } from "@/composables/useErro";
 import { useFormulario } from "@/composables/useFormulario";
+import { useThrottle } from "@/composables/useThrottle";
 import { validarCnpj, validarSenha } from "@/utils/validadores";
 
 const store = useGlobalStore();
@@ -119,7 +120,8 @@ onMounted(() => {
   }
 });
 
-const realizarLogin = async () => {
+// Função de login sem throttle (base)
+const realizarLoginSemThrottle = async () => {
   if (!formulario.validarFormulario()) {
     showToast(
       formulario.erros.value.cnpj ||
@@ -148,6 +150,9 @@ const realizarLogin = async () => {
     carregando.value = false;
   }
 };
+
+// Proteger com throttle de 2000ms (evita múltiplos cliques)
+const realizarLogin = useThrottle(realizarLoginSemThrottle, 2000);
 
 // Links de ação
 function onForgotPassword() {

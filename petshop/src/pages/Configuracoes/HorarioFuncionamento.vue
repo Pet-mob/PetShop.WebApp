@@ -113,6 +113,7 @@ import LoadingPetMob from "@/components/LoadingPetMob.vue";
 import Toast from "@/components/ToastCustomizado.vue";
 import { useErro } from "@/composables/useErro";
 import { useFormulario } from "@/composables/useFormulario";
+import { useDebounce } from "@/composables/useDebounce";
 
 const store = useGlobalStore();
 const { capturar } = useErro();
@@ -240,7 +241,8 @@ function validarHorarios() {
   return formulario.validarFormulario();
 }
 
-async function salvarHorarios() {
+// Função salvar horários sem debounce (base)
+const salvarHorariosSemDebounce = async () => {
   if (!validarHorarios()) {
     // Mostrar o primeiro erro encontrado
     const errosEncontrados = Object.values(formulario.erros.value).filter(
@@ -285,7 +287,10 @@ async function salvarHorarios() {
   } finally {
     carregando.value = false;
   }
-}
+};
+
+// Proteger com debounce de 500ms
+const salvarHorarios = useDebounce(salvarHorariosSemDebounce, 500);
 </script>
 
 <style scoped>

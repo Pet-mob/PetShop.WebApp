@@ -85,6 +85,7 @@
 import { ref } from "vue";
 import { useErro } from "@/composables/useErro";
 import { useFormulario } from "@/composables/useFormulario";
+import { useThrottle } from "@/composables/useThrottle";
 import { validarSenha, validarConfirmacaoSenha } from "@/utils/validadores";
 
 const { erro, capturar } = useErro();
@@ -109,8 +110,8 @@ const formularioNovaSenha = useFormulario({
     validarConfirmacaoSenha(valor, formularioNovaSenha.valores.novaSenha),
 });
 
-// Função para simular envio de código
-const enviarCodigo = async () => {
+// Função para enviar código sem throttle (base)
+const enviarCodigoSemThrottle = async () => {
   carregando.value = true;
   erro.value = "";
   mensagem.value = "";
@@ -136,6 +137,9 @@ const enviarCodigo = async () => {
   }
 };
 
+// Proteger com throttle de 3000ms (evita envio múltiplo de código)
+const enviarCodigo = useThrottle(enviarCodigoSemThrottle, 3000);
+
 // Função para verificar o código digitado
 const verificarCodigo = () => {
   if (!formularioCodigoVerificacao.validarFormulario()) {
@@ -153,8 +157,8 @@ const verificarCodigo = () => {
   }
 };
 
-// Função para redefinir senha
-const redefinirSenha = async () => {
+// Função para redefinir senha sem throttle (base)
+const redefinirSenhaSemThrottle = async () => {
   if (!formularioNovaSenha.validarFormulario()) {
     return;
   }
@@ -183,6 +187,9 @@ const redefinirSenha = async () => {
     carregando.value = false;
   }
 };
+
+// Proteger com throttle de 2000ms
+const redefinirSenha = useThrottle(redefinirSenhaSemThrottle, 2000);
 </script>
 
 <style scoped>

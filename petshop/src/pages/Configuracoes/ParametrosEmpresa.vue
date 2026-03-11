@@ -64,6 +64,7 @@ import { useGlobalStore } from "@/store/useGlobalStore";
 import Toast from "@/components/ToastCustomizado.vue";
 import { useErro } from "@/composables/useErro";
 import { useFormulario } from "@/composables/useFormulario";
+import { useDebounce } from "@/composables/useDebounce";
 import { validarNumero } from "@/utils/validadores";
 
 // Estado e store
@@ -113,8 +114,8 @@ async function carregarParametros() {
   }
 }
 
-// Salvar parâmetros
-async function salvar() {
+// Salvar parâmetros sem debounce (função base)
+const salvarSemDebounce = async () => {
   if (!formulario.validarFormulario()) {
     showToast(
       Object.values(formulario.erros.value).find((e) => e) ||
@@ -145,7 +146,10 @@ async function salvar() {
     capturar(e, { acao: "salvarParametros" });
     showToast(e.message || "Erro ao salvar parâmetros.", "error");
   }
-}
+};
+
+// Proteger com debounce de 500ms para evitar múltiplos cliques
+const salvar = useDebounce(salvarSemDebounce, 500);
 
 onMounted(carregarParametros);
 </script>
