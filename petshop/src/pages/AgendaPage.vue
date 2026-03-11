@@ -116,16 +116,17 @@ import dayjs from "dayjs";
 import "dayjs/locale/pt-br";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import agendaService from "@/services/agendaService";
+import { useErro } from "@/composables/useErro";
 dayjs.locale("pt-br");
 
 const store = useGlobalStore();
+const { capturar } = useErro();
 const dataFiltro = ref(dayjs().format("YYYY-MM-DD"));
 const inputData = ref(null);
 const carregando = ref(false);
 const agendamentos = ref([]);
 const modalServicosAberto = ref(false);
 const agendamentoSelecionado = ref(null);
-const erroBusca = ref("");
 
 const empresaLogada = store.empresaLogada || {};
 const idEmpresaLogada = empresaLogada.idEmpresa ?? empresaLogada[0].idEmpresa;
@@ -223,7 +224,6 @@ function agendamentosDoDia(dia) {
 
 async function buscarAgendamentos() {
   carregando.value = true;
-  erroBusca.value = "";
   const dataInicio = dayjs(dataFiltro.value)
     .startOf("week")
     .add(1, "day")
@@ -239,9 +239,8 @@ async function buscarAgendamentos() {
       idEmpresa: idEmpresaLogada,
     });
     agendamentos.value = dados || [];
-  } catch (error) {
-    erroBusca.value =
-      "Erro ao buscar agendamentos. Tente novamente mais tarde.";
+  } catch (e) {
+    capturar(e, { acao: "buscarAgendamentos", dataInicio, dataFim });
     agendamentos.value = [];
   } finally {
     carregando.value = false;

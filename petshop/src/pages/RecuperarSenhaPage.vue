@@ -62,6 +62,9 @@
 
 <script setup>
 import { ref } from "vue";
+import { useErro } from "@/composables/useErro";
+
+const { erro, capturar } = useErro();
 
 const step = ref(1);
 const carregando = ref(false);
@@ -70,7 +73,6 @@ const codigoDigitado = ref("");
 const novaSenha = ref("");
 const confirmaSenha = ref("");
 const mensagem = ref("");
-const erro = ref("");
 const sucesso = ref(false);
 
 // Função para simular envio de código
@@ -92,7 +94,8 @@ const enviarCodigo = async () => {
     sucesso.value = true;
     step.value = 2;
   } catch (e) {
-    erro.value = "Erro ao enviar código. Tente novamente.";
+    capturar(e, { acao: "enviarCodigo" });
+    erro.value = e.message || "Erro ao enviar código. Tente novamente.";
   } finally {
     carregando.value = false;
   }
@@ -117,7 +120,7 @@ const verificarCodigo = () => {
 };
 
 // Função para redefinir senha
-const redefinirSenha = () => {
+const redefinirSenha = async () => {
   erro.value = "";
   if (!novaSenha.value || novaSenha.value.length < 4) {
     erro.value = "A senha deve ter pelo menos 4 caracteres.";
@@ -131,9 +134,10 @@ const redefinirSenha = () => {
   }
   carregando.value = true;
 
-  // Aqui você deve integrar com sua API real para redefinir a senha
-  setTimeout(() => {
-    carregando.value = false;
+  try {
+    // Aqui você deve integrar com sua API real para redefinir a senha
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
     mensagem.value = "Senha redefinida com sucesso!";
     sucesso.value = true;
     step.value = 1;
@@ -143,7 +147,13 @@ const redefinirSenha = () => {
     novaSenha.value = "";
     confirmaSenha.value = "";
     codigoGerado.value = "";
-  }, 1500);
+  } catch (e) {
+    capturar(e, { acao: "redefinirSenha" });
+    erro.value = e.message || "Erro ao redefinir senha.";
+    sucesso.value = false;
+  } finally {
+    carregando.value = false;
+  }
 };
 </script>
 

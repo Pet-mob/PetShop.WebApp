@@ -64,14 +64,21 @@ import { ref, onMounted } from "vue";
 import agendaService from "../services/agendaService";
 import Toast from "../components/ToastCustomizado.vue";
 import { useGlobalStore } from "@/store/useGlobalStore";
+import { useErro } from "@/composables/useErro";
 
 const store = useGlobalStore();
+const { capturar } = useErro();
 const empresaLogada = store.empresaLogada || {};
 const idEmpresaLogada = empresaLogada.idEmpresa ?? empresaLogada[0].idEmpresa;
 const agendamentos = ref([]);
 const loading = ref(false);
 const toastMessage = ref("");
 const toastType = ref("info");
+
+function showToast(msg, type = "info") {
+  toastMessage.value = msg;
+  toastType.value = type;
+}
 
 onMounted(async () => {
   await carregarAgendamentos();
@@ -84,9 +91,10 @@ const carregarAgendamentos = async () => {
       idEmpresaLogada,
     );
     agendamentos.value = response.data || [];
-  } catch (error) {
-    showToast("Erro ao carregar agendamentos", "error");
-    console.error(error);
+  } catch (e) {
+    capturar(e, { acao: "carregarAgendamentos" });
+    showToast(e.message || "Erro ao carregar agendamentos", "error");
+    agendamentos.value = [];
   } finally {
     loading.value = false;
   }
@@ -98,9 +106,9 @@ const confirmarAgendamento = async (id) => {
     await agendaService.confirmarAgendamento(id);
     await carregarAgendamentos();
     showToast("Agendamento confirmado com sucesso!", "success");
-  } catch (error) {
-    showToast("Erro ao confirmar agendamento", "error");
-    console.error(error);
+  } catch (e) {
+    capturar(e, { acao: "confirmarAgendamento", idAgendamento: id });
+    showToast(e.message || "Erro ao confirmar agendamento", "error");
   } finally {
     loading.value = false;
   }
@@ -112,9 +120,9 @@ const negarAgendamento = async (id) => {
     await agendaService.negarAgendamento(id);
     await carregarAgendamentos();
     showToast("Agendamento negado com sucesso!", "success");
-  } catch (error) {
-    showToast("Erro ao negar agendamento", "error");
-    console.error(error);
+  } catch (e) {
+    capturar(e, { acao: "negarAgendamento", idAgendamento: id });
+    showToast(e.message || "Erro ao negar agendamento", "error");
   } finally {
     loading.value = false;
   }
@@ -159,11 +167,6 @@ const formatarHora = (horarioInicial) => {
   // Last-resort fallback
   return String(horarioInicial);
 };
-
-function showToast(msg, type = "info") {
-  toastMessage.value = msg;
-  toastType.value = type;
-}
 </script>
 
 <style scoped>

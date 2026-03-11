@@ -42,8 +42,10 @@ import empresaService from "@/services/empresaService";
 import dashboardService from "@/services/dashboardService";
 import Toast from "@/components/ToastCustomizado.vue";
 import LoadingPetMob from "@/components/LoadingPetMob.vue";
+import { useErro } from "@/composables/useErro";
 
 const store = useGlobalStore();
+const { capturar } = useErro();
 
 const carregando = ref(false);
 const petsAgendadosHoje = ref(0);
@@ -54,14 +56,14 @@ const dadosSemana = ref([]);
 const toastMessage = ref("");
 const toastType = ref("info");
 
-onMounted(async () => {
-  await buscarEmpresaLogadaPorCnpj();
-});
-
 function showToast(msg, type = "info") {
   toastMessage.value = msg;
   toastType.value = type;
 }
+
+onMounted(async () => {
+  await buscarEmpresaLogadaPorCnpj();
+});
 
 const buscarEmpresaLogadaPorCnpj = async () => {
   try {
@@ -69,7 +71,7 @@ const buscarEmpresaLogadaPorCnpj = async () => {
     let empresa = null;
     if (!store.empresaLogada) {
       var empresaRetornadoPorLista = await empresaService.buscarEmpresa(
-        store.cnpjLogado
+        store.cnpjLogado,
       );
       if (!empresaRetornadoPorLista) {
         return;
@@ -91,11 +93,9 @@ const buscarEmpresaLogadaPorCnpj = async () => {
         dadosSemana.value = dashboard.graficoSemanal || [0, 0, 0, 0, 0, 0, 0];
       }
     }
-  } catch (error) {
-    showToast(
-      error.response?.data?.message || "Erro ao carregar dashboard",
-      "error"
-    );
+  } catch (e) {
+    capturar(e, { acao: "buscarEmpresaLogadaPorCnpj" });
+    showToast(e.message || "Erro ao carregar dashboard", "error");
   } finally {
     carregando.value = false;
   }
@@ -105,8 +105,9 @@ const buscarDashboard = async (idEmpresaParam) => {
   try {
     const dataAtual = new Date();
     return await dashboardService.buscarDashboard(dataAtual, idEmpresaParam);
-  } catch (error) {
-    showToast("Erro ao buscar dashboard.", "error");
+  } catch (e) {
+    capturar(e, { acao: "buscarDashboard", idEmpresa: idEmpresaParam });
+    showToast(e.message || "Erro ao buscar dashboard.", "error");
     return null;
   }
 };
