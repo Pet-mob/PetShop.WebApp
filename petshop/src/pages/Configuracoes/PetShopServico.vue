@@ -174,7 +174,7 @@ import ServicosEmpresaService from "@/services/ServicosEmpresaService";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import LoadingPetMob from "@/components/LoadingPetMob.vue";
 import Toast from "@/components/ToastCustomizado.vue";
-import ParametrosEmpresa from "./ParametrosEmpresa.vue";
+import ParametrosEmpresa from "@/services/parametroService";
 
 // Constantes e chaves
 const MODO_KEY = "modoAgendamento";
@@ -197,6 +197,7 @@ const servicoSelecionado = ref(null);
 const modalTitulo = ref("");
 const botaoTextoModal = ref("");
 const servicos = ref([]);
+const parametrosEmpresa = ref([]);
 const modoAgendamento = ref(MODO.AGRUPADO);
 
 const categorias = ref([
@@ -216,7 +217,7 @@ onMounted(async () => {
 
 // Se os parametros mudarem em runtime, respeitamos a nova configuração
 watch(
-  () => parametros?.idModeloTrabalho,
+  () => parametrosEmpresa.value.idModeloTrabalho,
   (novo) => {
     if (novo === 1) setModoPadrao(MODO.AGRUPADO);
     else if (novo === 2) setModoPadrao(MODO.SEPARADO);
@@ -232,7 +233,8 @@ function inicializarModo() {
   }
 
   // Senão, usar configuração dos parâmetros da empresa
-  if (parametros?.idModeloTrabalho === 1) modoAgendamento.value = MODO.AGRUPADO;
+  if (parametrosEmpresa.value.idModeloTrabalho === 1)
+    modoAgendamento.value = MODO.AGRUPADO;
   else modoAgendamento.value = MODO.SEPARADO;
 }
 
