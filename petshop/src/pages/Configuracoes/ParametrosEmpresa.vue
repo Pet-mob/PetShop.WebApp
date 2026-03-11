@@ -12,7 +12,7 @@
         </label>
         <input
           id="qtde"
-          v-model.number="formulario.valores.qtdeAtendimento"
+          v-model.number="formulario.valores.value.qtdeAtendimento"
           @blur="() => formulario.validarAoSair('qtdeAtendimento')"
           type="number"
           min="1"
@@ -31,7 +31,7 @@
         </label>
         <select
           id="modelo"
-          v-model.number="formulario.valores.modeloTrabalho"
+          v-model.number="formulario.valores.value.modeloTrabalho"
           @change="() => formulario.validarAoSair('modeloTrabalho')"
           class="campo-texto"
           :class="{ 'input-erro': formulario.erros.value.modeloTrabalho }"
@@ -98,15 +98,23 @@ function showToast(msg, type = "info") {
 // Carregar parâmetros existentes
 async function carregarParametros() {
   try {
-    const data = await parametrosService.buscarParametro(idEmpresaLogada);
+    const resposta = await parametrosService.buscarParametro(idEmpresaLogada);
+
+    // Extrair dados se vierem em estrutura aninhada (data.data) ou diretamente
+    const data = resposta?.data || resposta;
+
     if (data) {
       Object.assign(parametros.value, data);
 
-      // Preencher os valores do formulário
-      formulario.definirValores({
-        qtdeAtendimento: data.qtdeAtendimentoSimultaneoHorario,
-        modeloTrabalho: data.idModeloTrabalho,
-      });
+      // Preencher os valores do formulário - suportar tanto camelCase quanto PascalCase
+      const qtdeAtendimento =
+        data.qtdeAtendimentoSimultaneoHorario ||
+        data.QtdeAtendimentoSimultaneoHorario;
+      const idModeloTrabalho = data.idModeloTrabalho || data.IdModeloTrabalho;
+
+      // ✅ Usar .value.propriedade porque formulario.valores é um ref
+      formulario.valores.value.qtdeAtendimento = qtdeAtendimento || 1;
+      formulario.valores.value.modeloTrabalho = idModeloTrabalho || 0;
     }
   } catch (e) {
     capturar(e, { acao: "carregarParametros" });
@@ -127,11 +135,12 @@ const salvarSemDebounce = async () => {
 
   try {
     // Atualizar objeto parametros com os valores do formulário
+    // ✅ Usar .value porque formulario.valores é um ref
     parametros.value.qtdeAtendimentoSimultaneoHorario = Number(
-      formulario.valores.qtdeAtendimento,
+      formulario.valores.value.qtdeAtendimento,
     );
     parametros.value.idModeloTrabalho = Number(
-      formulario.valores.modeloTrabalho,
+      formulario.valores.value.modeloTrabalho,
     );
 
     const resultado = await parametrosService.ataulizarParametros(
