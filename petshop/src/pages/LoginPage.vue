@@ -23,24 +23,37 @@
             <label for="cnpj">CNPJ</label>
             <input
               id="cnpj"
-              v-model="cnpj"
-              @input="formatarCnpj"
+              v-model="formulario.valores.cnpj"
+              @input="
+                (e) => {
+                  formulario.valores.cnpj = e.target.value;
+                  formatarCnpj();
+                }
+              "
+              @blur="() => formulario.validarAoSair('cnpj')"
               type="text"
               placeholder="00.000.000/0000-00"
-              required
               maxlength="18"
               aria-label="CNPJ do usuário"
+              :class="{ 'input-erro': formulario.erros.value.cnpj }"
             />
+            <span v-if="formulario.erros.value.cnpj" class="texto-erro">
+              {{ formulario.erros.value.cnpj }}
+            </span>
 
             <label for="senha">Senha</label>
             <input
               id="senha"
-              v-model="senha"
+              v-model="formulario.valores.senha"
+              @blur="() => formulario.validarAoSair('senha')"
               type="password"
               placeholder="Digite sua senha"
-              required
               aria-label="Senha do usuário"
+              :class="{ 'input-erro': formulario.erros.value.senha }"
             />
+            <span v-if="formulario.erros.value.senha" class="texto-erro">
+              {{ formulario.erros.value.senha }}
+            </span>
 
             <Toast :message="toastMessage" :type="toastType" />
 
@@ -75,49 +88,54 @@ import LoadingPetMob from "@/components/LoadingPetMob.vue";
 import useCnpjFormatado from "@/composables/useCnpjFormatado";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { useErro } from "@/composables/useErro";
+import { useFormulario } from "@/composables/useFormulario";
+import { validarCnpj, validarSenha } from "@/utils/validadores";
 
 const store = useGlobalStore();
 const { cnpj, cnpjSemFormatacao, formatarCnpj } = useCnpjFormatado();
 const { erro, capturar, mostrarNotificacao } = useErro();
 const toastMessage = ref("");
 const toastType = ref("info");
+const router = useRouter();
+const lembrar = ref(false);
+const carregando = ref(false);
+
+const formulario = useFormulario({
+  cnpj: validarCnpj,
+  senha: validarSenha,
+});
 
 function showToast(msg, type = "info") {
   toastMessage.value = msg;
   toastType.value = type;
 }
 
-const router = useRouter();
-const senha = ref("");
-const lembrar = ref(false);
-const carregando = ref(false);
-
 onMounted(() => {
   const cnpjSalvo = localStorage.getItem("cnpj");
   if (cnpjSalvo) {
+    formulario.definirValores({ cnpj: cnpjSalvo });
     cnpj.value = cnpjSalvo;
     lembrar.value = true;
   }
 });
 
-function validarCampos() {
-  if (!cnpj.value || cnpj.value.length < 14) {
-    showToast("CNPJ inválido.", "error");
-    return false;
-  }
-  if (!senha.value) {
-    showToast("Senha obrigatória.", "error");
-    return false;
-  }
-  return true;
-}
-
 const realizarLogin = async () => {
-  if (!validarCampos()) return;
+  if (!formulario.validarFormulario()) {
+    showToast(
+      formulario.erros.value.cnpj ||
+        formulario.erros.value.senha ||
+        "Preencha todos os campos corretamente.",
+      "error",
+    );
+    return;
+  }
   carregando.value = true;
 
   try {
-    await loginService.validarLogin(cnpjSemFormatacao.value, senha.value);
+    await loginService.validarLogin(
+      cnpjSemFormatacao.value,
+      formulario.valores.senha,
+    );
     localStorage.setItem("cnpj", cnpjSemFormatacao.value);
     store.definirCnpjLogado(cnpjSemFormatacao.value);
     showToast("Login realizado com sucesso!", "success");
@@ -355,5 +373,14 @@ button[disabled] {
 .links span {
   color: #00923f;
   font-weight: 700;
+}
+.input-erro {
+  border-color: #d32f2f !important;
+  box-shadow: 0 0 0 2px #d32f2f33 !important;
+}
+.texto-erro {
+  font-size: 0.85rem;
+  color: #d32f2f;
+  margin-top: -0.8rem;
 }
 </style>

@@ -12,13 +12,18 @@
         </label>
         <input
           id="qtde"
-          v-model.number="parametros.qtdeAtendimentoSimultaneoHorario"
+          v-model.number="formulario.valores.qtdeAtendimento"
+          @blur="() => formulario.validarAoSair('qtdeAtendimento')"
           type="number"
           min="1"
-          required
+          max="20"
           class="campo-texto"
+          :class="{ 'input-erro': formulario.erros.value.qtdeAtendimento }"
           aria-label="Quantidade de atendimentos simultâneos por horário"
         />
+        <span v-if="formulario.erros.value.qtdeAtendimento" class="texto-erro">
+          {{ formulario.erros.value.qtdeAtendimento }}
+        </span>
       </div>
       <div class="campo-formulario">
         <label for="modelo" class="label-formulario">
@@ -26,14 +31,19 @@
         </label>
         <select
           id="modelo"
-          v-model.number="parametros.idModeloTrabalho"
-          required
+          v-model.number="formulario.valores.modeloTrabalho"
+          @change="() => formulario.validarAoSair('modeloTrabalho')"
           class="campo-texto"
+          :class="{ 'input-erro': formulario.erros.value.modeloTrabalho }"
           aria-label="Modelo de serviço/trabalho"
         >
+          <option value="0">Selecione um modelo</option>
           <option :value="1">Seleção única de serviço</option>
           <option :value="2">Seleção simultânea de itens</option>
         </select>
+        <span v-if="formulario.erros.value.modeloTrabalho" class="texto-erro">
+          {{ formulario.erros.value.modeloTrabalho }}
+        </span>
       </div>
       <button
         type="submit"
@@ -53,6 +63,8 @@ import parametrosService from "@/services/parametroService";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import Toast from "@/components/ToastCustomizado.vue";
 import { useErro } from "@/composables/useErro";
+import { useFormulario } from "@/composables/useFormulario";
+import { validarNumero } from "@/utils/validadores";
 
 // Estado e store
 const store = useGlobalStore();
@@ -68,6 +80,14 @@ const parametros = ref({
 const toastMessage = ref("");
 const toastType = ref("info");
 
+const formulario = useFormulario({
+  qtdeAtendimento: (valor) => validarNumero(valor, 1, 20),
+  modeloTrabalho: (valor) => {
+    if (!valor || valor === 0) return "Modelo de trabalho obrigatório";
+    return null;
+  },
+});
+
 // Toast helper
 function showToast(msg, type = "info") {
   toastMessage.value = msg;
@@ -78,7 +98,15 @@ function showToast(msg, type = "info") {
 async function carregarParametros() {
   try {
     const data = await parametrosService.buscarParametro(idEmpresaLogada);
-    if (data) Object.assign(parametros.value, data);
+    if (data) {
+      Object.assign(parametros.value, data);
+
+      // Preencher os valores do formulário
+      formulario.definirValores({
+        qtdeAtendimento: data.qtdeAtendimentoSimultaneoHorario,
+        modeloTrabalho: data.idModeloTrabalho,
+      });
+    }
   } catch (e) {
     capturar(e, { acao: "carregarParametros" });
     showToast(e.message || "Erro ao carregar parâmetros.", "error");
@@ -87,7 +115,24 @@ async function carregarParametros() {
 
 // Salvar parâmetros
 async function salvar() {
+  if (!formulario.validarFormulario()) {
+    showToast(
+      Object.values(formulario.erros.value).find((e) => e) ||
+        "Preencha todos os campos corretamente.",
+      "error",
+    );
+    return;
+  }
+
   try {
+    // Atualizar objeto parametros com os valores do formulário
+    parametros.value.qtdeAtendimentoSimultaneoHorario = Number(
+      formulario.valores.qtdeAtendimento,
+    );
+    parametros.value.idModeloTrabalho = Number(
+      formulario.valores.modeloTrabalho,
+    );
+
     const resultado = await parametrosService.ataulizarParametros(
       parametros.value,
     );
@@ -166,5 +211,16 @@ onMounted(carregarParametros);
 
 .botao-principal:hover {
   background-color: #218838;
+}
+
+.input-erro {
+  border-color: #d32f2f !important;
+  background-color: #ffebee !important;
+}
+
+.texto-erro {
+  font-size: 0.85rem;
+  color: #d32f2f;
+  margin-top: 4px;
 }
 </style>

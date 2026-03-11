@@ -23,9 +23,21 @@
               <label :for="`abertura-${dia.value}`">Abertura</label>
               <select
                 v-model="horarios[dia.value].abertura"
+                @change="
+                  (e) => {
+                    formulario.valores[`abertura_${dia.value}`] =
+                      e.target.value;
+                    formulario.validarAoSair(`abertura_${dia.value}`);
+                  }
+                "
                 :id="`abertura-${dia.value}`"
                 :aria-label="`Horário de abertura de ${dia.label}`"
+                :class="{
+                  'select-erro':
+                    formulario.erros.value[`abertura_${dia.value}`],
+                }"
               >
+                <option value="">Selecione um horário</option>
                 <option
                   v-for="opcao in opcoesDeHorario"
                   :key="opcao.value"
@@ -34,15 +46,33 @@
                   {{ opcao.label }}
                 </option>
               </select>
+              <span
+                v-if="formulario.erros.value[`abertura_${dia.value}`]"
+                class="texto-erro"
+              >
+                {{ formulario.erros.value[`abertura_${dia.value}`] }}
+              </span>
             </div>
 
             <div class="picker-container">
               <label :for="`fechamento-${dia.value}`">Fechamento</label>
               <select
                 v-model="horarios[dia.value].fechamento"
+                @change="
+                  (e) => {
+                    formulario.valores[`fechamento_${dia.value}`] =
+                      e.target.value;
+                    formulario.validarAoSair(`fechamento_${dia.value}`);
+                  }
+                "
                 :id="`fechamento-${dia.value}`"
                 :aria-label="`Horário de fechamento de ${dia.label}`"
+                :class="{
+                  'select-erro':
+                    formulario.erros.value[`fechamento_${dia.value}`],
+                }"
               >
+                <option value="">Selecione um horário</option>
                 <option
                   v-for="opcao in opcoesDeHorario"
                   :key="opcao.value"
@@ -51,6 +81,12 @@
                   {{ opcao.label }}
                 </option>
               </select>
+              <span
+                v-if="formulario.erros.value[`fechamento_${dia.value}`]"
+                class="texto-erro"
+              >
+                {{ formulario.erros.value[`fechamento_${dia.value}`] }}
+              </span>
             </div>
           </div>
         </div>
@@ -76,6 +112,7 @@ import { useGlobalStore } from "@/store/useGlobalStore";
 import LoadingPetMob from "@/components/LoadingPetMob.vue";
 import Toast from "@/components/ToastCustomizado.vue";
 import { useErro } from "@/composables/useErro";
+import { useFormulario } from "@/composables/useFormulario";
 
 const store = useGlobalStore();
 const { capturar } = useErro();
@@ -125,6 +162,30 @@ const horarios = reactive({
   domingo: { ativo: false, abertura: "", fechamento: "" },
 });
 
+// Criar validadores de horário por dia
+const validadoresPorDia = {};
+diasDaSemana.forEach((dia) => {
+  validadoresPorDia[`abertura_${dia.value}`] = (valor) => {
+    if (horarios[dia.value].ativo && !valor) {
+      return `Horário de abertura obrigatório para ${dia.label}`;
+    }
+    return null;
+  };
+  validadoresPorDia[`fechamento_${dia.value}`] = (valor) => {
+    if (horarios[dia.value].ativo && !valor) {
+      return `Horário de fechamento obrigatório para ${dia.label}`;
+    }
+    if (horarios[dia.value].ativo && valor && horarios[dia.value].abertura) {
+      if (valor <= horarios[dia.value].abertura) {
+        return `Fechamento deve ser após abertura para ${dia.label}`;
+      }
+    }
+    return null;
+  };
+});
+
+const formulario = useFormulario(validadoresPorDia);
+
 onMounted(async () => {
   await buscarHorariosDeFuncionamentoDaEmpresa();
 });
@@ -143,6 +204,12 @@ async function buscarHorariosDeFuncionamentoDaEmpresa() {
         abertura: entrada.horarioAbertura.slice(0, 5),
         fechamento: entrada.horarioFechamento.slice(0, 5),
       };
+
+      // Preencher os valores do formulário
+      formulario.definirValores({
+        [`abertura_${chave}`]: entrada.horarioAbertura.slice(0, 5),
+        [`fechamento_${chave}`]: entrada.horarioFechamento.slice(0, 5),
+      });
     }
   } catch (e) {
     capturar(e, { acao: "buscarHorariosDeFuncionamento" });
@@ -169,18 +236,21 @@ function mapearNomeDiaParaChave(nomeDia) {
 }
 
 function validarHorarios() {
-  for (const dia of diasDaSemana) {
-    const valor = horarios[dia.value];
-    if (valor.ativo && (!valor.abertura || !valor.fechamento)) {
-      showToast(`Preencha abertura e fechamento para ${dia.label}.`, "error");
-      return false;
-    }
-  }
-  return true;
+  // Validar usando o formulário
+  return formulario.validarFormulario();
 }
 
 async function salvarHorarios() {
-  if (!validarHorarios()) return;
+  if (!validarHorarios()) {
+    // Mostrar o primeiro erro encontrado
+    const errosEncontrados = Object.values(formulario.erros.value).filter(
+      (e) => e,
+    );
+    if (errosEncontrados.length > 0) {
+      showToast(errosEncontrados[0], "error");
+    }
+    return;
+  }
   carregando.value = true;
 
   const configuracoes = [];
@@ -331,5 +401,17 @@ select {
     font-size: 16px;
     padding: 12px;
   }
+}
+
+.select-erro {
+  border-color: #d32f2f !important;
+  background-color: #ffebee !important;
+}
+
+.texto-erro {
+  font-size: 0.85rem;
+  color: #d32f2f;
+  margin-top: 4px;
+  text-align: left;
 }
 </style>

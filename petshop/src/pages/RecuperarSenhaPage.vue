@@ -16,42 +16,63 @@
     <div v-if="step === 2" class="step">
       <p>Insira o código que você recebeu no e-mail:</p>
       <input
-        v-model="codigoDigitado"
+        v-model="formularioCodigoVerificacao.valores.codigo"
+        @blur="() => formularioCodigoVerificacao.validarAoSair('codigo')"
         placeholder="Digite o código"
         aria-label="Código recebido por e-mail"
+        :class="{
+          'input-erro': formularioCodigoVerificacao.erros.value.codigo,
+        }"
       />
+      <span
+        v-if="formularioCodigoVerificacao.erros.value.codigo"
+        class="texto-erro"
+      >
+        {{ formularioCodigoVerificacao.erros.value.codigo }}
+      </span>
       <button
         @click="verificarCodigo"
-        :disabled="carregando || !codigoDigitado"
+        :disabled="carregando"
         aria-label="Verificar código"
       >
         {{ carregando ? "Verificando..." : "Verificar código" }}
       </button>
-      <p v-if="erro" class="erro">{{ erro }}</p>
     </div>
 
     <div v-if="step === 3" class="step">
       <p>Digite sua nova senha:</p>
       <input
         type="password"
-        v-model="novaSenha"
+        v-model="formularioNovaSenha.valores.novaSenha"
+        @blur="() => formularioNovaSenha.validarAoSair('novaSenha')"
         placeholder="Nova senha"
         aria-label="Nova senha"
+        :class="{ 'input-erro': formularioNovaSenha.erros.value.novaSenha }"
       />
+      <span v-if="formularioNovaSenha.erros.value.novaSenha" class="texto-erro">
+        {{ formularioNovaSenha.erros.value.novaSenha }}
+      </span>
       <input
         type="password"
-        v-model="confirmaSenha"
+        v-model="formularioNovaSenha.valores.confirmaSenha"
+        @blur="() => formularioNovaSenha.validarAoSair('confirmaSenha')"
         placeholder="Confirme a nova senha"
         aria-label="Confirme a nova senha"
+        :class="{ 'input-erro': formularioNovaSenha.erros.value.confirmaSenha }"
       />
+      <span
+        v-if="formularioNovaSenha.erros.value.confirmaSenha"
+        class="texto-erro"
+      >
+        {{ formularioNovaSenha.erros.value.confirmaSenha }}
+      </span>
       <button
         @click="redefinirSenha"
-        :disabled="carregando || !novaSenha || novaSenha !== confirmaSenha"
+        :disabled="carregando"
         aria-label="Redefinir senha"
       >
         {{ carregando ? "Redefinindo senha..." : "Redefinir senha" }}
       </button>
-      <p v-if="erro" class="erro">{{ erro }}</p>
     </div>
 
     <p v-if="mensagem" :class="{ sucesso: sucesso, erro: !sucesso }">
@@ -63,17 +84,30 @@
 <script setup>
 import { ref } from "vue";
 import { useErro } from "@/composables/useErro";
+import { useFormulario } from "@/composables/useFormulario";
+import { validarSenha, validarConfirmacaoSenha } from "@/utils/validadores";
 
 const { erro, capturar } = useErro();
 
 const step = ref(1);
 const carregando = ref(false);
 const codigoGerado = ref("");
-const codigoDigitado = ref("");
-const novaSenha = ref("");
-const confirmaSenha = ref("");
 const mensagem = ref("");
 const sucesso = ref(false);
+
+const formularioCodigoVerificacao = useFormulario({
+  codigo: (valor) => {
+    if (!valor) return "Código obrigatório";
+    if (valor.length < 6) return "Código deve ter 6 dígitos";
+    return null;
+  },
+});
+
+const formularioNovaSenha = useFormulario({
+  novaSenha: validarSenha,
+  confirmaSenha: (valor) =>
+    validarConfirmacaoSenha(valor, formularioNovaSenha.valores.novaSenha),
+});
 
 // Função para simular envio de código
 const enviarCodigo = async () => {
@@ -93,6 +127,7 @@ const enviarCodigo = async () => {
     mensagem.value = `Código enviado para o e-mail cadastrado.`;
     sucesso.value = true;
     step.value = 2;
+    formularioCodigoVerificacao.limpar();
   } catch (e) {
     capturar(e, { acao: "enviarCodigo" });
     erro.value = e.message || "Erro ao enviar código. Tente novamente.";
@@ -103,36 +138,30 @@ const enviarCodigo = async () => {
 
 // Função para verificar o código digitado
 const verificarCodigo = () => {
-  erro.value = "";
-  if (!codigoDigitado.value || codigoDigitado.value.length < 6) {
-    erro.value = "Digite o código recebido.";
-    sucesso.value = false;
+  if (!formularioCodigoVerificacao.validarFormulario()) {
     return;
   }
-  if (codigoDigitado.value === codigoGerado.value) {
+
+  if (formularioCodigoVerificacao.valores.codigo === codigoGerado.value) {
     mensagem.value = "";
     sucesso.value = true;
     step.value = 3;
+    formularioNovaSenha.limpar();
   } else {
-    erro.value = "Código inválido. Verifique e tente novamente.";
-    sucesso.value = false;
+    formularioCodigoVerificacao.erros.value.codigo =
+      "Código inválido. Verifique e tente novamente.";
   }
 };
 
 // Função para redefinir senha
 const redefinirSenha = async () => {
-  erro.value = "";
-  if (!novaSenha.value || novaSenha.value.length < 4) {
-    erro.value = "A senha deve ter pelo menos 4 caracteres.";
-    sucesso.value = false;
+  if (!formularioNovaSenha.validarFormulario()) {
     return;
   }
-  if (novaSenha.value !== confirmaSenha.value) {
-    erro.value = "As senhas não coincidem.";
-    sucesso.value = false;
-    return;
-  }
+
   carregando.value = true;
+  erro.value = "";
+  mensagem.value = "";
 
   try {
     // Aqui você deve integrar com sua API real para redefinir a senha
@@ -143,9 +172,8 @@ const redefinirSenha = async () => {
     step.value = 1;
 
     // Resetar campos
-    codigoDigitado.value = "";
-    novaSenha.value = "";
-    confirmaSenha.value = "";
+    formularioCodigoVerificacao.limpar();
+    formularioNovaSenha.limpar();
     codigoGerado.value = "";
   } catch (e) {
     capturar(e, { acao: "redefinirSenha" });
@@ -205,5 +233,18 @@ button:disabled {
 .sucesso {
   color: #4caf50;
   margin-top: 10px;
+}
+
+.input-erro {
+  border-color: #d32f2f !important;
+  background-color: #ffebee !important;
+}
+
+.texto-erro {
+  display: block;
+  font-size: 0.85rem;
+  color: #d32f2f;
+  margin-top: 5px;
+  text-align: left;
 }
 </style>

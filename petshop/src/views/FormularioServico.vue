@@ -1,36 +1,73 @@
 <template>
-  <form class="formulario-container" @submit.prevent="enviarFormulario" novalidate role="form"
-    aria-label="Formulário de serviço">
+  <form
+    class="formulario-container"
+    @submit.prevent="enviarFormulario"
+    novalidate
+    role="form"
+    aria-label="Formulário de serviço"
+  >
     <!-- Linha: Nome, Porte, Duração -->
     <div class="linha-formulario">
       <div class="campo-formulario flex2">
         <label for="nome" class="label-formulario">Nome do Serviço</label>
-        <input id="nome" v-model="dados.descricao" type="text" class="campo-texto" placeholder="Ex: Banho e Tosa" required
-          aria-label="Nome do serviço" :aria-invalid="erros.descricao ? 'true' : 'false'" />
-        <span v-if="erros.descricao" class="mensagem-erro" role="alert">{{
-          erros.descricao
-        }}</span>
+        <input
+          id="nome"
+          v-model="formulario.valores.descricao"
+          @blur="() => formulario.validarAoSair('descricao')"
+          type="text"
+          class="campo-texto"
+          placeholder="Ex: Banho e Tosa"
+          aria-label="Nome do serviço"
+          :class="{ 'input-erro': formulario.erros.value.descricao }"
+        />
+        <span
+          v-if="formulario.erros.value.descricao"
+          class="mensagem-erro"
+          role="alert"
+          >{{ formulario.erros.value.descricao }}</span
+        >
       </div>
       <div class="campo-formulario flex1">
         <label for="porte" class="label-formulario">Porte do Animal</label>
-        <select id="porte" v-model.number="dados.idPorte" class="campo-texto" placeholder="Selecione o porte" required
-          aria-label="Porte do animal" :aria-invalid="erros.idPorte ? 'true' : 'false'">
-          <option value="0">Todos</option>
-          <option value="1">Pequeno</option>
-          <option value="2">Médio</option>
-          <option value="3">Grande</option>
+        <select
+          id="porte"
+          v-model.number="formulario.valores.idPorte"
+          @change="() => formulario.validarAoSair('idPorte')"
+          class="campo-texto"
+          placeholder="Selecione o porte"
+          aria-label="Porte do animal"
+          :class="{ 'input-erro': formulario.erros.value.idPorte }"
+        >
+          <option :value="0">Todos</option>
+          <option :value="1">Pequeno</option>
+          <option :value="2">Médio</option>
+          <option :value="3">Grande</option>
         </select>
-        <span v-if="erros.idPorte" class="mensagem-erro" role="alert">{{
-          erros.idPorte
-        }}</span>
+        <span
+          v-if="formulario.erros.value.idPorte"
+          class="mensagem-erro"
+          role="alert"
+          >{{ formulario.erros.value.idPorte }}</span
+        >
       </div>
       <div class="campo-formulario flex1">
         <label for="duracao" class="label-formulario">Duração (min)</label>
-        <input id="duracao" v-model.number="dados.duracao" type="number" class="campo-texto" min="1" required
-          aria-label="Duração do serviço em minutos" :aria-invalid="erros.duracao ? 'true' : 'false'" />
-        <span v-if="erros.duracao" class="mensagem-erro" role="alert">{{
-          erros.duracao
-        }}</span>
+        <input
+          id="duracao"
+          v-model.number="formulario.valores.duracao"
+          @blur="() => formulario.validarAoSair('duracao')"
+          type="number"
+          class="campo-texto"
+          min="1"
+          aria-label="Duração do serviço em minutos"
+          :class="{ 'input-erro': formulario.erros.value.duracao }"
+        />
+        <span
+          v-if="formulario.erros.value.duracao"
+          class="mensagem-erro"
+          role="alert"
+          >{{ formulario.erros.value.duracao }}</span
+        >
       </div>
     </div>
 
@@ -38,11 +75,24 @@
     <div class="linha-formulario">
       <div class="campo-formulario flex1">
         <label for="preco" class="label-formulario">Preço (R$)</label>
-        <input id="preco" v-model.number="dados.valor" type="number" class="campo-texto" placeholder="Ex: 120.00" min="0"
-          step="0.01" required aria-label="Preço do serviço" :aria-invalid="erros.valor ? 'true' : 'false'" />
-        <span v-if="erros.valor" class="mensagem-erro" role="alert">{{
-          erros.valor
-        }}</span>
+        <input
+          id="preco"
+          v-model.number="formulario.valores.valor"
+          @blur="() => formulario.validarAoSair('valor')"
+          type="number"
+          class="campo-texto"
+          placeholder="Ex: 120.00"
+          min="0"
+          step="0.01"
+          aria-label="Preço do serviço"
+          :class="{ 'input-erro': formulario.erros.value.valor }"
+        />
+        <span
+          v-if="formulario.erros.value.valor"
+          class="mensagem-erro"
+          role="alert"
+          >{{ formulario.erros.value.valor }}</span
+        >
       </div>
       <!-- <div class="campo-formulario flex2 mensalidade-group">
         <div class="mensalidade-flex">
@@ -79,8 +129,13 @@
     <div class="linha-formulario">
       <div class="campo-formulario flex2">
         <label for="observacao" class="label-formulario">Observação</label>
-        <textarea id="observacao" v-model="dados.observacao" rows="2" class="campo-texto"
-          aria-label="Observação do serviço"></textarea>
+        <textarea
+          id="observacao"
+          v-model="dados.observacao"
+          rows="2"
+          class="campo-texto"
+          aria-label="Observação do serviço"
+        ></textarea>
       </div>
     </div>
 
@@ -92,6 +147,8 @@
 
 <script setup>
 import { ref, watch, defineProps, defineEmits } from "vue";
+import { useFormulario } from "@/composables/useFormulario";
+import { validarNome, validarNumero } from "@/utils/validadores";
 
 const props = defineProps({
   dadosIniciais: {
@@ -115,49 +172,37 @@ const props = defineProps({
 const emit = defineEmits(["salvar"]);
 
 const dados = ref({ ...props.dadosIniciais });
-const erros = ref({ descricao: "", valor: "", duracao: "", idPorte: "" });
+
+const formulario = useFormulario({
+  descricao: (valor) => validarNome(valor, 3),
+  duracao: (valor) => validarNumero(valor, 1, 480),
+  valor: (valor) => validarNumero(valor, 0, 100000),
+  idPorte: (valor) => {
+    if (valor === null || valor === undefined)
+      return "Selecione o porte do animal";
+    return null;
+  },
+});
 
 watch(
   () => props.dadosIniciais,
   (novo) => {
     dados.value = { ...novo };
-  }
+    formulario.definirValores({
+      descricao: novo.descricao,
+      duracao: novo.duracao,
+      valor: novo.valor,
+      idPorte: novo.idPorte,
+    });
+  },
 );
 
-function validarCampos() {
-  erros.value = { descricao: "", valor: "", duracao: "", porte: "" };
-  let valido = true;
-  if (!dados.value.descricao || dados.value.descricao.trim().length < 3) {
-    erros.value.descricao = "Informe um nome válido para o serviço.";
-    valido = false;
-  }
-  if (
-    dados.value.valor === null ||
-    dados.value.valor === undefined ||
-    isNaN(dados.value.valor) ||
-    dados.value.valor < 0
-  ) {
-    erros.value.valor = "Informe um valor válido (maior ou igual a zero).";
-    valido = false;
-  }
-  if (
-    !dados.value.duracao ||
-    isNaN(dados.value.duracao) ||
-    dados.value.duracao < 1
-  ) {
-    erros.value.duracao = "Informe a duração em minutos (mínimo 1).";
-    valido = false;
-  }
-  // Corrigido: aceita 0 como válido, só acusa erro se for null ou undefined
-  if (dados.value.idPorte === null || dados.value.idPorte === undefined) {
-    erros.value.idPorte = "Selecione o porte do animal.";
-    valido = false;
-  }
-  return valido;
-}
-
 function enviarFormulario() {
-  if (validarCampos()) {
+  if (formulario.validarFormulario()) {
+    dados.value.descricao = formulario.valores.descricao;
+    dados.value.duracao = Number(formulario.valores.duracao);
+    dados.value.valor = Number(formulario.valores.valor);
+    dados.value.idPorte = Number(formulario.valores.idPorte);
     emit("salvar", { ...dados.value });
   }
 }
@@ -292,7 +337,7 @@ select.campo-texto {
   transition: 0.2s ease;
 }
 
-.checkbox-container input:checked~.checkmark {
+.checkbox-container input:checked ~ .checkmark {
   background-color: #28a745;
   border-color: #28a745;
 }
@@ -310,7 +355,7 @@ select.campo-texto {
   transform: rotate(45deg);
 }
 
-.checkbox-container input:checked~.checkmark::after {
+.checkbox-container input:checked ~ .checkmark::after {
   display: block;
 }
 
@@ -375,5 +420,10 @@ select.campo-texto {
     width: 100%;
     min-width: 0;
   }
+}
+
+.input-erro {
+  border-color: #d32f2f !important;
+  background-color: #ffebee !important;
 }
 </style>

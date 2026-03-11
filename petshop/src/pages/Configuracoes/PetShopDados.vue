@@ -64,12 +64,16 @@
             <input
               type="text"
               id="nome"
-              v-model="empresa.descricaoNomeFisica"
-              required
+              v-model="formulario.valores.nome"
+              @blur="() => formulario.validarAoSair('nome')"
               autocomplete="organization"
               placeholder="Digite o nome da empresa"
               aria-label="Nome da empresa"
+              :class="{ 'input-erro': formulario.erros.value.nome }"
             />
+            <span v-if="formulario.erros.value.nome" class="texto-erro">
+              {{ formulario.erros.value.nome }}
+            </span>
           </div>
           <div class="campo">
             <label for="cnpj">CNPJ</label>
@@ -79,7 +83,6 @@
               :value="cnpjFormatado"
               disabled
               aria-disabled="true"
-              required
               aria-label="CNPJ da empresa"
             />
           </div>
@@ -91,12 +94,16 @@
             <input
               type="email"
               id="email"
-              v-model="empresa.email"
-              required
+              v-model="formulario.valores.email"
+              @blur="() => formulario.validarAoSair('email')"
               autocomplete="email"
               placeholder="exemplo@empresa.com"
               aria-label="E-mail da empresa"
+              :class="{ 'input-erro': formulario.erros.value.email }"
             />
+            <span v-if="formulario.erros.value.email" class="texto-erro">
+              {{ formulario.erros.value.email }}
+            </span>
           </div>
           <div class="campo">
             <label for="telefone">Telefone</label>
@@ -105,10 +112,14 @@
               id="telefone"
               v-model="telefoneFormatado"
               @input="onTelefoneInput"
-              required
+              @blur="() => formulario.validarAoSair('telefone')"
               placeholder="(XX) XXXXX-XXXX"
               aria-label="Telefone da empresa"
+              :class="{ 'input-erro': formulario.erros.value.telefone }"
             />
+            <span v-if="formulario.erros.value.telefone" class="texto-erro">
+              {{ formulario.erros.value.telefone }}
+            </span>
           </div>
         </div>
 
@@ -138,6 +149,12 @@ import LoadingPetMob from "@/components/LoadingPetMob.vue";
 import Toast from "@/components/ToastCustomizado.vue";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { useErro } from "@/composables/useErro";
+import { useFormulario } from "@/composables/useFormulario";
+import {
+  validarNome,
+  validarEmail,
+  validarTelefone,
+} from "@/utils/validadores";
 
 const store = useGlobalStore();
 const { capturar } = useErro();
@@ -158,6 +175,12 @@ const perfilUrl = ref(perfilPadrao);
 const capaUrl = ref(fotoCapaPadrao);
 const cnpjFormatado = ref("");
 const telefoneFormatado = ref("");
+
+const formulario = useFormulario({
+  nome: (valor) => validarNome(valor, 3),
+  email: validarEmail,
+  telefone: validarTelefone,
+});
 
 onMounted(async () => {
   await buscarDadosDaEmpresa();
@@ -202,6 +225,13 @@ async function buscarDadosDaEmpresa() {
     if (data.length > 0) {
       empresa.value = data[0];
       cnpjFormatado.value = formatarCnpj(empresa.value.cnpj);
+
+      // Preencher os valores do formulário
+      formulario.definirValores({
+        nome: empresa.value.descricaoNomeFisica,
+        email: empresa.value.email,
+        telefone: empresa.value.telefone,
+      });
     }
   } catch (e) {
     capturar(e, { acao: "buscarDadosDaEmpresa" });
@@ -302,29 +332,22 @@ function showToast(msg, type = "info") {
   toastType.value = type;
 }
 
-function validarCampos() {
-  if (
-    !empresa.value.descricaoNomeFisica ||
-    empresa.value.descricaoNomeFisica.length < 3
-  ) {
-    showToast("Nome da empresa é obrigatório.", "error");
-    return false;
-  }
-  if (!empresa.value.email || !/^\S+@\S+\.\S+$/.test(empresa.value.email)) {
-    showToast("E-mail inválido.", "error");
-    return false;
-  }
-  if (!empresa.value.telefone || empresa.value.telefone.length < 10) {
-    showToast("Telefone inválido.", "error");
-    return false;
-  }
-  return true;
-}
-
 async function salvar() {
-  if (!validarCampos()) return;
+  if (!formulario.validarFormulario()) {
+    showToast(
+      Object.values(formulario.erros.value).find((e) => e) ||
+        "Preencha todos os campos corretamente.",
+      "error",
+    );
+    return;
+  }
   carregando.value = true;
   try {
+    // Atualizar objeto empresa com os valores do formulário
+    empresa.value.descricaoNomeFisica = formulario.valores.nome;
+    empresa.value.email = formulario.valores.email;
+    empresa.value.telefone = formulario.valores.telefone;
+
     const data = await empresaService.atualizarDadosEmpresa(empresa.value);
     if (data) {
       showToast("Dados da empresa atualizados com sucesso!", "success");
@@ -497,5 +520,17 @@ async function salvar() {
     flex-direction: column;
     gap: 16px;
   }
+}
+
+.input-erro {
+  border-color: #d32f2f !important;
+  background-color: #ffebee !important;
+}
+
+.texto-erro {
+  font-size: 0.85rem;
+  color: #d32f2f;
+  margin-top: 4px;
+  text-align: left;
 }
 </style>
