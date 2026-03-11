@@ -38,6 +38,7 @@ import axios from "axios";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import router from "@/router";
 import { configurarDebugCORS } from "@/utils/corsDebug";
+import { tratarErroApi } from "@/utils/erroHandler";
 
 const apiClient = axios.create({
   baseURL: process.env.VUE_APP_API_URL,
@@ -62,13 +63,16 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // Token expirou
+    const erroNormalizado = tratarErroApi(error);
+
+    // Tratamento de autenticação expirada
+    if (erroNormalizado.statusCode === 401) {
       const store = useGlobalStore();
       store.desautenticar();
       router.push("/login");
     }
-    return Promise.reject(error);
+
+    return Promise.reject(erroNormalizado);
   },
 );
 

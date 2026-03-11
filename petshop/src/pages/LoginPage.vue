@@ -74,9 +74,11 @@ import Toast from "@/components/ToastCustomizado.vue";
 import LoadingPetMob from "@/components/LoadingPetMob.vue";
 import useCnpjFormatado from "@/composables/useCnpjFormatado";
 import { useGlobalStore } from "@/store/useGlobalStore";
+import { useErro } from "@/composables/useErro";
 
 const store = useGlobalStore();
 const { cnpj, cnpjSemFormatacao, formatarCnpj } = useCnpjFormatado();
+const { erro, capturar, mostrarNotificacao } = useErro();
 const toastMessage = ref("");
 const toastType = ref("info");
 
@@ -120,11 +122,10 @@ const realizarLogin = async () => {
     store.definirCnpjLogado(cnpjSemFormatacao.value);
     showToast("Login realizado com sucesso!", "success");
     router.push("/inicio");
-  } catch (err) {
-    showToast(
-      err.response?.data?.message || "CNPJ ou senha incorretos.",
-      "error",
-    );
+  } catch (e) {
+    capturar(e, { acao: "login", cnpj: cnpjSemFormatacao.value });
+    mostrarNotificacao(showToast);
+    showToast(erro.value?.message || "CNPJ ou senha incorretos.", "error");
   } finally {
     carregando.value = false;
   }
