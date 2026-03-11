@@ -75,8 +75,10 @@ import empresaService from "@/services/empresaService";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import LoadingPetMob from "@/components/LoadingPetMob.vue";
 import Toast from "@/components/ToastCustomizado.vue";
+import { useErro } from "@/composables/useErro";
 
 const store = useGlobalStore();
+const { capturar } = useErro();
 const empresaLogada = store.empresaLogada;
 const idEmpresaLogada = empresaLogada.idEmpresa ?? empresaLogada[0].idEmpresa;
 
@@ -142,8 +144,12 @@ async function buscarHorariosDeFuncionamentoDaEmpresa() {
         fechamento: entrada.horarioFechamento.slice(0, 5),
       };
     }
-  } catch (error) {
-    showToast("Erro ao carregar horários de funcionamento", "error");
+  } catch (e) {
+    capturar(e, { acao: "buscarHorariosDeFuncionamento" });
+    showToast(
+      e.message || "Erro ao carregar horários de funcionamento",
+      "error",
+    );
   } finally {
     carregando.value = false;
   }
@@ -200,9 +206,12 @@ async function salvarHorarios() {
   try {
     await empresaService.atualizarHorariosFuncionamentoEmpresa(configuracoes);
     showToast("Horários salvos com sucesso!", "success");
-  } catch (error) {
-    showToast("Erro ao salvar horários. Tente novamente.", "error");
-    console.error(error);
+  } catch (e) {
+    capturar(e, { acao: "salvarHorarios" });
+    showToast(
+      e.message || "Erro ao salvar horários. Tente novamente.",
+      "error",
+    );
   } finally {
     carregando.value = false;
   }

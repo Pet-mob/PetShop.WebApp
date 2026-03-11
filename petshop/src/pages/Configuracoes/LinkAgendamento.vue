@@ -40,9 +40,11 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useGlobalStore } from "@/store/useGlobalStore";
+import { useErro } from "@/composables/useErro";
 
 // Dados da empresa
 const store = useGlobalStore();
+const { erro, capturar } = useErro();
 const empresaLogada = store.empresaLogada || {};
 const idEmpresaLogada = empresaLogada.idEmpresa ?? empresaLogada[0].idEmpresa;
 
@@ -51,7 +53,6 @@ const baseUrl = "https://peton.app/redirect";
 // Computado e estados
 const linkGerado = computed(() => `${baseUrl}?empresa=${idEmpresaLogada}`);
 const copiado = ref(false);
-const erro = ref("");
 const podeCompartilhar = computed(() => !!navigator.share);
 
 // Ações
@@ -63,8 +64,10 @@ function copiarLink() {
       copiado.value = true;
       setTimeout(() => (copiado.value = false), 2000);
     })
-    .catch(() => {
-      erro.value = "Não foi possível copiar o link. Tente manualmente.";
+    .catch((e) => {
+      capturar(e, { acao: "copiarLink" });
+      erro.value =
+        e.message || "Não foi possível copiar o link. Tente manualmente.";
     });
 }
 
@@ -76,8 +79,10 @@ function compartilharLink() {
       text: "Clique no link para agendar o serviço do seu pet:",
       url: linkGerado.value,
     })
-    .catch(() => {
-      erro.value = "Não foi possível compartilhar o link neste dispositivo.";
+    .catch((e) => {
+      capturar(e, { acao: "compartilharLink" });
+      erro.value =
+        e.message || "Não foi possível compartilhar o link neste dispositivo.";
     });
 }
 </script>

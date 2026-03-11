@@ -137,8 +137,10 @@ import empresaService from "@/services/empresaService";
 import LoadingPetMob from "@/components/LoadingPetMob.vue";
 import Toast from "@/components/ToastCustomizado.vue";
 import { useGlobalStore } from "@/store/useGlobalStore";
+import { useErro } from "@/composables/useErro";
 
 const store = useGlobalStore();
+const { capturar } = useErro();
 const empresaLogada = store.empresaLogada;
 const cnpjEmpresaLogada = empresaLogada.cnpj ?? empresaLogada[0].cnpj;
 const idEmpresaLogado = empresaLogada.idEmpresa ?? empresaLogada[0].idEmpresa;
@@ -172,8 +174,9 @@ const carregarLogoEmpresa = async () => {
   try {
     const logo = await empresaService.buscarLogoEmpresa(idEmpresaLogado);
     if (logo.length > 0) perfilUrl.value = logo[0].url;
-  } catch (error) {
-    showToast("Erro ao carregar logo da empresa", "error");
+  } catch (e) {
+    capturar(e, { acao: "carregarLogoEmpresa" });
+    showToast(e.message || "Erro ao carregar logo da empresa", "error");
   } finally {
     carregando.value = false;
   }
@@ -184,8 +187,9 @@ const carregarCapaEmpresa = async () => {
   try {
     const logo = await empresaService.buscarCapaEmpresa(idEmpresaLogado);
     if (logo.length > 0) capaUrl.value = logo[0].url;
-  } catch (error) {
-    showToast("Erro ao carregar capa da empresa", "error");
+  } catch (e) {
+    capturar(e, { acao: "carregarCapaEmpresa" });
+    showToast(e.message || "Erro ao carregar capa da empresa", "error");
   } finally {
     carregando.value = false;
   }
@@ -199,8 +203,9 @@ async function buscarDadosDaEmpresa() {
       empresa.value = data[0];
       cnpjFormatado.value = formatarCnpj(empresa.value.cnpj);
     }
-  } catch (error) {
-    showToast("Erro ao carregar dados da empresa", "error");
+  } catch (e) {
+    capturar(e, { acao: "buscarDadosDaEmpresa" });
+    showToast(e.message || "Erro ao carregar dados da empresa", "error");
   } finally {
     carregando.value = false;
   }
@@ -271,8 +276,9 @@ const onFotoPerfilChange = (e) => {
       perfilUrl.value = URL.createObjectURL(file);
       empresaService.enviarLogoEmpresaPorIdEmpresa(file, idEmpresaLogado);
       showToast("Logo atualizada com sucesso!", "success");
-    } catch (error) {
-      showToast("Erro ao enviar logo da empresa", "error");
+    } catch (e) {
+      capturar(e, { acao: "enviarLogo" });
+      showToast(e.message || "Erro ao enviar logo da empresa", "error");
     }
   }
 };
@@ -284,8 +290,9 @@ const onFotoCapaChange = (e) => {
       capaUrl.value = URL.createObjectURL(file);
       empresaService.enviarCapaEmpresaPorIdEmpresa(file, idEmpresaLogado);
       showToast("Capa atualizada com sucesso!", "success");
-    } catch (error) {
-      showToast("Erro ao enviar capa da empresa", "error");
+    } catch (e) {
+      capturar(e, { acao: "enviarCapa" });
+      showToast(e.message || "Erro ao enviar capa da empresa", "error");
     }
   }
 };
@@ -322,8 +329,9 @@ async function salvar() {
     if (data) {
       showToast("Dados da empresa atualizados com sucesso!", "success");
     }
-  } catch (error) {
-    showToast("Erro ao atualizar dados da empresa", "error");
+  } catch (e) {
+    capturar(e, { acao: "salvarDadosEmpresa" });
+    showToast(e.message || "Erro ao atualizar dados da empresa", "error");
   } finally {
     carregando.value = false;
   }

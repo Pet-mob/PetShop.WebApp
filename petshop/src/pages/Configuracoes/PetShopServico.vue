@@ -175,6 +175,7 @@ import { useGlobalStore } from "@/store/useGlobalStore";
 import LoadingPetMob from "@/components/LoadingPetMob.vue";
 import Toast from "@/components/ToastCustomizado.vue";
 import ParametrosEmpresa from "@/services/parametroService";
+import { useErro } from "@/composables/useErro";
 
 // Constantes e chaves
 const MODO_KEY = "modoAgendamento";
@@ -185,6 +186,7 @@ const MODO = {
 
 // Store / contexto
 const store = useGlobalStore();
+const { capturar } = useErro();
 const parametros = store.retornoObjParametro();
 const empresaLogada = store.empresaLogada;
 const idEmpresaLogada = empresaLogada.idEmpresa ?? empresaLogada[0].idEmpresa;
@@ -294,10 +296,9 @@ async function buscarServicosDaEmpresa() {
       idEmpresaLogada,
     );
     if (data) servicos.value = data;
-  } catch (error) {
-    // Log mínimo para debugging
-    // console.error('buscarServicosDaEmpresa', error);
-    showToast("Erro ao carregar serviços", "error");
+  } catch (e) {
+    capturar(e, { acao: "buscarServicosDaEmpresa" });
+    showToast(e.message || "Erro ao carregar serviços", "error");
   } finally {
     carregando.value = false;
   }
@@ -308,10 +309,9 @@ async function buscarParametro() {
     if (!idEmpresaLogada) return;
     const data = await ParametrosEmpresa.buscarParametro(idEmpresaLogada);
     if (data) parametrosEmpresa.value = data;
-  } catch (error) {
-    // Log mínimo para debugging
-    // console.error('buscarServicosDaEmpresa', error);
-    showToast("Erro ao carregar serviços", "error");
+  } catch (e) {
+    capturar(e, { acao: "buscarParametro" });
+    showToast(e.message || "Erro ao carregar serviços", "error");
   } finally {
     carregando.value = false;
   }
@@ -343,8 +343,9 @@ async function adicionarServico(dto) {
   try {
     const data = await ServicosEmpresaService.adicionarServicoEmpresa(dto);
     if (data?.data) showToast("Serviço adicionado com sucesso!", "success");
-  } catch (error) {
-    showToast("Erro ao adicionar serviços", "error");
+  } catch (e) {
+    capturar(e, { acao: "adicionarServico" });
+    showToast(e.message || "Erro ao adicionar serviços", "error");
   } finally {
     carregando.value = false;
   }
@@ -356,8 +357,9 @@ async function atualizarServico(dto) {
   try {
     const data = await ServicosEmpresaService.atualizarServicoEmpresa(dto);
     if (data?.data) showToast("Serviço atualizado com sucesso!", "success");
-  } catch (error) {
-    showToast("Erro ao atualizar serviços", "error");
+  } catch (e) {
+    capturar(e, { acao: "atualizarServico" });
+    showToast(e.message || "Erro ao atualizar serviços", "error");
   } finally {
     carregando.value = false;
   }
@@ -380,8 +382,9 @@ async function excluirServico(dto) {
       showToast("Serviço excluído com sucesso!", "success");
       await buscarServicosDaEmpresa();
     }
-  } catch (error) {
-    showToast("Erro ao excluir serviços", "error");
+  } catch (e) {
+    capturar(e, { acao: "excluirServico" });
+    showToast(e.message || "Erro ao excluir serviços", "error");
   } finally {
     carregando.value = false;
   }
@@ -406,8 +409,9 @@ async function salvarServico(dados) {
     }
     showToast("Serviço salvo com sucesso!", "success");
     await fecharModal();
-  } catch (error) {
-    showToast("Erro ao salvar serviço", "error");
+  } catch (e) {
+    capturar(e, { acao: "salvarServico" });
+    showToast(e.message || "Erro ao salvar serviço", "error");
   } finally {
     carregando.value = false;
   }

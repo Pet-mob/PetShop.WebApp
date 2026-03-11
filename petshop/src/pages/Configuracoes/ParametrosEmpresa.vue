@@ -52,9 +52,11 @@ import { ref, onMounted } from "vue";
 import parametrosService from "@/services/parametroService";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import Toast from "@/components/ToastCustomizado.vue";
+import { useErro } from "@/composables/useErro";
 
 // Estado e store
 const store = useGlobalStore();
+const { capturar } = useErro();
 const empresaLogada = store.empresaLogada || {};
 const idEmpresaLogada = empresaLogada.idEmpresa ?? empresaLogada[0].idEmpresa;
 
@@ -77,8 +79,9 @@ async function carregarParametros() {
   try {
     const data = await parametrosService.buscarParametro(idEmpresaLogada);
     if (data) Object.assign(parametros.value, data);
-  } catch (error) {
-    showToast("Erro ao carregar parâmetros.", "error");
+  } catch (e) {
+    capturar(e, { acao: "carregarParametros" });
+    showToast(e.message || "Erro ao carregar parâmetros.", "error");
   }
 }
 
@@ -93,8 +96,9 @@ async function salvar() {
       return;
     }
     showToast("Parâmetros salvos com sucesso!", "success");
-  } catch (error) {
-    showToast("Erro ao salvar parâmetros.", "error");
+  } catch (e) {
+    capturar(e, { acao: "salvarParametros" });
+    showToast(e.message || "Erro ao salvar parâmetros.", "error");
   }
 }
 
